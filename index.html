@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modeling the impact of neurovascular coupling impairments on BOLD-based functional connectivity at rest</title>
+    <meta name="description"
+        content="Simulation study investigating how impaired neurovascular coupling affects resting-state BOLD functional connectivity, using an adjusted balloon model with independent CBF, CMRO2 and CBV dynamics.">
+    <meta property="og:title"
+        content="Modeling the impact of neurovascular coupling impairments on BOLD-based functional connectivity at rest">
+    <meta property="og:description"
+        content="A NeuroImage (2020) simulation study by Archila-Meléndez, Sorg & Preibisch on how neurovascular coupling shapes resting-state BOLD functional connectivity.">
+    <meta property="og:image" content="files/images/teaser.png">
+    <meta property="og:type" content="article">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="files/images/teaser.png">
+    <link rel="icon" type="image/png" href="files/images/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        /* ===== Reset & Base ===== */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 72px;
+        }
+
+        body {
+            background: #ffffff;
+            color: #1e293b;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== Layout ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        section {
+            padding: 72px 0;
+        }
+
+        section + section {
+            border-top: 1px solid #f1f5f9;
+        }
+
+        /* ===== Navigation ===== */
+        .nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .nav.scrolled {
+            box-shadow: 0 1px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .nav-inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .nav-inner::-webkit-scrollbar {
+            display: none;
+        }
+
+        .nav-link {
+            padding: 7px 18px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #334155;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: #0f172a;
+            background: #f1f5f9;
+        }
+
+        .nav-link.active {
+            color: #0f172a;
+            background: #f1f5f9;
+            font-weight: 600;
+        }
+
+        /* ===== Hero ===== */
+        .hero {
+            text-align: center;
+            padding: 64px 24px 48px;
+        }
+
+        .hero-logo {
+            width: 92px;
+            height: auto;
+            margin-bottom: 24px;
+        }
+
+        .hero-title {
+            font-size: clamp(1.6rem, 3.6vw, 2.55rem);
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            line-height: 1.15;
+            color: #0f172a;
+            margin: 0 auto 20px;
+            max-width: 980px;
+        }
+
+        .hero-venue {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #d97706;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .hero-authors {
+            font-size: 1.05rem;
+            color: #334155;
+            line-height: 1.8;
+            margin: 0 auto 8px;
+            max-width: 860px;
+        }
+
+        .hero-authors strong {
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .hero-affiliations {
+            font-size: 0.88rem;
+            color: #64748b;
+            margin-bottom: 28px;
+            line-height: 1.6;
+            max-width: 820px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        .hero-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 22px;
+            border-radius: 999px;
+            background: #0f172a;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            border: 2px solid #0f172a;
+        }
+
+        .hero-btn:hover {
+            background: #1e293b;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+        }
+
+        .hero-btn.secondary {
+            background: #fff;
+            color: #0f172a;
+        }
+
+        .hero-btn.secondary:hover {
+            background: #f1f5f9;
+        }
+
+        /* ===== Section Headings ===== */
+        .section-title {
+            font-size: clamp(1.5rem, 3vw, 2rem);
+            font-weight: 800;
+            color: #0f172a;
+            text-align: center;
+            margin-bottom: 12px;
+            letter-spacing: -0.03em;
+        }
+
+        .section-desc {
+            text-align: center;
+            color: #334155;
+            font-size: 1rem;
+            max-width: 840px;
+            margin: 0 auto 48px;
+        }
+
+        .subsection-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #334155;
+            text-align: center;
+            margin: 48px 0 24px;
+        }
+
+        /* ===== TL;DR Cards ===== */
+        .tldr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 48px;
+        }
+
+        .tldr-card {
+            padding: 24px;
+            border-radius: 16px;
+            background: #f8fafc;
+            border: 2px solid #c2cedd;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 18px;
+        }
+
+        .tldr-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        }
+
+        .tldr-icon {
+            font-size: 1.8rem;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+        .tldr-text {
+            font-size: 0.92rem;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        /* ===== Teaser ===== */
+        .teaser-img {
+            width: 100%;
+            max-width: 1000px;
+            display: block;
+            margin: 0 auto;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        /* ===== Abstract ===== */
+        .abstract-card {
+            padding: 36px;
+            border-radius: 16px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .abstract-card p {
+            font-size: 0.98rem;
+            line-height: 1.9;
+            color: #334155;
+        }
+
+        .abstract-card p + p {
+            margin-top: 14px;
+        }
+
+        /* ===== Scenario Cards ===== */
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 22px;
+        }
+
+        .scenario-card {
+            display: flex;
+            flex-direction: column;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            overflow: hidden;
+            transition: box-shadow 0.25s ease, transform 0.25s ease;
+        }
+
+        .scenario-card:hover {
+            box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .scenario-card img {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            background: #f1f5f9;
+            display: block;
+        }
+
+        .scenario-body {
+            padding: 20px 22px 24px;
+        }
+
+        .scenario-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #d97706;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            padding: 3px 10px;
+            border-radius: 999px;
+            margin-bottom: 10px;
+        }
+
+        .scenario-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 8px;
+            line-height: 1.35;
+        }
+
+        .scenario-desc {
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.65;
+        }
+
+        /* ===== Key Findings List ===== */
+        .findings-list {
+            max-width: 960px;
+            margin: 40px auto 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+        }
+
+        .finding-card {
+            padding: 22px 24px;
+            border-radius: 14px;
+            background: #f8fafc;
+            border-left: 4px solid #d97706;
+        }
+
+        .finding-card h4 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .finding-card p {
+            font-size: 0.88rem;
+            color: #475569;
+            line-height: 1.65;
+        }
+
+        /* ===== Methods ===== */
+        .methods-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+
+        .method-card {
+            padding: 26px;
+            border-radius: 14px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+        }
+
+        .method-step {
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            color: #64748b;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .method-card h4 {
+            font-size: 1.02rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 10px;
+        }
+
+        .method-card p {
+            font-size: 0.88rem;
+            color: #475569;
+            line-height: 1.65;
+        }
+
+        /* ===== BibTeX ===== */
+        .bibtex-card {
+            position: relative;
+            padding: 24px;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            max-width: 860px;
+            margin: 0 auto;
+        }
+
+        .bibtex-card pre {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.82rem;
+            color: #334155;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            word-break: normal;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: #e2e8f0;
+            border: none;
+            border-radius: 8px;
+            padding: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-btn:hover {
+            background: #cbd5e1;
+        }
+
+        .copy-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: #64748b;
+        }
+
+        .copy-btn.copied {
+            background: #10b981;
+        }
+
+        .copy-btn.copied svg {
+            stroke: #fff;
+        }
+
+        /* ===== Authors ===== */
+        .authors-section {
+            padding: 60px 0;
+            background: #f8fafc;
+        }
+
+        .author-group {
+            max-width: 1000px;
+            margin: 0 auto 28px;
+            text-align: center;
+        }
+
+        .author-role {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #64748b;
+            background: #e2e8f0;
+            padding: 4px 14px;
+            border-radius: 999px;
+            margin-bottom: 16px;
+        }
+
+        .author-role.lead {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #fff;
+        }
+
+        .author-names {
+            font-size: 0.98rem;
+            color: #334155;
+            line-height: 2;
+        }
+
+        .author-names strong {
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .author-affiliation {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 8px;
+            line-height: 1.7;
+            font-style: italic;
+        }
+
+        /* ===== Footer ===== */
+        .footer {
+            text-align: center;
+            padding: 32px 24px;
+            font-size: 0.82rem;
+            color: #94a3b8;
+            border-top: 1px solid #f1f5f9;
+            background: #fff;
+        }
+
+        .footer a {
+            color: #475569;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            color: #0f172a;
+            text-decoration: underline;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .hero {
+                padding: 40px 20px 32px;
+            }
+
+            section {
+                padding: 52px 0;
+            }
+
+            .abstract-card {
+                padding: 26px 22px;
+            }
+
+            .nav-inner {
+                justify-content: flex-start;
+                padding: 12px 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tldr-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== Animations ===== */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ===== HERO ===== -->
+    <header class="hero" id="top">
+        <div class="container">
+            <img src="files/images/logo.png" alt="Project logo" class="hero-logo">
+            <div class="hero-venue">NeuroImage · Vol. 218 · September 2020</div>
+            <h1 class="hero-title">
+                Modeling the impact of neurovascular coupling impairments on BOLD-based functional connectivity at rest
+            </h1>
+            <p class="hero-authors">
+                <strong>Mario E. Archila-Meléndez</strong><sup>1,2,*</sup> &nbsp;·&nbsp;
+                <strong>Christian Sorg</strong><sup>1,2,3</sup> &nbsp;·&nbsp;
+                <strong>Christine Preibisch</strong><sup>1,2,4</sup>
+            </p>
+            <p class="hero-affiliations">
+                <sup>1</sup>Department of Neuroradiology, Klinikum rechts der Isar, Technical University of Munich, Munich, Germany &nbsp;·&nbsp;
+                <sup>2</sup>TUM-Neuroimaging Center, Technical University of Munich, Munich, Germany &nbsp;·&nbsp;
+                <sup>3</sup>Department of Psychiatry, Klinikum rechts der Isar, Technical University of Munich, Munich, Germany &nbsp;·&nbsp;
+                <sup>4</sup>Clinic for Neurology, Klinikum rechts der Isar, Technical University of Munich, Munich, Germany
+            </p>
+            <div class="hero-actions">
+                <a href="https://doi.org/10.1016/j.neuroimage.2020.116871" class="hero-btn" target="_blank" rel="noopener">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="16" y1="13" x2="8" y2="13" />
+                        <line x1="16" y1="17" x2="8" y2="17" />
+                    </svg>
+                    Read the paper
+                </a>
+                <a href="https://www.sciencedirect.com/science/article/pii/S1053811920303578" class="hero-btn secondary"
+                    target="_blank" rel="noopener">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+                    </svg>
+                    ScienceDirect
+                </a>
+                <a href="#bibtex" class="hero-btn secondary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+                    </svg>
+                    Cite (BibTeX)
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- ===== NAVIGATION ===== -->
+    <nav class="nav" id="main-nav">
+        <div class="nav-inner container">
+            <a href="#overview" class="nav-link active">Overview</a>
+            <a href="#abstract" class="nav-link">Abstract</a>
+            <a href="#methods" class="nav-link">Methods</a>
+            <a href="#scenarios" class="nav-link">Scenarios</a>
+            <a href="#findings" class="nav-link">Key Findings</a>
+            <a href="#authors" class="nav-link">Authors</a>
+            <a href="#bibtex" class="nav-link">Cite</a>
+        </div>
+    </nav>
+
+    <!-- ===== OVERVIEW ===== -->
+    <section id="overview">
+        <div class="container">
+            <h2 class="section-title">Overview</h2>
+            <div class="tldr-grid fade-in">
+                <div class="tldr-card">
+                    <div class="tldr-icon">??</div>
+                    <div class="tldr-text">
+                        Impaired neurovascular coupling can profoundly reshape resting-state BOLD functional connectivity — even flipping its sign.
+                    </div>
+                </div>
+                <div class="tldr-card">
+                    <div class="tldr-icon">??</div>
+                    <div class="tldr-text">
+                        An adjusted balloon model simulates BOLD signals with independent CBF, CMRO<sub>2</sub> and CBV dynamics at 0.05&nbsp;Hz.
+                    </div>
+                </div>
+                <div class="tldr-card">
+                    <div class="tldr-icon">??</div>
+                    <div class="tldr-text">
+                        Amplitude effects are linear, delay effects are non-linear, and CBF–CBV coupling has almost no effect on BOLD-FC.
+                    </div>
+                </div>
+            </div>
+
+            <img src="files/images/teaser.png"
+                alt="Schematic overview: from neuronal activity through the balloon model to the simulated BOLD signal and resting-state functional connectivity."
+                class="teaser-img fade-in">
+        </div>
+    </section>
+
+    <!-- ===== ABSTRACT ===== -->
+    <section id="abstract">
+        <div class="container">
+            <h2 class="section-title">Abstract</h2>
+            <div class="abstract-card fade-in">
+                <p>
+                    Functional magnetic resonance imaging (fMRI) of blood oxygenation level dependent (BOLD) signals
+                    during the resting-state is widely used to study functional connectivity (FC) of slowly
+                    fluctuating ongoing brain activity (BOLD-FC) in humans with and without brain diseases. While
+                    physiological impairments — e.g. aberrant perfusion or vascular reactivity — are common in
+                    neurological and psychiatric disorders, their impact on BOLD-FC is widely unknown and ignored.
+                    The aim of our simulation study was therefore to investigate the influence of impaired
+                    neurovascular coupling on resting-state BOLD-FC.
+                </p>
+                <p>
+                    Simulated BOLD signals comprising intra- and extravascular contributions were derived from an
+                    adjusted balloon model, which allows for independent definitions of cerebral blood flow (CBF) and
+                    cerebral metabolic rate of oxygen (CMRO<sub>2</sub>) responses, elicited by a synthetic oscillatory
+                    input signal with low-frequency (0.05&nbsp;Hz) amplitude modulations. BOLD-FC was then defined by
+                    correlations between physiological reference BOLD time curves (seeds of seed-based BOLD-FC) and
+                    test BOLD time curves (targets of BOLD-FC) featuring altered physiological variables
+                    (CMRO<sub>2</sub>, CBF, cerebral blood volume (CBV)). Impact of impaired neurovascular coupling on
+                    BOLD-FC was investigated for three different scenarios with independent changes in (1) CBF and
+                    CMRO<sub>2</sub> amplitudes, (2) CBF and CMRO<sub>2</sub> delays, and (3) coupling between CBF and
+                    CBV.
+                </p>
+                <p>
+                    For scenario&nbsp;1, we found linear influences of CMRO<sub>2</sub> and CBF amplitudes on BOLD-FC:
+                    for a given CMRO<sub>2</sub> amplitude, BOLD-FC changes from negative to positive FC with
+                    increasing CBF amplitude, and increasing CMRO<sub>2</sub> amplitude simply shifts this dependence
+                    linearly. For scenario&nbsp;2, CMRO<sub>2</sub> and CBF delays had a complex non-linear effect on
+                    BOLD-FC: for small CMRO<sub>2</sub> delays, BOLD-FC changes from positive to negative BOLD-FC with
+                    increasing CBF delays, but for large CMRO<sub>2</sub> delays positive BOLD-FC simply diminishes with
+                    increasing CBF delay. For scenario&nbsp;3, changes in CBF–CBV coupling have almost no effect on
+                    BOLD-FC. None of these changes were critically influenced by signal-to-noise ratio or temporal
+                    resolution.
+                </p>
+                <p>
+                    Our results demonstrate the importance of alterations in neurovascular coupling for aberrant
+                    resting-state BOLD-FC. Based on our data, we suggest to complement BOLD-FC studies — at least of
+                    at-risk patient populations — with perfusion and oxygenation sensitive MRI. In cases where this is
+                    not available, we recommend careful interpretation of BOLD-FC results considering previous findings
+                    about hemodynamic–metabolic changes. Accurate modeling of the hemodynamic–metabolic context might
+                    in the future improve both our understanding of the crucial interplay between vascular,
+                    hemodynamic and neuronal components of intrinsic BOLD-FC and the evaluation of aberrant BOLD-FC in
+                    brain diseases with vascular–hemodynamic impairments.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== METHODS ===== -->
+    <section id="methods">
+        <div class="container">
+            <h2 class="section-title">Methods at a glance</h2>
+            <p class="section-desc">
+                A four-step simulation pipeline built around an adjusted balloon model, designed to decouple
+                neurovascular and metabolic contributions to the resting-state BOLD signal.
+            </p>
+            <div class="methods-grid fade-in">
+                <div class="method-card">
+                    <div class="method-step">Step 1</div>
+                    <h4>Synthetic oscillatory input</h4>
+                    <p>
+                        A low-frequency (0.05&nbsp;Hz) oscillatory neural drive is used to mimic slow, spontaneous
+                        resting-state fluctuations that dominate BOLD-FC analyses.
+                    </p>
+                </div>
+                <div class="method-card">
+                    <div class="method-step">Step 2</div>
+                    <h4>Adjusted balloon model</h4>
+                    <p>
+                        Cerebral blood flow (CBF), cerebral metabolic rate of oxygen (CMRO<sub>2</sub>) and cerebral
+                        blood volume (CBV) can be varied independently, generating BOLD signals that include both
+                        intra- and extravascular contributions.
+                    </p>
+                </div>
+                <div class="method-card">
+                    <div class="method-step">Step 3</div>
+                    <h4>Seed-based BOLD-FC</h4>
+                    <p>
+                        A physiological reference BOLD time course acts as seed; target BOLD time courses are generated
+                        with altered CBF, CMRO<sub>2</sub> or CBV properties, and connectivity is quantified by
+                        correlation.
+                    </p>
+                </div>
+                <div class="method-card">
+                    <div class="method-step">Step 4</div>
+                    <h4>Robustness checks</h4>
+                    <p>
+                        All scenarios are re-evaluated across a broad range of signal-to-noise ratios and temporal
+                        resolutions to verify that the observed effects are not artifacts of the acquisition regime.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SCENARIOS ===== -->
+    <section id="scenarios">
+        <div class="container">
+            <h2 class="section-title">Three simulation scenarios</h2>
+            <p class="section-desc">
+                Each scenario perturbs a different aspect of neurovascular coupling and quantifies its effect on
+                resting-state BOLD-based functional connectivity.
+            </p>
+            <div class="scenario-grid fade-in">
+                <article class="scenario-card">
+                    <img src="files/images/scenario1.png"
+                        alt="Illustration of scenario 1: linear effects of CBF and CMRO2 amplitude changes on BOLD-FC.">
+                    <div class="scenario-body">
+                        <span class="scenario-tag">Scenario 1 · Amplitudes</span>
+                        <div class="scenario-title">Linear effects of CBF &amp; CMRO<sub>2</sub> amplitudes</div>
+                        <p class="scenario-desc">
+                            For a fixed CMRO<sub>2</sub> amplitude, BOLD-FC transitions smoothly from negative to positive as CBF
+                            amplitude grows. Changing CMRO<sub>2</sub> amplitude shifts this dependence in a strictly linear
+                            fashion.
+                        </p>
+                    </div>
+                </article>
+                <article class="scenario-card">
+                    <img src="files/images/scenario2.png"
+                        alt="Illustration of scenario 2: non-linear effects of CBF and CMRO2 delays on BOLD-FC.">
+                    <div class="scenario-body">
+                        <span class="scenario-tag">Scenario 2 · Delays</span>
+                        <div class="scenario-title">Non-linear effects of CBF &amp; CMRO<sub>2</sub> delays</div>
+                        <p class="scenario-desc">
+                            For small CMRO<sub>2</sub> delays, BOLD-FC flips from positive to negative as CBF delay increases.
+                            For large CMRO<sub>2</sub> delays, positive BOLD-FC is instead simply attenuated — a strongly
+                            non-linear regime.
+                        </p>
+                    </div>
+                </article>
+                <article class="scenario-card">
+                    <img src="files/images/scenario3.png"
+                        alt="Illustration of scenario 3: CBF–CBV coupling has almost no effect on BOLD-FC.">
+                    <div class="scenario-body">
+                        <span class="scenario-tag">Scenario 3 · CBF–CBV coupling</span>
+                        <div class="scenario-title">Near-invariance to CBF–CBV coupling</div>
+                        <p class="scenario-desc">
+                            Varying the coupling between cerebral blood flow and cerebral blood volume produces only
+                            marginal changes in BOLD-FC, making CBF–CBV coupling a comparatively weak lever on
+                            connectivity estimates.
+                        </p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== KEY FINDINGS ===== -->
+    <section id="findings">
+        <div class="container">
+            <h2 class="section-title">Key findings</h2>
+            <p class="section-desc">
+                Why impaired neurovascular coupling matters for the interpretation of resting-state fMRI — especially in
+                clinical populations.
+            </p>
+            <div class="findings-list fade-in">
+                <div class="finding-card">
+                    <h4>Sign of BOLD-FC can flip</h4>
+                    <p>
+                        Plausible alterations in CBF or CMRO<sub>2</sub> can drive correlations from positive to
+                        negative values, without any change in underlying neural coupling.
+                    </p>
+                </div>
+                <div class="finding-card">
+                    <h4>Amplitudes: simple, linear</h4>
+                    <p>
+                        Amplitude-driven changes act as a linear offset and scale on BOLD-FC — a relatively tractable
+                        source of bias that can be reasoned about analytically.
+                    </p>
+                </div>
+                <div class="finding-card">
+                    <h4>Delays: strongly non-linear</h4>
+                    <p>
+                        Phase shifts between CBF and CMRO<sub>2</sub> produce complex, regime-dependent changes,
+                        including sign reversals that are hard to anticipate from neural activity alone.
+                    </p>
+                </div>
+                <div class="finding-card">
+                    <h4>CBV coupling is negligible</h4>
+                    <p>
+                        Across physiologically realistic ranges, altered CBF–CBV coupling does not meaningfully change
+                        BOLD-FC, simplifying the interpretation of hemodynamic perturbations.
+                    </p>
+                </div>
+                <div class="finding-card">
+                    <h4>Robust to SNR &amp; TR</h4>
+                    <p>
+                        Results hold across a wide range of signal-to-noise ratios and temporal resolutions, so the
+                        effects cannot be dismissed as acquisition artifacts.
+                    </p>
+                </div>
+                <div class="finding-card">
+                    <h4>Clinical implication</h4>
+                    <p>
+                        In at-risk populations (e.g. cerebrovascular or psychiatric disorders), BOLD-FC should be
+                        complemented with perfusion- and oxygenation-sensitive MRI, or interpreted with explicit
+                        hemodynamic context.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== AUTHORS ===== -->
+    <section id="authors" class="authors-section">
+        <div class="container">
+            <h2 class="section-title">Authors</h2>
+            <br>
+            <div class="author-group">
+                <div class="author-role lead">Corresponding author</div>
+                <div class="author-names">
+                    <strong>Mario E. Archila-Meléndez</strong>
+                </div>
+                <div class="author-affiliation">
+                    Department of Neuroradiology, Klinikum rechts der Isar &nbsp;·&nbsp; TUM-Neuroimaging Center,
+                    Technical University of Munich, Munich, Germany
+                </div>
+            </div>
+
+            <div class="author-group">
+                <div class="author-role">Co-authors</div>
+                <div class="author-names">
+                    <strong>Christian Sorg</strong> &nbsp;·&nbsp;
+                    <strong>Christine Preibisch</strong>
+                </div>
+                <div class="author-affiliation">
+                    Department of Neuroradiology · Department of Psychiatry · Clinic for Neurology · TUM-Neuroimaging
+                    Center, Klinikum rechts der Isar, Technical University of Munich, Munich, Germany
+                </div>
+            </div>
+
+            <div class="author-group">
+                <div class="author-role">Funding</div>
+                <div class="author-names" style="font-size: 0.9rem;">
+                    Deutsche Forschungsgemeinschaft (DFG) — grants <strong>PR&nbsp;1039/6-1</strong> and
+                    <strong>SO&nbsp;1336/4-1</strong>.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== BIBTEX ===== -->
+    <section id="bibtex">
+        <div class="container">
+            <h2 class="section-title">Cite this work</h2>
+            <p class="section-desc">
+                If this simulation framework is useful in your research, please cite the NeuroImage article.
+            </p>
+            <div class="bibtex-card">
+                <button class="copy-btn" id="copy-bibtex" aria-label="Copy BibTeX">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                    </svg>
+                </button>
+                <pre id="bibtex-text">@article{ArchilaMelendez2020neurovascular,
+  title   = {Modeling the impact of neurovascular coupling impairments on {BOLD}-based functional connectivity at rest},
+  author  = {Archila-Mel{\'e}ndez, Mario E. and Sorg, Christian and Preibisch, Christine},
+  journal = {NeuroImage},
+  volume  = {218},
+  pages   = {116871},
+  year    = {2020},
+  month   = sep,
+  doi     = {10.1016/j.neuroimage.2020.116871},
+  issn    = {1053-8119},
+  publisher = {Elsevier}
+}</pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container">
+            <p>
+                © 2020 The Authors. Published by Elsevier Inc. under the
+                <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/" target="_blank" rel="noopener">CC BY-NC-ND 4.0</a>
+                license.
+            </p>
+            <p style="margin-top: 6px;">
+                DOI:
+                <a href="https://doi.org/10.1016/j.neuroimage.2020.116871" target="_blank" rel="noopener">
+                    10.1016/j.neuroimage.2020.116871
+                </a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            const nav = document.getElementById('main-nav');
+            window.addEventListener('scroll', () => {
+                nav.classList.toggle('scrolled', window.scrollY > 10);
+            });
+
+            const sections = document.querySelectorAll('section[id]');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            function updateActiveNav() {
+                const scrollY = window.scrollY + 120;
+                let currentId = null;
+                sections.forEach(section => {
+                    const top = section.offsetTop - 80;
+                    const bottom = top + section.offsetHeight;
+                    if (scrollY >= top && scrollY < bottom) {
+                        currentId = section.getAttribute('id');
+                    }
+                });
+                navLinks.forEach(link => {
+                    link.classList.toggle('active', link.getAttribute('href') === '#' + currentId);
+                });
+            }
+            window.addEventListener('scroll', updateActiveNav, { passive: true });
+            updateActiveNav();
+
+            const copyBtn = document.getElementById('copy-bibtex');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', () => {
+                    const bibtexText = document.getElementById('bibtex-text').textContent;
+                    navigator.clipboard.writeText(bibtexText).then(() => {
+                        copyBtn.classList.add('copied');
+                        setTimeout(() => copyBtn.classList.remove('copied'), 2000);
+                    });
+                });
+            }
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+        });
+    </script>
+
+</body>
+
+</html>
