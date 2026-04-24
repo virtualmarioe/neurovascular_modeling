@@ -1336,12 +1336,7 @@
                         <div class="slider-hint">Adds zero-mean Gaussian noise on top of each BOLD trace (SNR stress-test).</div>
                     </div>
 
-                    <div class="sim-check">
-                        <label class="sim-check-label">
-                            <input type="checkbox" id="simLineExplore" />
-                            <span>Explore line slope: drag the round <strong>handle on the right edge</strong> of the scatter (grey = least-squares fit for the cloud).</span>
-                        </label>
-                    </div>
+                    <div class="slider-hint" style="margin-top:0.5rem">Drag the <strong>least-squares (dashed) line</strong> in the scatter to nudge the two sliders; the line always reflects the re-simulated OLS. Works the same in all three scenario families.</div>
 
                     <div class="presets">
                         <button type="button" data-sim-preset="healthy">Healthy region</button>
@@ -2015,7 +2010,6 @@
             scenarioVal: document.getElementById('simScenarioVal'),
             scenarioHint: document.getElementById('simScenarioHint'),
             fc: document.getElementById('simFc'),
-            lineExplore: document.getElementById('simLineExplore'),
             seedAmp: document.getElementById('simSeedAmp'),
             tgtAmp: document.getElementById('simTgtAmp')
         };
@@ -2067,6 +2061,60 @@
             }
         };
 
+        // OLS on scatter pair (%, %) — also used to drive fit-to-slope re-simulation
+        function olsOnArrays(fa, fb) {
+            const n = fa.length;
+            if (n < 2) return { ma: 0, mb: 0, slope: 0, intercept: 0 };
+            let ma = 0, mb = 0;
+            for (let i = 0; i < n; i++) { ma += fa[i]; mb += fb[i]; }
+            ma /= n; mb /= n;
+            let sxy = 0, sxx = 0;
+            for (let i = 0; i < n; i++) { sxy += (fa[i] - ma) * (fb[i] - mb); sxx += (fa[i] - ma) * (fa[i] - ma); }
+            const slope = sxx > 1e-12 ? sxy / sxx : 0;
+            const intercept = mb - slope * ma;
+            return { ma, mb, slope, intercept };
+        }
+
+        function olsSlopeFromRaw(ra, rb) {
+            const d = scenarioDefs[scenario];
+            const aP = ra * d.aScale;
+            const bP = rb * d.bScale;
+            const noise = +els.noise.value / 100;
+            const seed = makeHemo({ cbfAmp: 0.20, cmrAmp: 0.05, cbfPhase: 0, cmrPhase: 0, grubb: 0.38, noise, seed: 11 });
+            const tParams = Object.assign({ noise, seed: 29 }, d.toParams(aP, bP));
+            const tgt = makeHemo(tParams);
+            const fullSeed = Array.from(seed.bold).map(v => v * 100);
+            const fullTgt = Array.from(tgt.bold).map(v => v * 100);
+            return olsOnArrays(fullSeed, fullTgt).slope;
+        }
+
+        function fitSlidersToOlsSlope(sTgt) {
+            const d = scenarioDefs[scenario];
+            const sTarget = Math.max(-8, Math.min(8, sTgt));
+            let ra = Math.round(Math.max(d.aMin, Math.min(d.aMax, +els.A.value || 0)));
+            let rb = Math.round(Math.max(d.bMin, Math.min(d.bMax, +els.B.value || 0)));
+            const errS = s => Math.abs(s - sTarget);
+            let bestE = errS(olsSlopeFromRaw(ra, rb));
+            const n1 = [ [1, 0], [-1, 0], [0, 1], [0, -1] ];
+            const n2 = [ [2, 0], [-2, 0], [0, 2], [0, -2] ];
+            function climb(neigh, maxIt) {
+                for (let it = 0; it < maxIt; it++) {
+                    let improved = false;
+                    for (const [da, db] of neigh) {
+                        const ta = ra + da, tb = rb + db;
+                        if (ta < d.aMin || ta > d.aMax || tb < d.bMin || tb > d.bMax) continue;
+                        const e = errS(olsSlopeFromRaw(ta, tb));
+                        if (e < bestE - 1e-7) { bestE = e; ra = ta; rb = tb; improved = true; }
+                    }
+                    if (!improved) break;
+                }
+            }
+            climb(n1, 14);
+            if (bestE > 0.07) climb(n2, 8);
+            els.A.value = ra;
+            els.B.value = rb;
+        }
+
         // Seed vs. target scatter: hover tooltip + click/drag time scrubber (shares axes with drawScatter)
         const SCATTER_PAD = { L: 40, R: 12, T: 12, B: 28 };
         const scatterTip = document.getElementById('scatterHoverTooltip');
@@ -2074,20 +2122,22 @@
         let scatterPinIdx = Math.floor((NSAMP - 1) / 2);
         let scatterHoverIdx = -1;
         let scatterDrag = false;
-        let scatterLineRimY = null;
-        let scatterLineDrag = false;
+        let olsLineDrag = false;
+        let olsLineDragRaf = 0;
+        let olsLinePendingS = 0;
+        let olsDragS0 = 0, olsDragMa0 = 0, olsDragY0 = 0;
 
         function paintScatter() {
             if (!scatterBuf.a) return;
             const n = scatterBuf.a.length;
             scatterPinIdx = Math.max(0, Math.min(n - 1, scatterPinIdx));
             if (scatterHoverIdx >= n) scatterHoverIdx = -1;
-            drawScatter(scSvg, scatterBuf.a, scatterBuf.b, scatterBuf.r, { pin: scatterPinIdx, hover: scatterHoverIdx, lineExplore: els.lineExplore && els.lineExplore.checked, lineRimY: scatterLineRimY });
+            drawScatter(scSvg, scatterBuf.a, scatterBuf.b, scatterBuf.r, { pin: scatterPinIdx, hover: scatterHoverIdx });
         }
 
         function scatterEventToIndex(evt) {
             const a = scatterBuf.a, b = scatterBuf.b;
-            if (!a || !b) return { inPlot: false, j: 0 };
+            if (!a || !b) return { inPlot: false, j: 0, dist2: Infinity };
             const rect = scSvg.getBoundingClientRect();
             const vb = scSvg.viewBox.baseVal;
             const cx = (evt.clientX - rect.left) * (vb.width / rect.width);
@@ -2096,7 +2146,7 @@
             const padL = SCATTER_PAD.L, padR = SCATTER_PAD.R, padT = SCATTER_PAD.T, padB = SCATTER_PAD.B;
             const plotW = W - padL - padR, plotH = H - padT - padB;
             if (cx < padL - 2 || cx > padL + plotW + 2 || cy < padT - 2 || cy > padT + plotH + 2) {
-                return { inPlot: false, j: 0 };
+                return { inPlot: false, j: 0, dist2: Infinity };
             }
             const xMin = -2.5, xMax = 2.5, yMin = -2.5, yMax = 2.5;
             let best = 0, bestD = Infinity;
@@ -2107,23 +2157,49 @@
                 const d = (cx - px) * (cx - px) + (cy - py) * (cy - py);
                 if (d < bestD) { bestD = d; best = i; }
             }
-            return { inPlot: true, j: best };
+            return { inPlot: true, j: best, dist2: bestD };
         }
 
+        function pointerToScatterSvg(evt) {
+            const rect = scSvg.getBoundingClientRect();
+            const vb = scSvg.viewBox.baseVal;
+            return {
+                cx: (evt.clientX - rect.left) * (vb.width / rect.width),
+                cy: (evt.clientY - rect.top) * (vb.height / rect.height)
+            };
+        }
 
-        function scatterOlsRim() {
+        function dist2PointSeg(px, py, x1, y1, x2, y2) {
+            const vx = x2 - x1, vy = y2 - y1;
+            const wx = px - x1, wy = py - y1;
+            const c1 = vx * wx + vy * wy;
+            if (c1 <= 0) return (px - x1) * (px - x1) + (py - y1) * (py - y1);
+            const c2 = vx * vx + vy * vy;
+            if (c2 <= c1) return (px - x2) * (px - x2) + (py - y2) * (py - y2);
+            const t = c1 / c2;
+            const qx = x1 + t * vx, qy = y1 + t * vy;
+            return (px - qx) * (px - qx) + (py - qy) * (py - qy);
+        }
+
+        function olsLineDistSqToPointer(evt) {
             const a = scatterBuf.a, b = scatterBuf.b;
-            if (!a || !b) return { ma: 0, mb: 0, yOlsRim: 0 };
-            const n = a.length, xRim = 2.5;
-            let ma = 0, mb = 0;
-            for (let i = 0; i < n; i++) { ma += a[i]; mb += b[i]; }
-            ma /= n; mb /= n;
-            let sxy = 0, sxx = 0;
-            for (let i = 0; i < n; i++) { sxy += (a[i] - ma) * (b[i] - mb); sxx += (a[i] - ma) * (a[i] - ma); }
-            const slope = sxx > 1e-12 ? sxy / sxx : 0;
-            const intercept = mb - slope * ma;
-            return { ma, mb, yOlsRim: slope * xRim + intercept };
+            if (!a || !b) return Infinity;
+            const o = olsOnArrays(a, b);
+            const { slope, intercept } = o;
+            const xMin = -2.5, xMax = 2.5, yMin = -2.5, yMax = 2.5;
+            const padL = 40, padR = 12, padT = 12, padB = 28;
+            const W = scSvg.viewBox.baseVal.width, H = scSvg.viewBox.baseVal.height;
+            const plotW = W - padL - padR, plotH = H - padT - padB;
+            const y1 = slope * xMin + intercept;
+            const y2 = slope * xMax + intercept;
+            const X1 = padL + plotW * (xMin - xMin) / (xMax - xMin);
+            const X2 = padL + plotW * (xMax - xMin) / (xMax - xMin);
+            const Y1 = padT + plotH * (yMax - y1) / (yMax - yMin);
+            const Y2 = padT + plotH * (yMax - y2) / (yMax - yMin);
+            const p = pointerToScatterSvg(evt);
+            return dist2PointSeg(p.cx, p.cy, X1, Y1, X2, Y2);
         }
+
         function cyToRimY(cy) {
             const H = scSvg.viewBox.baseVal.height;
             const padT = SCATTER_PAD.T, padB = SCATTER_PAD.B;
@@ -2131,24 +2207,6 @@
             const yMin = -2.5, yMax = 2.5;
             const b = yMax - (cy - padT) / plotH * (yMax - yMin);
             return Math.max(yMin, Math.min(yMax, b));
-        }
-        function nearScatterLineHandle(evt) {
-            if (!els.lineExplore || !els.lineExplore.checked) return false;
-            if (!scatterBuf.a) return false;
-            const { yOlsRim } = scatterOlsRim();
-            const yRim = scatterLineRimY != null ? scatterLineRimY : yOlsRim;
-            const rect = scSvg.getBoundingClientRect();
-            const vb = scSvg.viewBox.baseVal;
-            const cx = (evt.clientX - rect.left) * (vb.width / rect.width);
-            const cy = (evt.clientY - rect.top) * (vb.height / rect.height);
-            const W = vb.width, H = vb.height;
-            const padL = SCATTER_PAD.L, padR = SCATTER_PAD.R, padT = SCATTER_PAD.T, padB = SCATTER_PAD.B;
-            const plotW = W - padL - padR, plotH = H - padT - padB;
-            const xMin = -2.5, yMin = -2.5, yMax = 2.5, xMax = 2.5;
-            const hx = padL + plotW * (xMax - xMin) / (xMax - xMin);
-            const hy = padT + plotH * (yMax - yRim) / (yMax - yMin);
-            const d = (cx - hx) * (cx - hx) + (cy - hy) * (cy - hy);
-            return d < 20 * 20;
         }
 
         function scatterTipHtml(j) {
@@ -2204,18 +2262,22 @@
         scSvg.style.cursor = 'crosshair';
         scSvg.style.touchAction = 'none';
         scSvg.addEventListener('pointerdown', (e) => {
-            if (nearScatterLineHandle(e)) {
-                scatterLineDrag = true;
-                const rect = scSvg.getBoundingClientRect();
-                const vb = scSvg.viewBox.baseVal;
-                const cy = (e.clientY - rect.top) * (vb.height / rect.height);
-                scatterLineRimY = cyToRimY(cy);
+            if (!scatterBuf.a) return;
+            const dLine = olsLineDistSqToPointer(e);
+            const h = scatterEventToIndex(e);
+            const wantOls = h.inPlot && dLine < 6.5 * 6.5 && dLine < h.dist2;
+            if (wantOls) {
+                olsLineDrag = true;
+                scSvg.style.cursor = 'grabbing';
+                const o = olsOnArrays(scatterBuf.a, scatterBuf.b);
+                olsDragS0 = o.slope;
+                olsDragMa0 = o.ma;
+                olsDragY0 = cyToRimY(pointerToScatterSvg(e).cy);
+                olsLinePendingS = olsDragS0;
                 try { scSvg.setPointerCapture(e.pointerId); } catch (_) {}
-                paintScatter();
                 e.preventDefault();
                 return;
             }
-            const h = scatterEventToIndex(e);
             if (!h.inPlot) return;
             scatterDrag = true;
             scatterPinIdx = h.j;
@@ -2224,23 +2286,59 @@
             e.preventDefault();
         });
         scSvg.addEventListener('pointermove', (e) => {
-            if (scatterLineDrag) {
-                const rect = scSvg.getBoundingClientRect();
-                const vb = scSvg.viewBox.baseVal;
-                const cy = (e.clientY - rect.top) * (vb.height / rect.height);
-                scatterLineRimY = cyToRimY(cy);
-                paintScatter();
+            if (olsLineDrag) {
+                const yRim = cyToRimY(pointerToScatterSvg(e).cy);
+                const run = 2.5 - olsDragMa0;
+                olsLinePendingS = Math.abs(run) > 0.12
+                    ? olsDragS0 + (yRim - olsDragY0) / run
+                    : olsDragS0 + (yRim - olsDragY0) * 0.4;
+                if (olsLineDragRaf) return;
+                olsLineDragRaf = requestAnimationFrame(() => {
+                    olsLineDragRaf = 0;
+                    if (!olsLineDrag) return;
+                    fitSlidersToOlsSlope(olsLinePendingS);
+                    render();
+                });
                 e.preventDefault();
                 return;
             }
             updateScatterTip(e);
         });
         scSvg.addEventListener('pointerup', (e) => {
-            if (scatterLineDrag) { scatterLineDrag = false; try { scSvg.releasePointerCapture(e.pointerId); } catch (_) {} return; }
+            if (olsLineDrag) {
+                olsLineDrag = false;
+                scSvg.style.cursor = 'crosshair';
+                if (olsLineDragRaf) { cancelAnimationFrame(olsLineDragRaf); olsLineDragRaf = 0; }
+                const yRim = cyToRimY(pointerToScatterSvg(e).cy);
+                const run = 2.5 - olsDragMa0;
+                olsLinePendingS = Math.abs(run) > 0.12
+                    ? olsDragS0 + (yRim - olsDragY0) / run
+                    : olsDragS0 + (yRim - olsDragY0) * 0.4;
+                fitSlidersToOlsSlope(olsLinePendingS);
+                render();
+                try { scSvg.releasePointerCapture(e.pointerId); } catch (_) {}
+                return;
+            }
             scatterDrag = false; try { scSvg.releasePointerCapture(e.pointerId); } catch (_) {} updateScatterTip(e);
         });
-        scSvg.addEventListener('pointercancel', (e) => { scatterLineDrag = false; scatterDrag = false; try { scSvg.releasePointerCapture(e.pointerId); } catch (_) {} });
-        scSvg.addEventListener('pointerleave', () => { scatterLineDrag = false; scatterDrag = false; scatterHoverIdx = -1; if (scatterTip) scatterTip.classList.remove('visible'); paintScatter(); });
+        scSvg.addEventListener('pointercancel', (e) => {
+            if (olsLineDrag) {
+                olsLineDrag = false;
+                scSvg.style.cursor = 'crosshair';
+                if (olsLineDragRaf) { cancelAnimationFrame(olsLineDragRaf); olsLineDragRaf = 0; }
+            }
+            scatterDrag = false;
+            try { scSvg.releasePointerCapture(e.pointerId); } catch (_) {}
+        });
+        scSvg.addEventListener('pointerleave', () => {
+            olsLineDrag = false;
+            scSvg.style.cursor = 'crosshair';
+            if (olsLineDragRaf) { cancelAnimationFrame(olsLineDragRaf); olsLineDragRaf = 0; }
+            scatterDrag = false;
+            scatterHoverIdx = -1;
+            if (scatterTip) scatterTip.classList.remove('visible');
+            paintScatter();
+        });
 
         function configureSliders() {
             const d = scenarioDefs[scenario];
@@ -2255,7 +2353,6 @@
         }
 
         function render() {
-            scatterLineRimY = null;
             const d = scenarioDefs[scenario];
             const rawA = +els.A.value;
             const rawB = +els.B.value;
@@ -2303,7 +2400,7 @@
             scatterBuf.b = fullTgt;
             scatterBuf.r = r;
             scatterHoverIdx = -1;
-            drawScatter(scSvg, fullSeed, fullTgt, r, { pin: scatterPinIdx, hover: scatterHoverIdx, lineExplore: els.lineExplore && els.lineExplore.checked, lineRimY: scatterLineRimY });
+            drawScatter(scSvg, fullSeed, fullTgt, r, { pin: scatterPinIdx, hover: scatterHoverIdx });
 
             // KPIs
             const sign = r >= 0 ? '+' : '\u2212';
@@ -2356,7 +2453,7 @@
                 svgEl.appendChild(svg('circle', { cx: x, cy: y, r: 2.2, fill: r >= 0 ? '#d97706' : '#2563eb', opacity: 0.55 }));
             }
 
-            // OLS + optional "explore" line (pivot: cloud centroid; handle at x = 2.5%)
+            // OLS line (picking: distance to this segment, see olsLineDistSqToPointer)
             let ma = 0, mb = 0;
             for (let i = 0; i < n; i++) { ma += a[i]; mb += b[i]; }
             ma /= n; mb /= n;
@@ -2371,24 +2468,7 @@
             const X2 = padL + plotW * (x2 - xMin) / (xMax - xMin);
             const Y1ols = padT + plotH * (yMax - y1ols) / (yMax - yMin);
             const Y2ols = padT + plotH * (yMax - y2ols) / (yMax - yMin);
-            const le = opts.lineExplore;
-            let yRim = (le && opts.lineRimY != null) ? opts.lineRimY : y2ols;
-            yRim = Math.max(yMin, Math.min(yMax, yRim));
-            const denom = x2 - ma;
-            const slopeE = (le && Math.abs(denom) > 1e-6) ? (yRim - mb) / denom : slope;
-            const intE = mb - slopeE * ma;
-            const y1e = slopeE * x1 + intE, y2e = slopeE * x2 + intE;
-            const Y1e = padT + plotH * (yMax - y1e) / (yMax - yMin);
-            const Y2e = padT + plotH * (yMax - y2e) / (yMax - yMin);
-            if (le) {
-                svgEl.appendChild(svg('line', { x1: X1, x2: X2, y1: Y1ols, y2: Y2ols, stroke: '#94a3b8', 'stroke-width': 1.5, 'stroke-dasharray': '3 2', opacity: 0.75, 'pointer-events': 'none' }));
-                svgEl.appendChild(svg('line', { x1: X1, x2: X2, y1: Y1e, y2: Y2e, stroke: '#6d28d9', 'stroke-width': 2.5, 'stroke-linecap': 'round', opacity: 0.95, 'pointer-events': 'none' }));
-                const hy = padT + plotH * (yMax - yRim) / (yMax - yMin);
-                svgEl.appendChild(svg('circle', { cx: X2, cy: hy, r: 8, fill: '#faf5ff', stroke: '#6d28d9', 'stroke-width': 2, 'pointer-events': 'none' }));
-                svgEl.appendChild(svg('circle', { cx: X2, cy: hy, r: 3, fill: '#6d28d9', 'pointer-events': 'none' }));
-            } else {
-                svgEl.appendChild(svg('line', { x1: X1, x2: X2, y1: Y1ols, y2: Y2ols, stroke: '#0f172a', 'stroke-width': 2, 'stroke-dasharray': '4 3', opacity: 0.8, 'pointer-events': 'none' }));
-            }
+            svgEl.appendChild(svg('line', { x1: X1, x2: X2, y1: Y1ols, y2: Y2ols, stroke: '#0f172a', 'stroke-width': 2, 'stroke-dasharray': '4 3', opacity: 0.8, 'pointer-events': 'none' }));
 
             // r annotation
             const rTxt = svg('text', { x: padL + plotW - 6, y: padT + 14, 'text-anchor': 'end', 'font-size': '11px', fill: r >= 0 ? '#d97706' : '#2563eb', 'font-weight': 800, 'font-family': 'Inter' });
@@ -2487,7 +2567,6 @@
             });
         });
 
-        if (els.lineExplore) els.lineExplore.addEventListener('change', () => { scatterLineRimY = null; render(); });
         configureSliders();
         render();
     })();
