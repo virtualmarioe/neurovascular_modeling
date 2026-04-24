@@ -34,7 +34,7 @@ realisations of drive and measurement noise, and the grid is refined to
 ## Site sections
 
 - **Overview**: TL;DR and pipeline teaser.
-- **Background: why the plumbing matters**: primer on BOLD, CBF, CMRO<sub>2</sub>,
+- **Background: why the vasculature matters**: primer on BOLD, CBF, CMRO<sub>2</sub>,
   CBV and neurovascular coupling.
 - **Abstract**: the published abstract verbatim.
 - **Methods at a glance**: four-step simulation pipeline.
@@ -45,8 +45,7 @@ realisations of drive and measurement noise, and the grid is refined to
 - **Key findings**: six take-aways from the paper.
 - **Clinical implications**: what the results mean for rs-fMRI practice.
 - **Glossary**: quick reference for all acronyms and concepts.
-- **Authors**: corresponding author, co-authors and funding.
-- **Cite this work**: one-click BibTeX citation.
+- **Authors & contributions**: per-author CRediT-style contribution statements, plus a nested BibTeX card with one-click copy.
 
 ## Structure
 
