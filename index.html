@@ -207,38 +207,85 @@
         }
         .takeaway strong { color: #92400e; }
 
-        /* ===== Disclaimer section ===== */
-        .disclaimer-section { padding: 60px 0; background: #ffffff; }
-        .disclaimer-body {
-            max-width: 860px; margin: 0 auto;
-            text-align: center;
+        /* ===== Educational-use disclaimer (gateway to interactive demos) ===== */
+        #disclaimer { padding: 30px 0 10px; background: #ffffff; }
+        .edu-disclaimer {
+            max-width: 900px; margin: 0 auto;
+            padding: 18px 24px;
+            display: flex; gap: 16px; align-items: flex-start;
+            background: linear-gradient(135deg, #fff7ed, #fffbeb);
+            border: 1px solid #fde68a;
+            border-left: 4px solid #d97706;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(217, 119, 6, 0.06);
+            color: #422006;
+            line-height: 1.6;
+            font-size: 0.9rem;
         }
-        .disclaimer-intro {
-            font-size: 0.98rem; color: #334155;
-            line-height: 1.75; margin: 0 auto 18px;
-            text-align: left;
+        .edu-disclaimer-icon {
+            flex: 0 0 auto;
+            width: 32px; height: 32px; border-radius: 50%;
+            background: #d97706; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.95rem;
+            font-family: Georgia, 'Times New Roman', serif;
+            box-shadow: 0 2px 6px rgba(217, 119, 6, 0.3);
+            margin-top: 2px;
         }
-        .disclaimer-intro strong { color: #0f172a; font-weight: 600; }
-        .disclaimer-intro em { color: #475569; }
-        .resource-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 14px; margin: 28px auto 0;
-            max-width: 960px;
+        .edu-disclaimer-body { flex: 1 1 auto; }
+        .edu-disclaimer-title {
+            font-size: 0.72rem; font-weight: 700;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            color: #92400e; margin-bottom: 6px;
         }
-        .resource-link {
-            display: flex; align-items: flex-start; gap: 12px;
-            padding: 16px 18px; border-radius: 10px;
-            background: #f8fafc; border: 1px solid #e2e8f0;
-            text-decoration: none; color: #334155;
-            text-align: left;
-            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+        .edu-disclaimer p { margin: 0 0 8px 0; color: #44403c; }
+        .edu-disclaimer p:last-child { margin-bottom: 0; }
+        .edu-disclaimer strong { color: #1f2937; font-weight: 600; }
+        .edu-disclaimer em { color: #57534e; }
+        .edu-disclaimer a {
+            color: #b45309;
+            text-decoration: underline;
+            text-decoration-thickness: 1px;
+            text-underline-offset: 2px;
+            font-weight: 500;
+            transition: color 0.15s ease;
         }
-        .resource-link:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06); border-color: #cbd5e1; }
-        .resource-link svg { flex-shrink: 0; width: 20px; height: 20px; stroke: #64748b; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; margin-top: 2px; }
-        .resource-link .r-title { font-weight: 600; font-size: 0.92rem; color: #0f172a; margin-bottom: 4px; display: block; }
-        .resource-link .r-desc  { font-size: 0.82rem; color: #475569; line-height: 1.55; }
-        .resource-link .r-host  { font-size: 0.74rem; color: #94a3b8; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin-top: 6px; display: block; word-break: break-all; }
+        .edu-disclaimer a:hover { color: #78350f; }
+        @media (max-width: 640px) {
+            .edu-disclaimer {
+                flex-direction: column;
+                padding: 16px 18px; gap: 10px;
+            }
+            .edu-disclaimer-icon { margin-bottom: 0; }
+        }
+
+        /* ===== Heatmap hover tooltip (BOLD-FC landscape) ===== */
+        .heatmap-plot-wrap { position: relative; }
+        .heat-tooltip {
+            position: absolute; pointer-events: none;
+            top: 0; left: 0;
+            background: rgba(15, 23, 42, 0.7);
+            color: #f8fafc;
+            font-size: 0.78rem;
+            padding: 7px 10px; border-radius: 8px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+            white-space: nowrap;
+            line-height: 1.35;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            opacity: 0;
+            transition: opacity 0.12s ease;
+            z-index: 5;
+            font-variant-numeric: tabular-nums;
+        }
+        .heat-tooltip.visible { opacity: 1; }
+        .heat-tooltip .ht-row {
+            display: flex; justify-content: space-between;
+            gap: 14px;
+        }
+        .heat-tooltip .ht-key { color: #cbd5e1; font-weight: 500; }
+        .heat-tooltip .ht-val { color: #f8fafc; font-weight: 700; }
+        .heat-tooltip .ht-row-accent .ht-val { color: #fbbf24; }
 
         /* ===== Interactive demo (shared layout) ===== */
         .demo {
@@ -901,71 +948,38 @@
             </div>
         </div>
     </section>
-    <!-- ===== DISCLAIMER & RESOURCES ===== -->
-    <section id="disclaimer" class="disclaimer-section">
+    <!-- ===== DISCLAIMER (gateway to the interactive deep-dive demos) ===== -->
+    <section id="disclaimer">
         <div class="container">
-            <h2 class="section-title">Educational disclaimer &amp; resources</h2>
-            <p class="section-desc">
-                This page is a didactic companion to the paper, not a reimplementation of it.
-            </p>
-            <div class="disclaimer-body fade-in">
-                <p class="disclaimer-intro">
-                    <strong>For educational use only.</strong> All explainers, sliders, heatmaps and the
-                    three in-browser simulators on this page are <em>toy examples</em> built to make the
-                    paper's qualitative story tangible in the browser. They rely on a linearised
-                    Davis-style BOLD model and a small set of synthetic inputs, and deliberately sacrifice
-                    numerical fidelity for interactivity. They are <strong>not</strong> a reproduction of
-                    the paper's quantitative analyses and should <strong>not</strong> be used for any
-                    scientific reanalysis, clinical inference, or benchmarking.
-                </p>
-                <p class="disclaimer-intro" style="margin-bottom: 0;">
-                    The full, peer-reviewed methodology (the adjusted Buxton&ndash;Obata balloon model, the
-                    rs-fMRI-specific simulation parameters, statistical evaluation, and robustness checks
-                    across SNR and TR) is described in the NeuroImage&nbsp;2020 paper. The corresponding
-                    <strong>data and Matlab simulation code are open access</strong> and published
-                    alongside the paper. Use those resources for any serious scientific work.
-                </p>
-                <div class="resource-grid">
-                    <a class="resource-link" href="https://doi.org/10.1016/j.neuroimage.2020.116871"
-                        target="_blank" rel="noopener">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                        </svg>
-                        <span>
-                            <span class="r-title">Peer-reviewed article</span>
-                            <span class="r-desc">Full methods, simulations, statistics and clinical discussion (NeuroImage, 2020).</span>
-                            <span class="r-host">doi.org/10.1016/j.neuroimage.2020.116871</span>
-                        </span>
-                    </a>
-                    <a class="resource-link" href="https://zenodo.org/record/3773316"
-                        target="_blank" rel="noopener">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                        <span>
-                            <span class="r-title">Data &amp; code archive (Zenodo)</span>
-                            <span class="r-desc">Supplementary data and the custom Matlab code used by the paper, citable and long-term archived.</span>
-                            <span class="r-host">zenodo.org/record/3773316</span>
-                        </span>
-                    </a>
-                    <a class="resource-link" href="https://gitlab.lrz.de/nmrm_lab/public_projects/bold-simulation"
-                        target="_blank" rel="noopener">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-                        </svg>
-                        <span>
-                            <span class="r-title">Matlab simulation source (GitLab LRZ)</span>
-                            <span class="r-desc">The original BOLD simulation repository maintained by the authors at TU Munich.</span>
-                            <span class="r-host">gitlab.lrz.de/nmrm_lab/public_projects/bold-simulation</span>
-                        </span>
-                    </a>
+            <aside class="edu-disclaimer fade-in" role="note" aria-labelledby="eduDisclaimerTitle">
+                <div class="edu-disclaimer-icon" aria-hidden="true">i</div>
+                <div class="edu-disclaimer-body">
+                    <div class="edu-disclaimer-title" id="eduDisclaimerTitle">
+                        A note about the demos below
+                    </div>
+                    <p>
+                        The three live demos below, namely the <strong>Balloon Model Explorer</strong>,
+                        the <strong>BOLD-FC Simulator</strong> and the <strong>Scenario Heatmap</strong>,
+                        are <strong>simplified pedagogical tools</strong> designed to build intuition for
+                        the concepts in the paper. The toy models, synthetic drives and in-browser
+                        re-computations are <em>not</em> the peer-reviewed simulations reported in the
+                        article and should <strong>not</strong> be used for scientific reanalysis,
+                        clinical inference or benchmarking.
+                    </p>
+                    <p>
+                        The full methodology (the adjusted Buxton&ndash;Obata balloon model, rs-fMRI
+                        simulation parameters, statistical evaluation and robustness checks across SNR
+                        and TR) is documented in the original publication:
+                        <a href="https://doi.org/10.1016/j.neuroimage.2020.116871"
+                           target="_blank" rel="noopener">Archila-Meléndez et&nbsp;al. (2020),
+                        <em>NeuroImage</em></a>. All data and Matlab simulation code are open access at
+                        the <a href="https://zenodo.org/record/3773316" target="_blank"
+                           rel="noopener">Zenodo archive</a> and the authors’
+                        <a href="https://gitlab.lrz.de/nmrm_lab/public_projects/bold-simulation"
+                           target="_blank" rel="noopener">GitLab repository</a>.
+                    </p>
                 </div>
-            </div>
+            </aside>
         </div>
     </section>
     <!-- ===== BACKGROUND ===== -->
@@ -1305,11 +1319,15 @@
                             <h4>BOLD-FC landscape</h4>
                             <p class="demo-hint">
                                 Blue&nbsp;&rarr;&nbsp;negative r, grey&nbsp;&rarr;&nbsp;near-zero r,
-                                orange&nbsp;&rarr;&nbsp;positive r. <strong>Click or drag</strong> on the
-                                landscape to move the cross-hair; the sliders follow.
+                                orange&nbsp;&rarr;&nbsp;positive r. <strong>Hover</strong> to read any cell,
+                                <strong>click or drag</strong> to move the cross-hair; the sliders and
+                                the pinned readout at the cross follow.
                             </p>
                         </div>
-                        <svg class="demo-svg" id="heatMap" viewBox="0 0 520 380" role="img" aria-label="BOLD-FC over two parameters"></svg>
+                        <div class="heatmap-plot-wrap">
+                            <svg class="demo-svg" id="heatMap" viewBox="0 0 520 380" role="img" aria-label="BOLD-FC over two parameters"></svg>
+                            <div class="heat-tooltip" id="heatHoverTooltip" aria-hidden="true"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -2485,6 +2503,55 @@
             mapSvg.appendChild(svg('circle', { cx: chX, cy: chY, r: 7, fill: '#fff', stroke: '#0f172a', 'stroke-width': 2, 'pointer-events': 'none' }));
             mapSvg.appendChild(svg('circle', { cx: chX, cy: chY, r: 2.5, fill: '#0f172a', 'pointer-events': 'none' }));
 
+            // Permanent readout pinned at the cross-hair.  Shows the currently
+            // selected x, y and r so the selection stays self-describing even
+            // when the cursor leaves the plot.
+            (function drawCrossLabel() {
+                const xShortPlain = sc.xShort.replace(/<[^>]+>/g, '');
+                const yShortPlain = sc.yShort.replace(/<[^>]+>/g, '');
+                const labelStr = xShortPlain + ' ' + sc.xFmt(xVal) +
+                                 '  \u00B7  ' + yShortPlain + ' ' + sc.yFmt(yVal) +
+                                 '  \u00B7  r ' + sign + Math.abs(rHere).toFixed(2);
+                const labelFS = 10;
+                const labelPadX = 7, labelPadY = 4;
+                const txt = svg('text', {
+                    'font-size': labelFS + 'px',
+                    'font-family': 'Inter',
+                    'font-weight': 600,
+                    fill: '#f8fafc',
+                    'pointer-events': 'none',
+                    'dominant-baseline': 'middle'
+                });
+                txt.textContent = labelStr;
+                mapSvg.appendChild(txt);
+                // Measure once in the DOM so positioning is font-accurate.
+                const bb = txt.getBBox();
+                const tw = bb.width + labelPadX * 2;
+                const th = bb.height + labelPadY * 2;
+
+                // Prefer right-of-cross; flip to left if it would clip.
+                const gap = 12;
+                let lx = chX + gap;
+                if (lx + tw > padL + plotW - 2) lx = chX - gap - tw;
+                if (lx < padL + 2) lx = padL + 2;
+                // Vertically centered on the cross, clamped to plot area.
+                let ly = chY - th / 2;
+                if (ly < padT + 2) ly = padT + 2;
+                if (ly + th > padT + plotH - 2) ly = padT + plotH - 2 - th;
+
+                const rect = svg('rect', {
+                    x: lx, y: ly, width: tw, height: th,
+                    rx: 5, ry: 5,
+                    fill: '#0f172a', 'fill-opacity': 0.9,
+                    stroke: '#fbbf24', 'stroke-width': 1,
+                    'pointer-events': 'none'
+                });
+                // Insert rect behind text.
+                mapSvg.insertBefore(rect, txt);
+                txt.setAttribute('x', lx + labelPadX);
+                txt.setAttribute('y', ly + th / 2);
+            })();
+
             // Axis ticks/labels
             for (let i = 0; i <= 4; i++) {
                 const f = i / 4;
@@ -2638,6 +2705,55 @@
         mapSvg.addEventListener('pointerup', endHeatDrag);
         mapSvg.addEventListener('pointercancel', endHeatDrag);
         mapSvg.addEventListener('pointerleave', endHeatDrag);
+
+        // --- Hover tooltip: semi-transparent overlay showing the hovered cell ---
+        // Fires on every pointer motion inside the plot; separate from the drag
+        // listener above so the tooltip works both when idly hovering and when
+        // actively dragging the cross-hair.
+        const heatTip = document.getElementById('heatHoverTooltip');
+        function formatHeatTip(xFrac, yFrac) {
+            const sc = scenarios[scenario];
+            const xVal = sc.xLow + (sc.xHigh - sc.xLow) * xFrac;
+            const yVal = sc.yLow + (sc.yHigh - sc.yLow) * yFrac;
+            const grid = computeGrid(scenario);
+            const ii = Math.min(GRID_N - 1, Math.max(0, Math.round(xFrac * (GRID_N - 1))));
+            const jj = Math.min(GRID_N - 1, Math.max(0, Math.round(yFrac * (GRID_N - 1))));
+            const r = grid[jj * GRID_N + ii];
+            const sgn = r >= 0 ? '+' : '\u2212';
+            return '<span class="ht-row"><span class="ht-key">' + sc.xShort + '</span>' +
+                   '<span class="ht-val">' + sc.xFmt(xVal) + '</span></span>' +
+                   '<span class="ht-row"><span class="ht-key">' + sc.yShort + '</span>' +
+                   '<span class="ht-val">' + sc.yFmt(yVal) + '</span></span>' +
+                   '<span class="ht-row ht-row-accent"><span class="ht-key">BOLD-FC</span>' +
+                   '<span class="ht-val">r = ' + sgn + Math.abs(r).toFixed(2) + '</span></span>';
+        }
+        function updateHeatTip(e) {
+            if (!heatTip) return;
+            const { xFrac, yFrac, inPlot } = heatPointerToFrac(e);
+            if (!inPlot) { heatTip.classList.remove('visible'); return; }
+            heatTip.innerHTML = formatHeatTip(xFrac, yFrac);
+            const wrap = heatTip.parentElement;
+            const wrect = wrap.getBoundingClientRect();
+            // Tooltip offset from cursor; flip sides near the right/bottom edges.
+            const tw = heatTip.offsetWidth;
+            const th = heatTip.offsetHeight;
+            const cx = e.clientX - wrect.left;
+            const cy = e.clientY - wrect.top;
+            let x = cx + 14;
+            let y = cy + 14;
+            if (x + tw > wrect.width  - 4) x = cx - tw - 14;
+            if (y + th > wrect.height - 4) y = cy - th - 14;
+            if (x < 4) x = 4;
+            if (y < 4) y = 4;
+            heatTip.style.left = x + 'px';
+            heatTip.style.top  = y + 'px';
+            heatTip.classList.add('visible');
+        }
+        mapSvg.addEventListener('pointermove', updateHeatTip);
+        mapSvg.addEventListener('pointerenter', updateHeatTip);
+        mapSvg.addEventListener('pointerleave', () => {
+            if (heatTip) heatTip.classList.remove('visible');
+        });
 
         render();
     })();
