@@ -60,6 +60,12 @@
         }
         .nav-link:hover { color: #0f172a; background: #f1f5f9; }
         .nav-link.active { color: #0f172a; background: #f1f5f9; font-weight: 600; }
+        .nav-home {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding-left: 10px; padding-right: 12px;
+        }
+        .nav-home svg { stroke: currentColor; }
+        .nav-home:hover { color: #d97706; background: #fff7ed; }
 
         /* ===== Hero ===== */
         .hero {
@@ -388,6 +394,16 @@
         }
         .impl-card h4 { font-size: 1rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; padding-left: 12px; }
         .impl-card p { font-size: 0.9rem; color: #475569; line-height: 1.7; padding-left: 12px; }
+        /* On desktop, lock to three columns so the orphan 4th card can be
+           centred instead of left-aligned below the first column. */
+        @media (min-width: 900px) {
+            .implications-grid { grid-template-columns: repeat(3, 1fr); }
+            .implications-grid .impl-card:nth-child(4):last-child {
+                grid-column: 2 / span 1;
+                justify-self: center;
+                width: 100%;
+            }
+        }
 
         /* ===== Glossary ===== */
         .glossary-grid {
@@ -489,6 +505,14 @@
             font-size: 0.85rem; color: #64748b;
             line-height: 1.7; margin: 0;
         }
+        .acknowledgements .ack-logo-link {
+            display: inline-block; margin-top: 18px;
+            opacity: 0.85; transition: opacity 0.2s ease;
+        }
+        .acknowledgements .ack-logo-link:hover { opacity: 1; }
+        .acknowledgements .ack-logo {
+            height: 44px; width: auto; display: block;
+        }
         .bibtex-nested {
             max-width: 1000px; margin: 48px auto 0;
             text-align: center;
@@ -559,10 +583,6 @@
                     <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                     Try the simulator
                 </a>
-                <a href="https://www.sciencedirect.com/science/article/pii/S1053811920303578" class="hero-btn secondary" target="_blank" rel="noopener">
-                    <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                    ScienceDirect
-                </a>
                 <a href="#bibtex" class="hero-btn secondary">
                     <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
                     Cite (BibTeX)
@@ -574,6 +594,13 @@
     <!-- ===== NAVIGATION ===== -->
     <nav class="nav" id="main-nav">
         <div class="nav-inner container">
+            <a href="#top" class="nav-link nav-home" aria-label="Back to top">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 12l9-9 9 9"/>
+                    <path d="M5 10v10h5v-6h4v6h5V10"/>
+                </svg>
+                <span>Home</span>
+            </a>
             <a href="#overview" class="nav-link active">Overview</a>
             <a href="#abstract" class="nav-link">Abstract</a>
             <a href="#methods" class="nav-link">Methods</a>
@@ -874,13 +901,80 @@
             </div>
         </div>
     </section>
+    <!-- ===== DISCLAIMER & RESOURCES ===== -->
+    <section id="disclaimer" class="disclaimer-section">
+        <div class="container">
+            <h2 class="section-title">Educational disclaimer &amp; resources</h2>
+            <p class="section-desc">
+                This page is a didactic companion to the paper, not a reimplementation of it.
+            </p>
+            <div class="disclaimer-body fade-in">
+                <p class="disclaimer-intro">
+                    <strong>For educational use only.</strong> All explainers, sliders, heatmaps and the
+                    three in-browser simulators on this page are <em>toy examples</em> built to make the
+                    paper's qualitative story tangible in the browser. They rely on a linearised
+                    Davis-style BOLD model and a small set of synthetic inputs, and deliberately sacrifice
+                    numerical fidelity for interactivity. They are <strong>not</strong> a reproduction of
+                    the paper's quantitative analyses and should <strong>not</strong> be used for any
+                    scientific reanalysis, clinical inference, or benchmarking.
+                </p>
+                <p class="disclaimer-intro" style="margin-bottom: 0;">
+                    The full, peer-reviewed methodology (the adjusted Buxton&ndash;Obata balloon model, the
+                    rs-fMRI-specific simulation parameters, statistical evaluation, and robustness checks
+                    across SNR and TR) is described in the NeuroImage&nbsp;2020 paper. The corresponding
+                    <strong>data and Matlab simulation code are open access</strong> and published
+                    alongside the paper. Use those resources for any serious scientific work.
+                </p>
+                <div class="resource-grid">
+                    <a class="resource-link" href="https://doi.org/10.1016/j.neuroimage.2020.116871"
+                        target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                        <span>
+                            <span class="r-title">Peer-reviewed article</span>
+                            <span class="r-desc">Full methods, simulations, statistics and clinical discussion (NeuroImage, 2020).</span>
+                            <span class="r-host">doi.org/10.1016/j.neuroimage.2020.116871</span>
+                        </span>
+                    </a>
+                    <a class="resource-link" href="https://zenodo.org/record/3773316"
+                        target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>
+                            <span class="r-title">Data &amp; code archive (Zenodo)</span>
+                            <span class="r-desc">Supplementary data and the custom Matlab code used by the paper, citable and long-term archived.</span>
+                            <span class="r-host">zenodo.org/record/3773316</span>
+                        </span>
+                    </a>
+                    <a class="resource-link" href="https://gitlab.lrz.de/nmrm_lab/public_projects/bold-simulation"
+                        target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                        </svg>
+                        <span>
+                            <span class="r-title">Matlab simulation source (GitLab LRZ)</span>
+                            <span class="r-desc">The original BOLD simulation repository maintained by the authors at TU Munich.</span>
+                            <span class="r-host">gitlab.lrz.de/nmrm_lab/public_projects/bold-simulation</span>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
     <!-- ===== BACKGROUND ===== -->
     <section id="background">
         <div class="container">
             <div class="section-eyebrow">Deep dive</div>
             <h2 class="section-title">Background: why the vasculature matters</h2>
             <p class="section-desc">
-                The sections above summarise <em>what</em> the paper finds. The next four sections unpack
+                The paper arc above summarises <em>what</em> the study finds. The next four sections unpack
                 <em>why</em> those findings make physiological sense and let you reproduce the effects
                 yourself in the browser.
             </p>
@@ -1211,7 +1305,8 @@
                             <h4>BOLD-FC landscape</h4>
                             <p class="demo-hint">
                                 Blue&nbsp;&rarr;&nbsp;negative r, grey&nbsp;&rarr;&nbsp;near-zero r,
-                                orange&nbsp;&rarr;&nbsp;positive r. Cross-hair marks the currently selected cell.
+                                orange&nbsp;&rarr;&nbsp;positive r. <strong>Click or drag</strong> on the
+                                landscape to move the cross-hair; the sliders follow.
                             </p>
                         </div>
                         <svg class="demo-svg" id="heatMap" viewBox="0 0 520 380" role="img" aria-label="BOLD-FC over two parameters"></svg>
@@ -1387,73 +1482,6 @@
             </div>
         </div>
     </section>
-    <!-- ===== DISCLAIMER & RESOURCES ===== -->
-    <section id="disclaimer" class="disclaimer-section">
-        <div class="container">
-            <h2 class="section-title">Educational disclaimer &amp; resources</h2>
-            <p class="section-desc">
-                This page is a didactic companion to the paper, not a reimplementation of it.
-            </p>
-            <div class="disclaimer-body fade-in">
-                <p class="disclaimer-intro">
-                    <strong>For educational use only.</strong> All explainers, sliders, heatmaps and the
-                    three in-browser simulators on this page are <em>toy examples</em> built to make the
-                    paper's qualitative story tangible in the browser. They rely on a linearised
-                    Davis-style BOLD model and a small set of synthetic inputs, and deliberately sacrifice
-                    numerical fidelity for interactivity. They are <strong>not</strong> a reproduction of
-                    the paper's quantitative analyses and should <strong>not</strong> be used for any
-                    scientific reanalysis, clinical inference, or benchmarking.
-                </p>
-                <p class="disclaimer-intro" style="margin-bottom: 0;">
-                    The full, peer-reviewed methodology (the adjusted Buxton&ndash;Obata balloon model, the
-                    rs-fMRI-specific simulation parameters, statistical evaluation, and robustness checks
-                    across SNR and TR) is described in the NeuroImage&nbsp;2020 paper. The corresponding
-                    <strong>data and Matlab simulation code are open access</strong> and published
-                    alongside the paper. Use those resources for any serious scientific work.
-                </p>
-                <div class="resource-grid">
-                    <a class="resource-link" href="https://doi.org/10.1016/j.neuroimage.2020.116871"
-                        target="_blank" rel="noopener">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                        </svg>
-                        <span>
-                            <span class="r-title">Peer-reviewed article</span>
-                            <span class="r-desc">Full methods, simulations, statistics and clinical discussion (NeuroImage, 2020).</span>
-                            <span class="r-host">doi.org/10.1016/j.neuroimage.2020.116871</span>
-                        </span>
-                    </a>
-                    <a class="resource-link" href="https://zenodo.org/record/3773316"
-                        target="_blank" rel="noopener">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                        <span>
-                            <span class="r-title">Data &amp; code archive (Zenodo)</span>
-                            <span class="r-desc">Supplementary data and the custom Matlab code used by the paper, citable and long-term archived.</span>
-                            <span class="r-host">zenodo.org/record/3773316</span>
-                        </span>
-                    </a>
-                    <a class="resource-link" href="https://gitlab.lrz.de/nmrm_lab/public_projects/bold-simulation"
-                        target="_blank" rel="noopener">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
-                        </svg>
-                        <span>
-                            <span class="r-title">Matlab simulation source (GitLab LRZ)</span>
-                            <span class="r-desc">The original BOLD simulation repository maintained by the authors at TU Munich.</span>
-                            <span class="r-host">gitlab.lrz.de/nmrm_lab/public_projects/bold-simulation</span>
-                        </span>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
     <!-- ===== AUTHORS & CONTRIBUTIONS ===== -->
     <section id="authors" class="authors-section">
         <div class="container">
@@ -1513,6 +1541,11 @@
                     The authors thank the Deutsche Forschungsgemeinschaft (DFG) for funding
                     [grants <strong>PR&nbsp;1039/6-1</strong> and <strong>SO&nbsp;1336/4-1</strong>].
                 </p>
+                <a class="ack-logo-link" href="https://www.dfg.de/en" target="_blank" rel="noopener"
+                   aria-label="Deutsche Forschungsgemeinschaft (DFG)">
+                    <img src="files/images/dfg-logo.svg" alt="Deutsche Forschungsgemeinschaft (DFG) logo"
+                         class="ack-logo">
+                </a>
             </div>
 
             <!-- BibTeX -->
@@ -2449,7 +2482,8 @@
             const chY = padT + (1 - yFrac) * plotH;
             mapSvg.appendChild(svg('line', { x1: padL, x2: padL + plotW, y1: chY, y2: chY, stroke: '#0f172a', 'stroke-width': 1 }));
             mapSvg.appendChild(svg('line', { x1: chX, x2: chX, y1: padT, y2: padT + plotH, stroke: '#0f172a', 'stroke-width': 1 }));
-            mapSvg.appendChild(svg('circle', { cx: chX, cy: chY, r: 5, fill: '#fff', stroke: '#0f172a', 'stroke-width': 2 }));
+            mapSvg.appendChild(svg('circle', { cx: chX, cy: chY, r: 7, fill: '#fff', stroke: '#0f172a', 'stroke-width': 2, 'pointer-events': 'none' }));
+            mapSvg.appendChild(svg('circle', { cx: chX, cy: chY, r: 2.5, fill: '#0f172a', 'pointer-events': 'none' }));
 
             // Axis ticks/labels
             for (let i = 0; i <= 4; i++) {
@@ -2556,6 +2590,55 @@
                 render();
             });
         });
+
+        // --- Drag-to-move cross-hair ---
+        // A click or drag anywhere on the landscape moves the cross-hair to
+        // that cell and syncs the X/Y sliders so both controls stay in sync.
+        // Paddings must mirror those used inside render().
+        const HEAT_PAD = { L: 48, R: 60, T: 18, B: 34 };
+        mapSvg.style.cursor = 'crosshair';
+        mapSvg.style.touchAction = 'none';
+
+        function heatPointerToFrac(evt) {
+            const rect = mapSvg.getBoundingClientRect();
+            const vb = mapSvg.viewBox.baseVal;
+            const cx = (evt.clientX - rect.left) * (vb.width  / rect.width);
+            const cy = (evt.clientY - rect.top)  * (vb.height / rect.height);
+            const plotW = vb.width  - HEAT_PAD.L - HEAT_PAD.R;
+            const plotH = vb.height - HEAT_PAD.T - HEAT_PAD.B;
+            const xFrac = Math.max(0, Math.min(1, (cx - HEAT_PAD.L) / plotW));
+            const yFrac = Math.max(0, Math.min(1, 1 - (cy - HEAT_PAD.T) / plotH));
+            return { xFrac, yFrac, inPlot: cx >= HEAT_PAD.L - 6 && cx <= HEAT_PAD.L + plotW + 6 };
+        }
+        function commitDragFrac(xFrac, yFrac) {
+            els.xIn.value = xFrac * 100;
+            els.yIn.value = yFrac * 100;
+            els.xIn.dispatchEvent(new Event('input', { bubbles: true }));
+            els.yIn.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        let heatDragging = false;
+        mapSvg.addEventListener('pointerdown', (e) => {
+            const { xFrac, yFrac, inPlot } = heatPointerToFrac(e);
+            if (!inPlot) return;
+            heatDragging = true;
+            try { mapSvg.setPointerCapture(e.pointerId); } catch (_) {}
+            commitDragFrac(xFrac, yFrac);
+            e.preventDefault();
+        });
+        mapSvg.addEventListener('pointermove', (e) => {
+            if (!heatDragging) return;
+            const { xFrac, yFrac } = heatPointerToFrac(e);
+            commitDragFrac(xFrac, yFrac);
+        });
+        const endHeatDrag = (e) => {
+            if (!heatDragging) return;
+            heatDragging = false;
+            try { mapSvg.releasePointerCapture(e.pointerId); } catch (_) {}
+        };
+        mapSvg.addEventListener('pointerup', endHeatDrag);
+        mapSvg.addEventListener('pointercancel', endHeatDrag);
+        mapSvg.addEventListener('pointerleave', endHeatDrag);
+
         render();
     })();
 
