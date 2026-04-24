@@ -264,19 +264,32 @@
         .heat-tooltip {
             position: absolute; pointer-events: none;
             top: 0; left: 0;
-            background: rgba(15, 23, 42, 0.7);
             color: #f8fafc;
             font-size: 0.78rem;
             padding: 7px 10px; border-radius: 8px;
             box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
+            border: 1px solid transparent;
             white-space: nowrap;
             line-height: 1.35;
             backdrop-filter: blur(2px);
             -webkit-backdrop-filter: blur(2px);
             opacity: 0;
-            transition: opacity 0.12s ease;
+            transition: opacity 0.12s ease, background 0.12s ease, border-color 0.12s ease;
             z-index: 5;
             font-variant-numeric: tabular-nums;
+        }
+        /* Base + r-sign tint (matches heatmap: blue < 0, yellow/orange > 0) */
+        .heat-tooltip.heat-tip-neg {
+            background: linear-gradient(145deg, rgba(37, 99, 235, 0.32), rgba(15, 23, 42, 0.78));
+            border-color: rgba(96, 165, 250, 0.35);
+        }
+        .heat-tooltip.heat-tip-pos {
+            background: linear-gradient(145deg, rgba(250, 204, 21, 0.22), rgba(15, 23, 42, 0.78));
+            border-color: rgba(250, 204, 21, 0.4);
+        }
+        .heat-tooltip.heat-tip-neu {
+            background: rgba(15, 23, 42, 0.7);
+            border-color: rgba(148, 163, 184, 0.25);
         }
         .heat-tooltip.visible { opacity: 1; }
         .heat-tooltip .ht-row {
@@ -285,7 +298,9 @@
         }
         .heat-tooltip .ht-key { color: #cbd5e1; font-weight: 500; }
         .heat-tooltip .ht-val { color: #f8fafc; font-weight: 700; }
-        .heat-tooltip .ht-row-accent .ht-val { color: #fbbf24; }
+        .heat-tooltip .ht-r-neg { color: #2563eb; }
+        .heat-tooltip .ht-r-pos { color: #d97706; }
+        .heat-tooltip .ht-r-neu { color: #94a3b8; }
 
         /* ===== Interactive demo (shared layout) ===== */
         .demo {
@@ -702,286 +717,7 @@
                 class="teaser-img fade-in">
         </div>
     </section>
-    <!-- ===== ABSTRACT ===== -->
-    <section id="abstract">
-        <div class="container">
-            <h2 class="section-title">Abstract</h2>
-            <div class="abstract-card fade-in">
-                <p>
-                    Functional magnetic resonance imaging (fMRI) of blood oxygenation level dependent (BOLD) signals
-                    during the resting-state is widely used to study functional connectivity (FC) of slowly
-                    fluctuating ongoing brain activity (BOLD-FC) in humans with and without brain diseases. While
-                    physiological impairments (e.g. aberrant perfusion or vascular reactivity) are common
-                    in neurological and psychiatric disorders, their impact on BOLD-FC is widely unknown and ignored.
-                    The aim of our simulation study was therefore to investigate the influence of impaired
-                    neurovascular coupling on resting-state BOLD-FC.
-                </p>
-                <p>
-                    Simulated BOLD signals comprising intra- and extravascular contributions were derived from an
-                    adjusted balloon model, which allows for independent definitions of cerebral blood flow (CBF)
-                    and cerebral metabolic rate of oxygen (CMRO<sub>2</sub>) responses, elicited by a synthetic
-                    oscillatory input signal with low-frequency (0.05&nbsp;Hz) amplitude modulations. BOLD-FC was
-                    then defined by correlations between physiological reference BOLD time curves (seeds of seed-based
-                    BOLD-FC) and test BOLD time curves (targets of BOLD-FC) featuring altered physiological variables
-                    (CMRO<sub>2</sub>, CBF, cerebral blood volume (CBV)). Impact of impaired neurovascular coupling
-                    on BOLD-FC was investigated for three different scenarios with independent changes in
-                    (1) CBF and CMRO<sub>2</sub> amplitudes, (2) CBF and CMRO<sub>2</sub> delays, and (3) coupling
-                    between CBF and CBV.
-                </p>
-                <p>
-                    For scenario&nbsp;1, we found linear influences of CMRO<sub>2</sub> and CBF amplitudes on BOLD-FC:
-                    for a given CMRO<sub>2</sub> amplitude, BOLD-FC changes from negative to positive FC with
-                    increasing CBF amplitude, and increasing CMRO<sub>2</sub> amplitude simply shifts this dependence
-                    linearly. For scenario&nbsp;2, CMRO<sub>2</sub> and CBF delays had a complex non-linear effect on
-                    BOLD-FC: for small CMRO<sub>2</sub> delays, BOLD-FC changes from positive to negative BOLD-FC with
-                    increasing CBF delays, but for large CMRO<sub>2</sub> delays positive BOLD-FC simply diminishes
-                    with increasing CBF delay. For scenario&nbsp;3, changes in CBF&ndash;CBV coupling have almost no
-                    effect on BOLD-FC. None of these changes were critically influenced by signal-to-noise ratio or
-                    temporal resolution.
-                </p>
-                <p>
-                    Our results demonstrate the importance of alterations in neurovascular coupling for aberrant
-                    resting-state BOLD-FC. Based on our data, we suggest to complement BOLD-FC studies, at
-                    least of at-risk patient populations, with perfusion and oxygenation sensitive MRI. In
-                    cases where this is not available, we recommend careful interpretation of BOLD-FC results
-                    considering previous findings about hemodynamic&ndash;metabolic changes. Accurate modeling of
-                    the hemodynamic&ndash;metabolic context might in the future improve both our understanding of
-                    the crucial interplay between vascular, hemodynamic and neuronal components of intrinsic BOLD-FC
-                    and the evaluation of aberrant BOLD-FC in brain diseases with vascular&ndash;hemodynamic
-                    impairments.
-                </p>
-            </div>
-        </div>
-    </section>
-    <!-- ===== METHODS ===== -->
-    <section id="methods">
-        <div class="container">
-            <h2 class="section-title">Methods at a glance</h2>
-            <p class="section-desc">
-                A four-step simulation pipeline built around an adjusted balloon model, designed to decouple
-                neurovascular and metabolic contributions to the resting-state BOLD signal.
-            </p>
-            <div class="methods-grid fade-in">
-                <div class="method-card">
-                    <div class="method-step">Step 1</div>
-                    <h4>Synthetic oscillatory input</h4>
-                    <p>
-                        A low-frequency (0.05&nbsp;Hz) oscillatory neural drive mimics the slow, spontaneous
-                        resting-state fluctuations that dominate BOLD-FC analyses.
-                    </p>
-                </div>
-                <div class="method-card">
-                    <div class="method-step">Step 2</div>
-                    <h4>Adjusted balloon model</h4>
-                    <p>
-                        Cerebral blood flow (CBF), cerebral metabolic rate of oxygen (CMRO<sub>2</sub>) and cerebral
-                        blood volume (CBV) can be varied <em>independently</em>, generating BOLD signals that include
-                        both intra- and extravascular contributions.
-                    </p>
-                </div>
-                <div class="method-card">
-                    <div class="method-step">Step 3</div>
-                    <h4>Seed-based BOLD-FC</h4>
-                    <p>
-                        A physiological reference BOLD time course acts as the seed; target BOLD time courses are
-                        generated with altered CBF, CMRO<sub>2</sub> or CBV properties, and connectivity is quantified
-                        by Pearson correlation.
-                    </p>
-                </div>
-                <div class="method-card">
-                    <div class="method-step">Step 4</div>
-                    <h4>Robustness checks</h4>
-                    <p>
-                        All scenarios are re-evaluated across a broad range of signal-to-noise ratios and temporal
-                        resolutions to verify that the observed effects are not artifacts of the acquisition regime.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- ===== SCENARIOS ===== -->
-    <section id="scenarios">
-        <div class="container">
-            <h2 class="section-title">Three simulation scenarios</h2>
-            <p class="section-desc">
-                Each scenario perturbs a different aspect of neurovascular coupling and quantifies its effect on
-                resting-state BOLD-based functional connectivity.
-            </p>
-            <div class="scenario-grid fade-in">
-                <article class="scenario-card">
-                    <img src="files/images/scenario1.png"
-                        alt="Illustration of scenario 1: linear effects of CBF and CMRO2 amplitude changes on BOLD-FC.">
-                    <div class="scenario-body">
-                        <span class="scenario-tag">Scenario 1 &middot; Amplitudes</span>
-                        <div class="scenario-title">Linear effects of CBF &amp; CMRO<sub>2</sub> amplitudes</div>
-                        <p class="scenario-desc">
-                            For a fixed CMRO<sub>2</sub> amplitude, BOLD-FC transitions smoothly from negative to
-                            positive as CBF amplitude grows. Changing CMRO<sub>2</sub> amplitude shifts this
-                            dependence in a strictly linear fashion.
-                        </p>
-                    </div>
-                </article>
-                <article class="scenario-card">
-                    <img src="files/images/scenario2.png"
-                        alt="Illustration of scenario 2: non-linear effects of CBF and CMRO2 delays on BOLD-FC.">
-                    <div class="scenario-body">
-                        <span class="scenario-tag">Scenario 2 &middot; Delays</span>
-                        <div class="scenario-title">Non-linear effects of CBF &amp; CMRO<sub>2</sub> delays</div>
-                        <p class="scenario-desc">
-                            For small CMRO<sub>2</sub> delays, BOLD-FC flips from positive to negative as CBF delay
-                            increases. For large CMRO<sub>2</sub> delays, positive BOLD-FC is instead simply
-                            attenuated, a strongly non-linear regime.
-                        </p>
-                    </div>
-                </article>
-                <article class="scenario-card">
-                    <img src="files/images/scenario3.png"
-                        alt="Illustration of scenario 3: CBF-CBV coupling has almost no effect on BOLD-FC.">
-                    <div class="scenario-body">
-                        <span class="scenario-tag">Scenario 3 &middot; CBF&ndash;CBV coupling</span>
-                        <div class="scenario-title">Near-invariance to CBF&ndash;CBV coupling</div>
-                        <p class="scenario-desc">
-                            Varying the coupling between cerebral blood flow and cerebral blood volume produces only
-                            marginal changes in BOLD-FC, making CBF&ndash;CBV coupling a comparatively weak lever on
-                            connectivity estimates.
-                        </p>
-                    </div>
-                </article>
-            </div>
-        </div>
-    </section>
-    <!-- ===== KEY FINDINGS ===== -->
-    <section id="findings">
-        <div class="container">
-            <h2 class="section-title">Key findings</h2>
-            <p class="section-desc">
-                Six take-aways that drop out of the simulations, and that matter for anyone interpreting
-                resting-state fMRI.
-            </p>
-            <div class="findings-list fade-in">
-                <div class="finding-card">
-                    <h4>Sign of BOLD-FC can flip</h4>
-                    <p>
-                        Plausible alterations in CBF or CMRO<sub>2</sub> can drive correlations from positive to
-                        negative values, without any change in underlying neural coupling.
-                    </p>
-                </div>
-                <div class="finding-card">
-                    <h4>Amplitudes: simple, linear</h4>
-                    <p>
-                        Amplitude-driven changes act as a linear offset and scale on BOLD-FC: a relatively
-                        tractable source of bias that can be reasoned about analytically.
-                    </p>
-                </div>
-                <div class="finding-card">
-                    <h4>Delays: strongly non-linear</h4>
-                    <p>
-                        Phase shifts between CBF and CMRO<sub>2</sub> produce complex, regime-dependent changes,
-                        including sign reversals that are hard to anticipate from neural activity alone.
-                    </p>
-                </div>
-                <div class="finding-card">
-                    <h4>CBV coupling is negligible</h4>
-                    <p>
-                        Across physiologically realistic ranges, altered CBF&ndash;CBV coupling does not meaningfully
-                        change BOLD-FC, simplifying the interpretation of hemodynamic perturbations.
-                    </p>
-                </div>
-                <div class="finding-card">
-                    <h4>Robust to SNR &amp; TR</h4>
-                    <p>
-                        Results hold across a wide range of signal-to-noise ratios and temporal resolutions, so the
-                        effects cannot be dismissed as acquisition artifacts.
-                    </p>
-                </div>
-                <div class="finding-card">
-                    <h4>Clinical implication</h4>
-                    <p>
-                        In at-risk populations (e.g. cerebrovascular or psychiatric disorders), BOLD-FC should be
-                        complemented with perfusion- and oxygenation-sensitive MRI, or interpreted with explicit
-                        hemodynamic context.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- ===== CLINICAL IMPLICATIONS ===== -->
-    <section id="implications">
-        <div class="container">
-            <h2 class="section-title">Clinical implications</h2>
-            <p class="section-desc">
-                How should these simulation results change what researchers and clinicians actually do?
-            </p>
-            <div class="implications-grid fade-in">
-                <div class="impl-card">
-                    <h4>Don't over-interpret rs-fMRI alone</h4>
-                    <p>
-                        In populations where cerebrovascular health is plausibly altered, such as stroke,
-                        small-vessel disease, dementia, schizophrenia, or aging, a BOLD-FC difference cannot
-                        be interpreted as a neural connectivity difference without further evidence.
-                    </p>
-                </div>
-                <div class="impl-card">
-                    <h4>Complement BOLD with CBF / OEF</h4>
-                    <p>
-                        Arterial Spin Labeling (ASL) for CBF and multi-parametric quantitative BOLD for oxygen
-                        extraction fraction add the missing physiological axes. A one-hour protocol can anchor the
-                        BOLD signal to a measurable perfusion and oxygenation state.
-                    </p>
-                </div>
-                <div class="impl-card">
-                    <h4>Report hemodynamic context</h4>
-                    <p>
-                        When ASL/qBOLD are not available, studies should at minimum report known or suspected
-                        hemodynamic alterations and discuss their expected effect on BOLD-FC; the simulation
-                        landscapes above offer a concrete reference.
-                    </p>
-                </div>
-                <div class="impl-card">
-                    <h4>Model-based analyses ahead</h4>
-                    <p>
-                        Hemodynamic deconvolution, biophysically informed FC estimators and calibrated BOLD methods
-                        can, in principle, factor out much of this vascular bias. This paper's results motivate their
-                        broader adoption in clinical cohorts.
-                    </p>
-                </div>
-            </div>
-        </div>
-    </section>
-    <!-- ===== DISCLAIMER (gateway to the interactive deep-dive demos) ===== -->
-    <section id="disclaimer">
-        <div class="container">
-            <aside class="edu-disclaimer fade-in" role="note" aria-labelledby="eduDisclaimerTitle">
-                <div class="edu-disclaimer-icon" aria-hidden="true">i</div>
-                <div class="edu-disclaimer-body">
-                    <div class="edu-disclaimer-title" id="eduDisclaimerTitle">
-                        A note about the demos below
-                    </div>
-                    <p>
-                        The three live demos below, namely the <strong>Balloon Model Explorer</strong>,
-                        the <strong>BOLD-FC Simulator</strong> and the <strong>Scenario Heatmap</strong>,
-                        are <strong>simplified pedagogical tools</strong> designed to build intuition for
-                        the concepts in the paper. The toy models, synthetic drives and in-browser
-                        re-computations are <em>not</em> the peer-reviewed simulations reported in the
-                        article and should <strong>not</strong> be used for scientific reanalysis,
-                        clinical inference or benchmarking.
-                    </p>
-                    <p>
-                        The full methodology (the adjusted Buxton&ndash;Obata balloon model, rs-fMRI
-                        simulation parameters, statistical evaluation and robustness checks across SNR
-                        and TR) is documented in the original publication:
-                        <a href="https://doi.org/10.1016/j.neuroimage.2020.116871"
-                           target="_blank" rel="noopener">Archila-Meléndez et&nbsp;al. (2020),
-                        <em>NeuroImage</em></a>. All data and Matlab simulation code are open access at
-                        the <a href="https://zenodo.org/record/3773316" target="_blank"
-                           rel="noopener">Zenodo archive</a> and the authors’
-                        <a href="https://gitlab.lrz.de/nmrm_lab/public_projects/bold-simulation"
-                           target="_blank" rel="noopener">GitLab repository</a>.
-                    </p>
-                </div>
-            </aside>
-        </div>
-    </section>
+
     <!-- ===== BACKGROUND ===== -->
     <section id="background">
         <div class="container">
@@ -1037,6 +773,106 @@
             </div>
         </div>
     </section>
+
+    <!-- ===== ABSTRACT ===== -->
+    <section id="abstract">
+        <div class="container">
+            <h2 class="section-title">Abstract</h2>
+            <div class="abstract-card fade-in">
+                <p>
+                    Functional magnetic resonance imaging (fMRI) of blood oxygenation level dependent (BOLD) signals
+                    during the resting-state is widely used to study functional connectivity (FC) of slowly
+                    fluctuating ongoing brain activity (BOLD-FC) in humans with and without brain diseases. While
+                    physiological impairments (e.g. aberrant perfusion or vascular reactivity) are common
+                    in neurological and psychiatric disorders, their impact on BOLD-FC is widely unknown and ignored.
+                    The aim of our simulation study was therefore to investigate the influence of impaired
+                    neurovascular coupling on resting-state BOLD-FC.
+                </p>
+                <p>
+                    Simulated BOLD signals comprising intra- and extravascular contributions were derived from an
+                    adjusted balloon model, which allows for independent definitions of cerebral blood flow (CBF)
+                    and cerebral metabolic rate of oxygen (CMRO<sub>2</sub>) responses, elicited by a synthetic
+                    oscillatory input signal with low-frequency (0.05&nbsp;Hz) amplitude modulations. BOLD-FC was
+                    then defined by correlations between physiological reference BOLD time curves (seeds of seed-based
+                    BOLD-FC) and test BOLD time curves (targets of BOLD-FC) featuring altered physiological variables
+                    (CMRO<sub>2</sub>, CBF, cerebral blood volume (CBV)). Impact of impaired neurovascular coupling
+                    on BOLD-FC was investigated for three different scenarios with independent changes in
+                    (1) CBF and CMRO<sub>2</sub> amplitudes, (2) CBF and CMRO<sub>2</sub> delays, and (3) coupling
+                    between CBF and CBV.
+                </p>
+                <p>
+                    For scenario&nbsp;1, we found linear influences of CMRO<sub>2</sub> and CBF amplitudes on BOLD-FC:
+                    for a given CMRO<sub>2</sub> amplitude, BOLD-FC changes from negative to positive FC with
+                    increasing CBF amplitude, and increasing CMRO<sub>2</sub> amplitude simply shifts this dependence
+                    linearly. For scenario&nbsp;2, CMRO<sub>2</sub> and CBF delays had a complex non-linear effect on
+                    BOLD-FC: for small CMRO<sub>2</sub> delays, BOLD-FC changes from positive to negative BOLD-FC with
+                    increasing CBF delays, but for large CMRO<sub>2</sub> delays positive BOLD-FC simply diminishes
+                    with increasing CBF delay. For scenario&nbsp;3, changes in CBF&ndash;CBV coupling have almost no
+                    effect on BOLD-FC. None of these changes were critically influenced by signal-to-noise ratio or
+                    temporal resolution.
+                </p>
+                <p>
+                    Our results demonstrate the importance of alterations in neurovascular coupling for aberrant
+                    resting-state BOLD-FC. Based on our data, we suggest to complement BOLD-FC studies, at
+                    least of at-risk patient populations, with perfusion and oxygenation sensitive MRI. In
+                    cases where this is not available, we recommend careful interpretation of BOLD-FC results
+                    considering previous findings about hemodynamic&ndash;metabolic changes. Accurate modeling of
+                    the hemodynamic&ndash;metabolic context might in the future improve both our understanding of
+                    the crucial interplay between vascular, hemodynamic and neuronal components of intrinsic BOLD-FC
+                    and the evaluation of aberrant BOLD-FC in brain diseases with vascular&ndash;hemodynamic
+                    impairments.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== METHODS ===== -->
+    <section id="methods">
+        <div class="container">
+            <h2 class="section-title">Methods at a glance</h2>
+            <p class="section-desc">
+                A four-step simulation pipeline built around an adjusted balloon model, designed to decouple
+                neurovascular and metabolic contributions to the resting-state BOLD signal.
+            </p>
+            <div class="methods-grid fade-in">
+                <div class="method-card">
+                    <div class="method-step">Step 1</div>
+                    <h4>Synthetic oscillatory input</h4>
+                    <p>
+                        A low-frequency (0.05&nbsp;Hz) oscillatory neural drive mimics the slow, spontaneous
+                        resting-state fluctuations that dominate BOLD-FC analyses.
+                    </p>
+                </div>
+                <div class="method-card">
+                    <div class="method-step">Step 2</div>
+                    <h4>Adjusted balloon model</h4>
+                    <p>
+                        Cerebral blood flow (CBF), cerebral metabolic rate of oxygen (CMRO<sub>2</sub>) and cerebral
+                        blood volume (CBV) can be varied <em>independently</em>, generating BOLD signals that include
+                        both intra- and extravascular contributions.
+                    </p>
+                </div>
+                <div class="method-card">
+                    <div class="method-step">Step 3</div>
+                    <h4>Seed-based BOLD-FC</h4>
+                    <p>
+                        A physiological reference BOLD time course acts as the seed; target BOLD time courses are
+                        generated with altered CBF, CMRO<sub>2</sub> or CBV properties, and connectivity is quantified
+                        by Pearson correlation.
+                    </p>
+                </div>
+                <div class="method-card">
+                    <div class="method-step">Step 4</div>
+                    <h4>Robustness checks</h4>
+                    <p>
+                        All scenarios are re-evaluated across a broad range of signal-to-noise ratios and temporal
+                        resolutions to verify that the observed effects are not artifacts of the acquisition regime.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ===== BALLOON MODEL EXPLAINER ===== -->
     <section id="balloon">
         <div class="container">
@@ -1161,6 +997,59 @@
             </div>
         </div>
     </section>
+
+    <!-- ===== SCENARIOS ===== -->
+    <section id="scenarios">
+        <div class="container">
+            <h2 class="section-title">Three simulation scenarios</h2>
+            <p class="section-desc">
+                Each scenario perturbs a different aspect of neurovascular coupling and quantifies its effect on
+                resting-state BOLD-based functional connectivity.
+            </p>
+            <div class="scenario-grid fade-in">
+                <article class="scenario-card">
+                    <img src="files/images/scenario1.png"
+                        alt="Illustration of scenario 1: linear effects of CBF and CMRO2 amplitude changes on BOLD-FC.">
+                    <div class="scenario-body">
+                        <span class="scenario-tag">Scenario 1 &middot; Amplitudes</span>
+                        <div class="scenario-title">Linear effects of CBF &amp; CMRO<sub>2</sub> amplitudes</div>
+                        <p class="scenario-desc">
+                            For a fixed CMRO<sub>2</sub> amplitude, BOLD-FC transitions smoothly from negative to
+                            positive as CBF amplitude grows. Changing CMRO<sub>2</sub> amplitude shifts this
+                            dependence in a strictly linear fashion.
+                        </p>
+                    </div>
+                </article>
+                <article class="scenario-card">
+                    <img src="files/images/scenario2.png"
+                        alt="Illustration of scenario 2: non-linear effects of CBF and CMRO2 delays on BOLD-FC.">
+                    <div class="scenario-body">
+                        <span class="scenario-tag">Scenario 2 &middot; Delays</span>
+                        <div class="scenario-title">Non-linear effects of CBF &amp; CMRO<sub>2</sub> delays</div>
+                        <p class="scenario-desc">
+                            For small CMRO<sub>2</sub> delays, BOLD-FC flips from positive to negative as CBF delay
+                            increases. For large CMRO<sub>2</sub> delays, positive BOLD-FC is instead simply
+                            attenuated, a strongly non-linear regime.
+                        </p>
+                    </div>
+                </article>
+                <article class="scenario-card">
+                    <img src="files/images/scenario3.png"
+                        alt="Illustration of scenario 3: CBF-CBV coupling has almost no effect on BOLD-FC.">
+                    <div class="scenario-body">
+                        <span class="scenario-tag">Scenario 3 &middot; CBF&ndash;CBV coupling</span>
+                        <div class="scenario-title">Near-invariance to CBF&ndash;CBV coupling</div>
+                        <p class="scenario-desc">
+                            Varying the coupling between cerebral blood flow and cerebral blood volume produces only
+                            marginal changes in BOLD-FC, making CBF&ndash;CBV coupling a comparatively weak lever on
+                            connectivity estimates.
+                        </p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
     <!-- ===== BOLD-FC SIMULATOR ===== -->
     <section id="simulator">
         <div class="container">
@@ -1289,6 +1178,7 @@
             </div>
         </div>
     </section>
+
     <!-- ===== SCENARIO HEATMAP ===== -->
     <section id="heatmap">
         <div class="container">
@@ -1320,8 +1210,8 @@
                             <p class="demo-hint">
                                 Blue&nbsp;&rarr;&nbsp;negative r, grey&nbsp;&rarr;&nbsp;near-zero r,
                                 orange&nbsp;&rarr;&nbsp;positive r. <strong>Hover</strong> to read any cell,
-                                <strong>click or drag</strong> to move the cross-hair; the sliders and
-                                the pinned readout at the cross follow.
+                                <strong>click or drag</strong> to move the cross-hair; the sliders and the
+                                pinned readout at the cross follow.
                             </p>
                         </div>
                         <div class="heatmap-plot-wrap">
@@ -1391,6 +1281,107 @@
             </div>
         </div>
     </section>
+
+    <!-- ===== KEY FINDINGS ===== -->
+    <section id="findings">
+        <div class="container">
+            <h2 class="section-title">Key findings</h2>
+            <p class="section-desc">
+                Six take-aways that drop out of the simulations, and that matter for anyone interpreting
+                resting-state fMRI.
+            </p>
+            <div class="findings-list fade-in">
+                <div class="finding-card">
+                    <h4>Sign of BOLD-FC can flip</h4>
+                    <p>
+                        Plausible alterations in CBF or CMRO<sub>2</sub> can drive correlations from positive to
+                        negative values, without any change in underlying neural coupling.
+                    </p>
+                </div>
+                <div class="finding-card">
+                    <h4>Amplitudes: simple, linear</h4>
+                    <p>
+                        Amplitude-driven changes act as a linear offset and scale on BOLD-FC: a relatively
+                        tractable source of bias that can be reasoned about analytically.
+                    </p>
+                </div>
+                <div class="finding-card">
+                    <h4>Delays: strongly non-linear</h4>
+                    <p>
+                        Phase shifts between CBF and CMRO<sub>2</sub> produce complex, regime-dependent changes,
+                        including sign reversals that are hard to anticipate from neural activity alone.
+                    </p>
+                </div>
+                <div class="finding-card">
+                    <h4>CBV coupling is negligible</h4>
+                    <p>
+                        Across physiologically realistic ranges, altered CBF&ndash;CBV coupling does not meaningfully
+                        change BOLD-FC, simplifying the interpretation of hemodynamic perturbations.
+                    </p>
+                </div>
+                <div class="finding-card">
+                    <h4>Robust to SNR &amp; TR</h4>
+                    <p>
+                        Results hold across a wide range of signal-to-noise ratios and temporal resolutions, so the
+                        effects cannot be dismissed as acquisition artifacts.
+                    </p>
+                </div>
+                <div class="finding-card">
+                    <h4>Clinical implication</h4>
+                    <p>
+                        In at-risk populations (e.g. cerebrovascular or psychiatric disorders), BOLD-FC should be
+                        complemented with perfusion- and oxygenation-sensitive MRI, or interpreted with explicit
+                        hemodynamic context.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CLINICAL IMPLICATIONS ===== -->
+    <section id="implications">
+        <div class="container">
+            <h2 class="section-title">Clinical implications</h2>
+            <p class="section-desc">
+                How should these simulation results change what researchers and clinicians actually do?
+            </p>
+            <div class="implications-grid fade-in">
+                <div class="impl-card">
+                    <h4>Don't over-interpret rs-fMRI alone</h4>
+                    <p>
+                        In populations where cerebrovascular health is plausibly altered, such as stroke,
+                        small-vessel disease, dementia, schizophrenia, or aging, a BOLD-FC difference cannot
+                        be interpreted as a neural connectivity difference without further evidence.
+                    </p>
+                </div>
+                <div class="impl-card">
+                    <h4>Complement BOLD with CBF / OEF</h4>
+                    <p>
+                        Arterial Spin Labeling (ASL) for CBF and multi-parametric quantitative BOLD for oxygen
+                        extraction fraction add the missing physiological axes. A one-hour protocol can anchor the
+                        BOLD signal to a measurable perfusion and oxygenation state.
+                    </p>
+                </div>
+                <div class="impl-card">
+                    <h4>Report hemodynamic context</h4>
+                    <p>
+                        When ASL/qBOLD are not available, studies should at minimum report known or suspected
+                        hemodynamic alterations and discuss their expected effect on BOLD-FC; the simulation
+                        landscapes above offer a concrete reference.
+                    </p>
+                </div>
+                <div class="impl-card">
+                    <h4>Model-based analyses ahead</h4>
+                    <p>
+                        Hemodynamic deconvolution, biophysically informed FC estimators and calibrated BOLD methods
+                        can, in principle, factor out much of this vascular bias. This paper's results motivate their
+                        broader adoption in clinical cohorts.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ===== GLOSSARY ===== -->
     <section id="glossary">
         <div class="container">
@@ -1500,6 +1491,42 @@
             </div>
         </div>
     </section>
+
+    <!-- ===== DISCLAIMER & RESOURCES (gateway to interactive demos) ===== -->
+    <section id="disclaimer">
+        <div class="container">
+            <aside class="edu-disclaimer fade-in" role="note" aria-labelledby="eduDisclaimerTitle">
+                <div class="edu-disclaimer-icon" aria-hidden="true">i</div>
+                <div class="edu-disclaimer-body">
+                    <div class="edu-disclaimer-title" id="eduDisclaimerTitle">
+                        A note about the demos below
+                    </div>
+                    <p>
+                        The three live demos below, namely the <strong>Balloon Model Explorer</strong>,
+                        the <strong>BOLD-FC Simulator</strong> and the <strong>Scenario Heatmap</strong>,
+                        are <strong>simplified pedagogical tools</strong> designed to build intuition for
+                        the concepts in the paper. The toy models, synthetic drives and in-browser
+                        re-computations are <em>not</em> the peer-reviewed simulations reported in the
+                        article and should <strong>not</strong> be used for scientific reanalysis,
+                        clinical inference or benchmarking.
+                    </p>
+                    <p>
+                        The full methodology (the adjusted Buxton&ndash;Obata balloon model, rs-fMRI
+                        simulation parameters, statistical evaluation and robustness checks across SNR
+                        and TR) is documented in the original publication:
+                        <a href="https://doi.org/10.1016/j.neuroimage.2020.116871"
+                           target="_blank" rel="noopener">Archila-Mel&eacute;ndez et&nbsp;al. (2020),
+                        <em>NeuroImage</em></a>. All data and Matlab simulation code are open access at
+                        the <a href="https://zenodo.org/record/3773316" target="_blank"
+                           rel="noopener">Zenodo archive</a> and the authors&rsquo;
+                        <a href="https://gitlab.lrz.de/nmrm_lab/public_projects/bold-simulation"
+                           target="_blank" rel="noopener">GitLab repository</a>.
+                    </p>
+                </div>
+            </aside>
+        </div>
+    </section>
+
     <!-- ===== AUTHORS & CONTRIBUTIONS ===== -->
     <section id="authors" class="authors-section">
         <div class="container">
@@ -2509,11 +2536,13 @@
             (function drawCrossLabel() {
                 const xShortPlain = sc.xShort.replace(/<[^>]+>/g, '');
                 const yShortPlain = sc.yShort.replace(/<[^>]+>/g, '');
-                const labelStr = xShortPlain + ' ' + sc.xFmt(xVal) +
-                                 '  \u00B7  ' + yShortPlain + ' ' + sc.yFmt(yVal) +
-                                 '  \u00B7  r ' + sign + Math.abs(rHere).toFixed(2);
+                const prefix = xShortPlain + ' ' + sc.xFmt(xVal) +
+                    '  \u00B7  ' + yShortPlain + ' ' + sc.yFmt(yVal) + '  \u00B7  ';
+                const rBit = 'r ' + sign + Math.abs(rHere).toFixed(2);
+                const rFill = rHere < 0 ? '#2563eb' : rHere > 0 ? '#d97706' : '#94a3b8';
                 const labelFS = 10;
                 const labelPadX = 7, labelPadY = 4;
+                const NS = 'http://www.w3.org/2000/svg';
                 const txt = svg('text', {
                     'font-size': labelFS + 'px',
                     'font-family': 'Inter',
@@ -2522,7 +2551,15 @@
                     'pointer-events': 'none',
                     'dominant-baseline': 'middle'
                 });
-                txt.textContent = labelStr;
+                const tPre = document.createElementNS(NS, 'tspan');
+                tPre.textContent = prefix;
+                tPre.setAttribute('fill', '#f8fafc');
+                const tR = document.createElementNS(NS, 'tspan');
+                tR.textContent = rBit;
+                tR.setAttribute('fill', rFill);
+                tR.setAttribute('font-weight', '700');
+                txt.appendChild(tPre);
+                txt.appendChild(tR);
                 mapSvg.appendChild(txt);
                 // Measure once in the DOM so positioning is font-accurate.
                 const bb = txt.getBBox();
@@ -2539,11 +2576,15 @@
                 if (ly < padT + 2) ly = padT + 2;
                 if (ly + th > padT + plotH - 2) ly = padT + plotH - 2 - th;
 
+                const chipNeg = { fill: 'rgba(30, 58, 120, 0.88)', stroke: 'rgba(96, 165, 250, 0.65)' };
+                const chipPos = { fill: 'rgba(90, 70, 25, 0.88)', stroke: 'rgba(250, 204, 21, 0.65)' };
+                const chipNeu = { fill: 'rgba(15, 23, 42, 0.9)', stroke: 'rgba(148, 163, 184, 0.45)' };
+                const chip = rHere < 0 ? chipNeg : rHere > 0 ? chipPos : chipNeu;
                 const rect = svg('rect', {
                     x: lx, y: ly, width: tw, height: th,
                     rx: 5, ry: 5,
-                    fill: '#0f172a', 'fill-opacity': 0.9,
-                    stroke: '#fbbf24', 'stroke-width': 1,
+                    fill: chip.fill, 'fill-opacity': 1,
+                    stroke: chip.stroke, 'stroke-width': 1,
                     'pointer-events': 'none'
                 });
                 // Insert rect behind text.
@@ -2720,18 +2761,23 @@
             const jj = Math.min(GRID_N - 1, Math.max(0, Math.round(yFrac * (GRID_N - 1))));
             const r = grid[jj * GRID_N + ii];
             const sgn = r >= 0 ? '+' : '\u2212';
-            return '<span class="ht-row"><span class="ht-key">' + sc.xShort + '</span>' +
+            const rClass = r < 0 ? 'ht-r-neg' : r > 0 ? 'ht-r-pos' : 'ht-r-neu';
+            const html = '<span class="ht-row"><span class="ht-key">' + sc.xShort + '</span>' +
                    '<span class="ht-val">' + sc.xFmt(xVal) + '</span></span>' +
                    '<span class="ht-row"><span class="ht-key">' + sc.yShort + '</span>' +
                    '<span class="ht-val">' + sc.yFmt(yVal) + '</span></span>' +
-                   '<span class="ht-row ht-row-accent"><span class="ht-key">BOLD-FC</span>' +
-                   '<span class="ht-val">r = ' + sgn + Math.abs(r).toFixed(2) + '</span></span>';
+                   '<span class="ht-row"><span class="ht-key">BOLD-FC</span>' +
+                   '<span class="ht-val ' + rClass + '">r = ' + sgn + Math.abs(r).toFixed(2) + '</span></span>';
+            return { html, r };
         }
         function updateHeatTip(e) {
             if (!heatTip) return;
             const { xFrac, yFrac, inPlot } = heatPointerToFrac(e);
             if (!inPlot) { heatTip.classList.remove('visible'); return; }
-            heatTip.innerHTML = formatHeatTip(xFrac, yFrac);
+            const { html, r } = formatHeatTip(xFrac, yFrac);
+            heatTip.innerHTML = html;
+            heatTip.classList.remove('heat-tip-neg', 'heat-tip-pos', 'heat-tip-neu');
+            heatTip.classList.add(r < 0 ? 'heat-tip-neg' : r > 0 ? 'heat-tip-pos' : 'heat-tip-neu');
             const wrap = heatTip.parentElement;
             const wrect = wrap.getBoundingClientRect();
             // Tooltip offset from cursor; flip sides near the right/bottom edges.
