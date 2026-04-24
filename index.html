@@ -301,6 +301,45 @@
         .heat-tooltip .ht-r-pos { color: #d97706; }
         .heat-tooltip .ht-r-neu { color: #94a3b8; }
 
+        /* Seed vs. target scatter (BOLD-FC simulator) */
+        .scatter-plot-wrap { position: relative; }
+        .scatter-tooltip {
+            position: absolute; pointer-events: none;
+            top: 0; left: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            color: #f8fafc;
+            font-size: 0.76rem;
+            padding: 6px 9px; border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.22);
+            border: 1px solid transparent;
+            white-space: nowrap;
+            line-height: 1.4;
+            backdrop-filter: blur(2px);
+            -webkit-backdrop-filter: blur(2px);
+            opacity: 0;
+            transition: opacity 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+            z-index: 5;
+            font-variant-numeric: tabular-nums;
+        }
+        .scatter-tooltip.st-tip-neg {
+            background: linear-gradient(145deg, rgba(37, 99, 235, 0.28), rgba(15, 23, 42, 0.78));
+            border-color: rgba(96, 165, 250, 0.32);
+        }
+        .scatter-tooltip.st-tip-pos {
+            background: linear-gradient(145deg, rgba(250, 204, 21, 0.2), rgba(15, 23, 42, 0.78));
+            border-color: rgba(250, 204, 21, 0.38);
+        }
+        .scatter-tooltip.st-tip-neu {
+            background: rgba(15, 23, 42, 0.72);
+            border-color: rgba(148, 163, 184, 0.22);
+        }
+        .scatter-tooltip.visible { opacity: 1; }
+        .scatter-tooltip .st-row { display: flex; justify-content: space-between; gap: 12px; }
+        .scatter-tooltip .st-key { color: #cbd5e1; font-weight: 500; }
+        .scatter-tooltip .st-val { color: #f8fafc; font-weight: 600; }
+
         /* ===== Interactive demo (shared layout) ===== */
         .demo {
             margin: 0 auto; max-width: 1180px;
@@ -1231,10 +1270,14 @@
                             <h4>Seed vs. target scatter</h4>
                             <p class="demo-hint">
                                 Each point is one time sample. Slope and tightness visualise the Pearson correlation
-                                (BOLD-FC).
+                                (BOLD-FC). <strong>Hover</strong> to read any sample; <strong>click or drag</strong>
+                                in the cloud to move the cross-hair and keep a pinned readout.
                             </p>
                         </div>
-                        <svg class="demo-svg" id="simScatter" viewBox="0 0 520 220" role="img" aria-label="Scatter of seed vs target BOLD values"></svg>
+                        <div class="scatter-plot-wrap">
+                            <svg class="demo-svg" id="simScatter" viewBox="0 0 520 220" role="img" aria-label="Scatter of seed vs target BOLD values"></svg>
+                            <div class="scatter-tooltip" id="scatterHoverTooltip" aria-hidden="true"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -2008,6 +2051,113 @@
             }
         };
 
+        // Seed vs. target scatter: hover tooltip + click/drag time scrubber (shares axes with drawScatter)
+        const SCATTER_PAD = { L: 40, R: 12, T: 12, B: 28 };
+        const scatterTip = document.getElementById('scatterHoverTooltip');
+        const scatterBuf = { a: null, b: null, r: 0 };
+        let scatterPinIdx = Math.floor((NSAMP - 1) / 2);
+        let scatterHoverIdx = -1;
+        let scatterDrag = false;
+
+        function paintScatter() {
+            if (!scatterBuf.a) return;
+            const n = scatterBuf.a.length;
+            scatterPinIdx = Math.max(0, Math.min(n - 1, scatterPinIdx));
+            if (scatterHoverIdx >= n) scatterHoverIdx = -1;
+            drawScatter(scSvg, scatterBuf.a, scatterBuf.b, scatterBuf.r, { pin: scatterPinIdx, hover: scatterHoverIdx });
+        }
+
+        function scatterEventToIndex(evt) {
+            const a = scatterBuf.a, b = scatterBuf.b;
+            if (!a || !b) return { inPlot: false, j: 0 };
+            const rect = scSvg.getBoundingClientRect();
+            const vb = scSvg.viewBox.baseVal;
+            const cx = (evt.clientX - rect.left) * (vb.width / rect.width);
+            const cy = (evt.clientY - rect.top) * (vb.height / rect.height);
+            const W = vb.width, H = vb.height;
+            const padL = SCATTER_PAD.L, padR = SCATTER_PAD.R, padT = SCATTER_PAD.T, padB = SCATTER_PAD.B;
+            const plotW = W - padL - padR, plotH = H - padT - padB;
+            if (cx < padL - 2 || cx > padL + plotW + 2 || cy < padT - 2 || cy > padT + plotH + 2) {
+                return { inPlot: false, j: 0 };
+            }
+            const xMin = -2.5, xMax = 2.5, yMin = -2.5, yMax = 2.5;
+            let best = 0, bestD = Infinity;
+            const n = a.length;
+            for (let i = 0; i < n; i++) {
+                const px = padL + plotW * (a[i] - xMin) / (xMax - xMin);
+                const py = padT + plotH * (yMax - b[i]) / (yMax - yMin);
+                const d = (cx - px) * (cx - px) + (cy - py) * (cy - py);
+                if (d < bestD) { bestD = d; best = i; }
+            }
+            return { inPlot: true, j: best };
+        }
+
+        function scatterTipHtml(j) {
+            const a = scatterBuf.a, b = scatterBuf.b, r0 = scatterBuf.r;
+            if (!a || !b) return { html: '', r: 0 };
+            const sa = a[j] >= 0 ? '+' : '\u2212';
+            const sb = b[j] >= 0 ? '+' : '\u2212';
+            return {
+                html: '<span class="st-row"><span class="st-key">Time</span><span class="st-val">' + TIME[j].toFixed(0) + ' s</span></span>' +
+                    '<span class="st-row"><span class="st-key">Seed</span><span class="st-val">' + sa + Math.abs(a[j]).toFixed(2) + '%</span></span>' +
+                    '<span class="st-row"><span class="st-key">Target</span><span class="st-val">' + sb + Math.abs(b[j]).toFixed(2) + '%</span></span>',
+                r: r0
+            };
+        }
+
+        function positionScatterTip(evt) {
+            if (!scatterTip) return;
+            const wrap = scatterTip.parentElement;
+            if (!wrap) return;
+            const wrect = wrap.getBoundingClientRect();
+            const tw = scatterTip.offsetWidth, th = scatterTip.offsetHeight;
+            const cx = evt.clientX - wrect.left, cy = evt.clientY - wrect.top;
+            let x = cx + 12, y = cy + 12;
+            if (x + tw > wrect.width - 4) x = cx - tw - 12;
+            if (y + th > wrect.height - 4) y = cy - th - 12;
+            if (x < 4) x = 4; if (y < 4) y = 4;
+            scatterTip.style.left = x + 'px';
+            scatterTip.style.top = y + 'px';
+        }
+
+        function updateScatterTip(evt) {
+            if (!scatterTip) return;
+            const h = scatterEventToIndex(evt);
+            if (!h.inPlot) {
+                if (!scatterDrag) {
+                    scatterTip.classList.remove('visible');
+                    scatterHoverIdx = -1;
+                    paintScatter();
+                }
+                return;
+            }
+            scatterHoverIdx = scatterDrag ? -1 : h.j;
+            if (scatterDrag) scatterPinIdx = h.j;
+            const { html, r } = scatterTipHtml(h.j);
+            scatterTip.innerHTML = html;
+            scatterTip.classList.remove('st-tip-neg', 'st-tip-pos', 'st-tip-neu');
+            scatterTip.classList.add(r < 0 ? 'st-tip-neg' : r > 0 ? 'st-tip-pos' : 'st-tip-neu');
+            positionScatterTip(evt);
+            scatterTip.classList.add('visible');
+            paintScatter();
+        }
+
+        scSvg.style.cursor = 'crosshair';
+        scSvg.style.touchAction = 'none';
+        scSvg.addEventListener('pointerdown', (e) => {
+            const h = scatterEventToIndex(e);
+            if (!h.inPlot) return;
+            scatterDrag = true;
+            scatterPinIdx = h.j;
+            try { scSvg.setPointerCapture(e.pointerId); } catch (_) {}
+            updateScatterTip(e);
+            e.preventDefault();
+        });
+        scSvg.addEventListener('pointermove', (e) => { updateScatterTip(e); });
+        scSvg.addEventListener('pointerup', (e) => { scatterDrag = false; try { scSvg.releasePointerCapture(e.pointerId); } catch (_) {} updateScatterTip(e); });
+        scSvg.addEventListener('pointercancel', (e) => { scatterDrag = false; try { scSvg.releasePointerCapture(e.pointerId); } catch (_) {} });
+        scSvg.addEventListener('pointerleave', () => { scatterDrag = false; scatterHoverIdx = -1; if (scatterTip) scatterTip.classList.remove('visible'); paintScatter(); });
+
         function configureSliders() {
             const d = scenarioDefs[scenario];
             els.aLab.innerHTML = d.aLab;
@@ -2064,7 +2214,11 @@
             const fullSeed = Array.from(seed.bold).map(v => v * 100);
             const fullTgt = Array.from(tgt.bold).map(v => v * 100);
             const r = pearson(fullSeed, fullTgt);
-            drawScatter(scSvg, fullSeed, fullTgt, r);
+            scatterBuf.a = fullSeed;
+            scatterBuf.b = fullTgt;
+            scatterBuf.r = r;
+            scatterHoverIdx = -1;
+            drawScatter(scSvg, fullSeed, fullTgt, r, { pin: scatterPinIdx, hover: scatterHoverIdx });
 
             // KPIs
             const sign = r >= 0 ? '+' : '\u2212';
@@ -2073,7 +2227,8 @@
             els.tgtAmp.textContent = (rms(tgt.bold) * Math.SQRT2 * 100).toFixed(2) + '%';
         }
 
-        function drawScatter(svgEl, a, b, r) {
+        function drawScatter(svgEl, a, b, r, opts) {
+            opts = opts || {};
             const vb = svgEl.viewBox.baseVal;
             const W = vb.width, H = vb.height;
             const padL = 40, padR = 12, padT = 12, padB = 28;
@@ -2102,9 +2257,10 @@
             yLab.textContent = 'target BOLD (%)';
             svgEl.appendChild(yLab);
 
-            // Dots (subsample)
             const n = a.length;
             const step = Math.max(1, Math.floor(n / 180));
+
+            // Dots (subsample) — draw underneath overlays
             for (let i = 0; i < n; i += step) {
                 const x = padL + plotW * (a[i] - xMin) / (xMax - xMin);
                 const y = padT + plotH * (yMax - b[i]) / (yMax - yMin);
@@ -2132,6 +2288,63 @@
             const rTxt = svg('text', { x: padL + plotW - 6, y: padT + 14, 'text-anchor': 'end', 'font-size': '11px', fill: r >= 0 ? '#d97706' : '#2563eb', 'font-weight': 800, 'font-family': 'Inter' });
             rTxt.textContent = 'r = ' + (r >= 0 ? '+' : '\u2212') + Math.abs(r).toFixed(2);
             svgEl.appendChild(rTxt);
+
+            const pinIdx = Math.max(0, Math.min(n - 1, opts.pin | 0));
+            const hoverIdx = (opts.hover != null && opts.hover >= 0 && opts.hover < n) ? (opts.hover | 0) : -1;
+            const NS = 'http://www.w3.org/2000/svg';
+
+            function dataToPx(i) {
+                const px = padL + plotW * (a[i] - xMin) / (xMax - xMin);
+                const py = padT + plotH * (yMax - b[i]) / (yMax - yMin);
+                return { px, py };
+            }
+
+            // Hover sample ring (ephemeral) when distinct from the pinned cross-hair
+            if (hoverIdx >= 0 && hoverIdx !== pinIdx) {
+                const h = dataToPx(hoverIdx);
+                svgEl.appendChild(svg('circle', {
+                    cx: h.px, cy: h.py, r: 5, fill: 'none', stroke: r >= 0 ? '#d97706' : '#2563eb',
+                    'stroke-width': 1.4, 'stroke-dasharray': '2 2', opacity: 0.9, 'pointer-events': 'none'
+                }));
+            }
+
+            // Pinned cross-hair + readout
+            {
+                const { px, py } = dataToPx(pinIdx);
+                const tSec = TIME[pinIdx];
+                svgEl.appendChild(svg('line', { x1: padL, x2: padL + plotW, y1: py, y2: py, stroke: '#0f172a', 'stroke-width': 1, opacity: 0.25, 'pointer-events': 'none' }));
+                svgEl.appendChild(svg('line', { x1: px, x2: px, y1: padT, y2: padT + plotH, stroke: '#0f172a', 'stroke-width': 1, opacity: 0.25, 'pointer-events': 'none' }));
+                svgEl.appendChild(svg('circle', { cx: px, cy: py, r: 7, fill: '#fff', stroke: '#0f172a', 'stroke-width': 2, 'pointer-events': 'none' }));
+                svgEl.appendChild(svg('circle', { cx: px, cy: py, r: 2.5, fill: '#0f172a', 'pointer-events': 'none' }));
+                const sStr = a[pinIdx] >= 0 ? '+' : '\u2212';
+                const tStr = b[pinIdx] >= 0 ? '+' : '\u2212';
+                const labelStr = 't = ' + tSec.toFixed(0) + ' s  \u00B7  seed ' + sStr + Math.abs(a[pinIdx]).toFixed(2) + '%  \u00B7  target ' + tStr + Math.abs(b[pinIdx]).toFixed(2) + '%';
+                const labelFS = 9;
+                const labelPadX = 6, labelPadY = 3;
+                const ltxt = svg('text', {
+                    'font-size': labelFS + 'px', 'font-family': 'Inter', 'font-weight': 600, fill: '#f8fafc',
+                    'pointer-events': 'none', 'dominant-baseline': 'middle'
+                });
+                ltxt.textContent = labelStr;
+                svgEl.appendChild(ltxt);
+                const lbb = ltxt.getBBox();
+                const ltw = lbb.width + labelPadX * 2, lth = lbb.height + labelPadY * 2;
+                let lx = px + 12, ly = py - lth / 2;
+                if (lx + ltw > padL + plotW - 2) lx = px - 12 - ltw;
+                if (lx < padL + 2) lx = padL + 2;
+                if (ly < padT + 2) ly = padT + 2;
+                if (ly + lth > padT + plotH - 2) ly = padT + plotH - 2 - lth;
+                const lchip = r < 0
+                    ? { f: 'rgba(30, 58, 120, 0.9)', s: 'rgba(96, 165, 250, 0.65)' }
+                    : (r > 0 ? { f: 'rgba(90, 70, 25, 0.9)', s: 'rgba(250, 204, 21, 0.65)' } : { f: 'rgba(15, 23, 42, 0.9)', s: 'rgba(148, 163, 184, 0.45)' });
+                const lr = svg('rect', {
+                    x: lx, y: ly, width: ltw, height: lth, rx: 5, ry: 5, fill: lchip.f,
+                    stroke: lchip.s, 'stroke-width': 1, 'pointer-events': 'none'
+                });
+                svgEl.insertBefore(lr, ltxt);
+                ltxt.setAttribute('x', lx + labelPadX);
+                ltxt.setAttribute('y', ly + lth / 2);
+            }
         }
 
         const presets = {
