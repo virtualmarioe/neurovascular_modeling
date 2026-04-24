@@ -33,19 +33,36 @@ realisations of drive and measurement noise, and the grid is refined to
 
 ## Site sections
 
+The page follows the reader-first arc of the paper, then opens into
+pedagogical deep dives and interactive demos, and closes with reference
+material and authorship.
+
+**Paper arc**
+
 - **Overview**: TL;DR and pipeline teaser.
-- **Background: why the vasculature matters**: primer on BOLD, CBF, CMRO<sub>2</sub>,
-  CBV and neurovascular coupling.
 - **Abstract**: the published abstract verbatim.
 - **Methods at a glance**: four-step simulation pipeline.
-- **Inside the balloon model**: explainer plus Balloon Model Explorer demo.
-- **Three simulation scenarios**: illustrated summary cards.
-- **BOLD-FC simulator**: interactive two-region simulator with scatter plot.
-- **Scenario heatmap**: 2-D BOLD-FC landscape for each scenario.
+- **Three simulation scenarios**: illustrated summary cards for the three
+  manipulations (amplitudes, delays, CBF-CBV coupling).
 - **Key findings**: six take-aways from the paper.
 - **Clinical implications**: what the results mean for rs-fMRI practice.
+
+**Deep dives and interactive demos**
+
+- **Background: why the vasculature matters**: primer on BOLD, CBF,
+  CMRO<sub>2</sub>, CBV and neurovascular coupling.
+- **Inside the balloon model**: explainer plus Balloon Model Explorer demo.
+- **BOLD-FC simulator**: interactive two-region simulator with scatter plot.
+- **Scenario heatmap**: 2-D BOLD-FC landscape for each scenario.
+
+**Reference and meta**
+
 - **Glossary**: quick reference for all acronyms and concepts.
-- **Authors & contributions**: per-author CRediT-style contribution statements, plus a nested BibTeX card with one-click copy.
+- **Educational disclaimer & resources**: explicit "toy example" notice plus
+  links to the peer-reviewed article, the Zenodo data/code archive, and the
+  GitLab Matlab simulation source.
+- **Authors & contributions**: per-author CRediT-style contribution
+  statements, plus a nested BibTeX card with one-click copy.
 
 ## Structure
 
