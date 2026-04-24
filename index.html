@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modeling the impact of neurovascular coupling impairments on BOLD-based functional connectivity at rest &mdash; Archila-Mel&eacute;ndez, Sorg &amp; Preibisch (2020)</title>
+    <title>Modeling the impact of neurovascular coupling impairments on BOLD-based functional connectivity at rest | Archila-Mel&eacute;ndez, Sorg &amp; Preibisch (2020)</title>
     <meta name="description"
-        content="Interactive companion page for the NeuroImage (2020) simulation study on how impaired neurovascular coupling &mdash; CBF, CMRO2 and CBV &mdash; reshapes resting-state BOLD functional connectivity.">
+        content="Interactive companion page for the NeuroImage (2020) simulation study on how impaired neurovascular coupling (CBF, CMRO2 and CBV) reshapes resting-state BOLD functional connectivity.">
     <meta property="og:title"
         content="Modeling the impact of neurovascular coupling impairments on BOLD-based functional connectivity at rest">
     <meta property="og:description"
@@ -456,19 +456,20 @@
             </h1>
             <p class="hero-subtitle">
                 A simulation study showing how plausible alterations in cerebral blood flow, oxygen metabolism and
-                blood volume can, on their own, reshape &mdash; and even reverse &mdash; the sign of resting-state
+                blood volume can, on their own, reshape, and even reverse, the sign of resting-state
                 BOLD functional connectivity.
             </p>
             <p class="hero-authors">
-                <strong>Mario E. Archila-Mel&eacute;ndez</strong><sup>1,2,*</sup> &nbsp;&middot;&nbsp;
+                <strong>Mario E. Archila-Mel&eacute;ndez</strong><sup>1,2</sup> &nbsp;&middot;&nbsp;
                 <strong>Christian Sorg</strong><sup>1,2,3</sup> &nbsp;&middot;&nbsp;
-                <strong>Christine Preibisch</strong><sup>1,2,4</sup>
+                <strong>Christine Preibisch</strong><sup>1,2,4,*</sup>
             </p>
             <p class="hero-affiliations">
                 <sup>1</sup>Department of Neuroradiology, Klinikum rechts der Isar, Technical University of Munich, Munich, Germany &nbsp;&middot;&nbsp;
                 <sup>2</sup>TUM-Neuroimaging Center, Technical University of Munich, Munich, Germany &nbsp;&middot;&nbsp;
                 <sup>3</sup>Department of Psychiatry, Klinikum rechts der Isar, Technical University of Munich, Munich, Germany &nbsp;&middot;&nbsp;
-                <sup>4</sup>Clinic for Neurology, Klinikum rechts der Isar, Technical University of Munich, Munich, Germany
+                <sup>4</sup>Clinic for Neurology, Klinikum rechts der Isar, Technical University of Munich, Munich, Germany &nbsp;&middot;&nbsp;
+                <sup>*</sup>Corresponding author: <a href="mailto:preibisch@tum.de">preibisch@tum.de</a>
             </p>
             <div class="hero-buttons">
                 <a href="https://doi.org/10.1016/j.neuroimage.2020.116871" class="hero-btn" target="_blank" rel="noopener">
@@ -512,7 +513,7 @@
             <h2 class="section-title">Overview</h2>
             <p class="section-desc">
                 Resting-state fMRI maps how brain regions "talk" to one another by correlating their slow BOLD
-                fluctuations. But the BOLD signal is not neural activity &mdash; it is a hemodynamic proxy. This
+                fluctuations. But the BOLD signal is not neural activity; it is a hemodynamic proxy. This
                 paper asks a simple but consequential question: <em>how much of resting-state connectivity can be
                 explained by the vascular and metabolic machinery alone?</em>
             </p>
@@ -521,7 +522,7 @@
                     <div class="tldr-icon">&#129504;</div>
                     <div class="tldr-text">
                         Impaired neurovascular coupling can profoundly reshape resting-state BOLD functional
-                        connectivity &mdash; even flipping its sign.
+                        connectivity, even flipping its sign.
                     </div>
                 </div>
                 <div class="tldr-card">
@@ -555,8 +556,8 @@
                 activity: it reflects how local <em>blood flow</em>, <em>oxygen consumption</em> and
                 <em>blood volume</em> respond together to changes in neuronal firing. This chain of physiological
                 events is called <strong>neurovascular coupling</strong>. When it is intact, BOLD is a useful proxy
-                for neural activity. When it is impaired &mdash; as in stroke, small-vessel disease, Alzheimer's,
-                schizophrenia or simply healthy aging &mdash; BOLD signals <em>and</em> the connectivity networks
+                for neural activity. When it is impaired, as happens in stroke, small-vessel disease, Alzheimer's,
+                schizophrenia or simply healthy aging, BOLD signals <em>and</em> the connectivity networks
                 derived from them can shift without any change in the underlying neural communication.
             </p>
 
@@ -566,7 +567,7 @@
                     <p>
                         The BOLD contrast arises from the balance between oxygen <em>delivered</em> (CBF) and oxygen
                         <em>used</em> (CMRO<sub>2</sub>) in tiny post-capillary vessels. Two different combinations
-                        of CBF and CMRO<sub>2</sub> can produce the exact same BOLD trace &mdash; or opposite ones.
+                        of CBF and CMRO<sub>2</sub> can produce the exact same BOLD trace, or opposite ones.
                     </p>
                 </div>
                 <div class="exp-card">
@@ -574,7 +575,7 @@
                     <p>
                         Spontaneous BOLD fluctuations at rest are dominated by slow oscillations (&lt;&nbsp;0.1&nbsp;Hz).
                         Correlating those slow time courses between regions is what we call BOLD-based functional
-                        connectivity &mdash; a workhorse of cognitive and clinical neuroimaging.
+                        connectivity, a workhorse of cognitive and clinical neuroimaging.
                     </p>
                 </div>
                 <div class="exp-card">
@@ -589,7 +590,7 @@
 
             <div class="takeaway">
                 <strong>The driving question:</strong> can realistic alterations in CBF, CMRO<sub>2</sub> and CBV
-                &mdash; on their own, with <em>no change</em> in the underlying neural input &mdash; generate the
+                (on their own, with <em>no change</em> in the underlying neural input) generate the
                 connectivity differences routinely reported in patient populations? This paper answers that question
                 with a forward simulation you can reproduce in-browser below.
             </div>
@@ -605,7 +606,7 @@
                     Functional magnetic resonance imaging (fMRI) of blood oxygenation level dependent (BOLD) signals
                     during the resting-state is widely used to study functional connectivity (FC) of slowly
                     fluctuating ongoing brain activity (BOLD-FC) in humans with and without brain diseases. While
-                    physiological impairments &mdash; e.g. aberrant perfusion or vascular reactivity &mdash; are common
+                    physiological impairments (e.g. aberrant perfusion or vascular reactivity) are common
                     in neurological and psychiatric disorders, their impact on BOLD-FC is widely unknown and ignored.
                     The aim of our simulation study was therefore to investigate the influence of impaired
                     neurovascular coupling on resting-state BOLD-FC.
@@ -635,8 +636,8 @@
                 </p>
                 <p>
                     Our results demonstrate the importance of alterations in neurovascular coupling for aberrant
-                    resting-state BOLD-FC. Based on our data, we suggest to complement BOLD-FC studies &mdash; at
-                    least of at-risk patient populations &mdash; with perfusion and oxygenation sensitive MRI. In
+                    resting-state BOLD-FC. Based on our data, we suggest to complement BOLD-FC studies, at
+                    least of at-risk patient populations, with perfusion and oxygenation sensitive MRI. In
                     cases where this is not available, we recommend careful interpretation of BOLD-FC results
                     considering previous findings about hemodynamic&ndash;metabolic changes. Accurate modeling of
                     the hemodynamic&ndash;metabolic context might in the future improve both our understanding of
@@ -701,7 +702,7 @@
             <h2 class="section-title">Inside the balloon model</h2>
             <p class="exp-intro">
                 The <em>balloon model</em> (Buxton, Wong &amp; Frank, 1998) views a small patch of cortex as a
-                compliant venous compartment &mdash; a "balloon" &mdash; fed by arterial blood. When a region
+                compliant venous compartment (a "balloon") fed by arterial blood. When a region
                 becomes active, CBF increases rapidly, CMRO<sub>2</sub> follows more slowly and partially, and CBV
                 inflates the balloon. BOLD rises because the ratio of oxygenated to deoxygenated hemoglobin inside
                 the balloon shifts. In this <em>adjusted</em> version we can turn each of those knobs independently.
@@ -721,7 +722,7 @@
                 <div class="exp-card">
                     <h4>2. CMRO<sub>2</sub> <em>pulls BOLD down</em></h4>
                     <p>
-                        Higher oxygen consumption does the opposite &mdash; it creates more deoxyhemoglobin locally,
+                        Higher oxygen consumption does the opposite: it creates more deoxyhemoglobin locally,
                         which shortens T2* and <em>reduces</em> the BOLD signal.
                     </p>
                 </div>
@@ -744,7 +745,7 @@
                                 <span style="color:#0ea5e9;font-weight:700;">CBF</span> &middot;
                                 <span style="color:#dc2626;font-weight:700;">CMRO<sub>2</sub></span> &middot;
                                 <span style="color:#16a34a;font-weight:700;">CBV</span>
-                                &nbsp;&mdash; fractional change around baseline
+                                &nbsp;&middot; fractional change around baseline
                             </p>
                         </div>
                         <svg class="demo-svg" id="balloonInputs" viewBox="0 0 520 180" role="img" aria-label="Simulated CBF, CMRO2 and CBV time courses"></svg>
@@ -851,7 +852,7 @@
                         <p class="scenario-desc">
                             For small CMRO<sub>2</sub> delays, BOLD-FC flips from positive to negative as CBF delay
                             increases. For large CMRO<sub>2</sub> delays, positive BOLD-FC is instead simply
-                            attenuated &mdash; a strongly non-linear regime.
+                            attenuated, a strongly non-linear regime.
                         </p>
                     </div>
                 </article>
@@ -878,8 +879,8 @@
             <h2 class="section-title">BOLD-FC simulator</h2>
             <p class="exp-intro">
                 Two regions receive the <em>same</em> underlying neural oscillation at 0.05&nbsp;Hz. One
-                &mdash; the <strong>seed</strong> &mdash; has textbook neurovascular coupling. The other
-                &mdash; the <strong>target</strong> &mdash; can be made hypoperfused, metabolically dominant, or
+                region, the <strong>seed</strong>, has textbook neurovascular coupling. The other
+                region, the <strong>target</strong>, can be made hypoperfused, metabolically dominant, or
                 delayed. The correlation between the two simulated BOLD time courses <em>is</em> the BOLD-FC
                 estimate you would report from an rs-fMRI analysis. Watch it move as you change the plumbing.
             </p>
@@ -888,7 +889,7 @@
                 <div class="exp-card">
                     <h4>1. Same neural input <em>both sides</em></h4>
                     <p>
-                        Any change you see is driven purely by altered hemodynamics &mdash; there is no
+                        Any change you see is driven purely by altered hemodynamics; there is no
                         underlying change in neural connectivity between the two regions.
                     </p>
                 </div>
@@ -995,8 +996,8 @@
                 <strong>Key observation:</strong> without touching the underlying neural input, realistic shifts in
                 the target region's CBF or CMRO<sub>2</sub> can move the measured BOLD-FC from a strong positive
                 correlation (&asymp;&nbsp;+0.9) to a strong negative one (&asymp;&nbsp;&minus;0.7). A researcher
-                comparing patients to controls with rs-fMRI alone would see a "connectivity difference" &mdash;
-                but the neural wiring is identical.
+                comparing patients to controls with rs-fMRI alone would see a "connectivity difference",
+                yet the neural wiring is identical.
             </div>
         </div>
     </section>
@@ -1004,7 +1005,7 @@
     <!-- ===== SCENARIO HEATMAP ===== -->
     <section id="heatmap">
         <div class="container">
-            <h2 class="section-title">Scenario heatmap &mdash; BOLD-FC across the parameter plane</h2>
+            <h2 class="section-title">Scenario heatmap: BOLD-FC across the parameter plane</h2>
             <p class="exp-intro">
                 Individual sliders are useful, but the paper's central figures are <em>2D landscapes</em>:
                 BOLD-FC plotted over all combinations of two physiological variables. Each cell below is the
@@ -1012,6 +1013,16 @@
                 pair of parameters. Switch scenario to see how the shape of the landscape changes from a smooth
                 plane (scenario&nbsp;1) to a curved non-linear surface (scenario&nbsp;2) to an almost flat sheet
                 (scenario&nbsp;3).
+            </p>
+            <p class="exp-intro" style="margin-top: 12px; font-size: 0.92rem; color: #475569;">
+                To mirror the paper's methodology more faithfully, the landscapes below are computed from
+                <strong>broadband resting-state-like drives</strong> (filtered to the canonical
+                <strong>0.01&ndash;0.1&nbsp;Hz</strong> rs-fMRI band) sampled at a TR of <strong>2&nbsp;s</strong>
+                over <strong>6&nbsp;min</strong> of simulated data. Each cell averages the Pearson correlation
+                across <strong>4 independent Monte-Carlo realisations</strong> of the drive and measurement
+                noise, and the grid is refined to <strong>41&nbsp;&times;&nbsp;41</strong> parameter combinations.
+                A <strong>bilinear interpolation</strong> smooths the rendered colour field without hiding the
+                underlying grid resolution.
             </p>
 
             <div class="demo fade-in" id="heatDemo">
@@ -1078,10 +1089,13 @@
             </div>
 
             <div class="takeaway">
-                <strong>Reading the landscapes:</strong> the <em>amplitudes</em> map has a long, straight
-                "zero-crossing" diagonal &mdash; purely linear. The <em>delays</em> map shows a curved, ring-like
-                zero contour &mdash; strongly non-linear. The <em>CBV-coupling</em> map is almost uniformly
-                orange &mdash; BOLD-FC barely moves. That is the paper's central geometrical story.
+                <strong>Reading the landscapes.</strong> The <em>amplitudes</em> map shows a long, straight
+                "zero-crossing" diagonal; the dependence is essentially linear. The <em>delays</em> map shows a
+                curved, ring-like zero contour; the dependence is strongly non-linear because each frequency in
+                the broadband drive accumulates a different phase shift for the same temporal delay. The
+                <em>CBV-coupling</em> map is almost uniformly orange; BOLD-FC barely moves as the Grubb
+                exponent varies. That is the paper's central geometrical story, and it now survives the
+                switch from a single-tone drive to a realistic, noise-averaged rs-fMRI-band drive.
             </div>
         </div>
     </section>
@@ -1091,7 +1105,7 @@
         <div class="container">
             <h2 class="section-title">Key findings</h2>
             <p class="section-desc">
-                Six take-aways that drop out of the simulations &mdash; and matter for anyone interpreting
+                Six take-aways that drop out of the simulations, and that matter for anyone interpreting
                 resting-state fMRI.
             </p>
             <div class="findings-list fade-in">
@@ -1105,7 +1119,7 @@
                 <div class="finding-card">
                     <h4>Amplitudes: simple, linear</h4>
                     <p>
-                        Amplitude-driven changes act as a linear offset and scale on BOLD-FC &mdash; a relatively
+                        Amplitude-driven changes act as a linear offset and scale on BOLD-FC: a relatively
                         tractable source of bias that can be reasoned about analytically.
                     </p>
                 </div>
@@ -1153,8 +1167,8 @@
                 <div class="impl-card">
                     <h4>Don't over-interpret rs-fMRI alone</h4>
                     <p>
-                        In populations where cerebrovascular health is plausibly altered &mdash; stroke,
-                        small-vessel disease, dementia, schizophrenia, aging &mdash; a BOLD-FC difference cannot
+                        In populations where cerebrovascular health is plausibly altered, such as stroke,
+                        small-vessel disease, dementia, schizophrenia, or aging, a BOLD-FC difference cannot
                         be interpreted as a neural connectivity difference without further evidence.
                     </p>
                 </div>
@@ -1170,7 +1184,7 @@
                     <h4>Report hemodynamic context</h4>
                     <p>
                         When ASL/qBOLD are not available, studies should at minimum report known or suspected
-                        hemodynamic alterations and discuss their expected effect on BOLD-FC &mdash; the simulation
+                        hemodynamic alterations and discuss their expected effect on BOLD-FC; the simulation
                         landscapes above offer a concrete reference.
                     </p>
                 </div>
@@ -1274,7 +1288,7 @@
                 <div class="glossary-item">
                     <div class="glossary-term"><abbr title="Arterial Spin Labeling">ASL</abbr></div>
                     <div class="glossary-def">
-                        MRI technique that magnetically labels arterial water to image CBF quantitatively &mdash;
+                        MRI technique that magnetically labels arterial water to image CBF quantitatively;
                         the most common non-invasive perfusion measurement.
                     </div>
                 </div>
@@ -1304,31 +1318,35 @@
             <div class="author-group">
                 <div class="author-role lead">Corresponding author</div>
                 <div class="author-names">
-                    <strong>Mario E. Archila-Mel&eacute;ndez</strong>
+                    <strong>Christine Preibisch</strong> &nbsp;&middot;&nbsp;
+                    <a href="mailto:preibisch@tum.de">preibisch@tum.de</a>
                 </div>
                 <div class="author-affiliation">
-                    Department of Neuroradiology, Klinikum rechts der Isar &nbsp;&middot;&nbsp; TUM-Neuroimaging
-                    Center, Technical University of Munich, Munich, Germany
+                    Department of Diagnostic and Interventional Neuroradiology &middot; Clinic for Neurology
+                    &middot; TUM-Neuroimaging Center, Klinikum rechts der Isar, Technical University of Munich,
+                    Ismaninger Stra&szlig;e&nbsp;22, 81675 Munich, Germany
                 </div>
             </div>
 
             <div class="author-group">
                 <div class="author-role">Co-authors</div>
                 <div class="author-names">
+                    <strong>Mario E. Archila-Mel&eacute;ndez</strong> &nbsp;&middot;&nbsp;
+                    <a href="mailto:mario.archila@tum.de">mario.archila@tum.de</a><br>
                     <strong>Christian Sorg</strong> &nbsp;&middot;&nbsp;
-                    <strong>Christine Preibisch</strong>
+                    <a href="mailto:christian.sorg@tum.de">christian.sorg@tum.de</a>
                 </div>
                 <div class="author-affiliation">
-                    Department of Neuroradiology &middot; Department of Psychiatry &middot; Clinic for Neurology
-                    &middot; TUM-Neuroimaging Center, Klinikum rechts der Isar, Technical University of Munich,
-                    Munich, Germany
+                    Department of Diagnostic and Interventional Neuroradiology &middot; Department of
+                    Psychiatry &middot; TUM-Neuroimaging Center, Klinikum rechts der Isar, Technical
+                    University of Munich, Munich, Germany
                 </div>
             </div>
 
             <div class="author-group">
                 <div class="author-role">Funding</div>
                 <div class="author-names" style="font-size: 0.9rem;">
-                    Deutsche Forschungsgemeinschaft (DFG) &mdash; grants <strong>PR&nbsp;1039/6-1</strong> and
+                    Deutsche Forschungsgemeinschaft (DFG): grants <strong>PR&nbsp;1039/6-1</strong> and
                     <strong>SO&nbsp;1336/4-1</strong>.
                 </div>
             </div>
@@ -1967,7 +1985,7 @@
                 xLow: 0, xHigh: 0.40, xFmt: v => (v * 100).toFixed(0) + '%',
                 yLow: 0, yHigh: 0.40, yFmt: v => (v * 100).toFixed(0) + '%',
                 scenarioHint: 'X&nbsp;axis:&nbsp;target CBF amplitude. Y&nbsp;axis:&nbsp;target CMRO<sub>2</sub> amplitude. Each cell is one full simulation.',
-                compute: (x, y) => computeFc({ cbfAmp: x, cmrAmp: y, cbfPhase: 0, cmrPhase: 0, grubb: 0.38 })
+                compute: (x, y) => computeFcBB({ cbfAmp: x, cmrAmp: y, cbfDelay: 0, cmrDelay: 0, grubb: 0.38 })
             },
             delay: {
                 label: '2 &middot; Delays',
@@ -1979,10 +1997,9 @@
                 xLow: -6, xHigh: 6, xFmt: v => v.toFixed(1) + 's',
                 yLow: -6, yHigh: 6, yFmt: v => v.toFixed(1) + 's',
                 scenarioHint: 'X&nbsp;axis:&nbsp;target CBF delay. Y&nbsp;axis:&nbsp;target CMRO<sub>2</sub> delay. Amplitudes stay at healthy baseline.',
-                compute: (x, y) => computeFc({
+                compute: (x, y) => computeFcBB({
                     cbfAmp: 0.20, cmrAmp: 0.05,
-                    cbfPhase: 2 * Math.PI * FREQ * x,
-                    cmrPhase: 2 * Math.PI * FREQ * y,
+                    cbfDelay: x, cmrDelay: y,
                     grubb: 0.38
                 })
             },
@@ -1994,20 +2011,110 @@
                 xShort: 'Grubb &alpha;',
                 yShort: 'CBF amp',
                 xLow: 0, xHigh: 0.80, xFmt: v => v.toFixed(2),
-                yLow: 0, yHigh: 0.40, yFmt: v => (v * 100).toFixed(0) + '%',
-                scenarioHint: 'X&nbsp;axis:&nbsp;CBF&ndash;CBV coupling. Y&nbsp;axis:&nbsp;target CBF amplitude. Notice how flat this surface is.',
-                compute: (x, y) => computeFc({
+                yLow: 0.10, yHigh: 0.30, yFmt: v => (v * 100).toFixed(0) + '%',
+                scenarioHint: 'X&nbsp;axis:&nbsp;CBF&ndash;CBV coupling (Grubb exponent &alpha;<sub>v</sub>,&nbsp;0 to&nbsp;0.80). Y&nbsp;axis:&nbsp;target CBF amplitude held to the physiological 10&ndash;30&nbsp;% range. Notice how flat this surface is across both axes.',
+                compute: (x, y) => computeFcBB({
                     cbfAmp: y, cmrAmp: 0.05,
-                    cbfPhase: 0, cmrPhase: 0,
+                    cbfDelay: 0, cmrDelay: 0,
                     grubb: x
                 })
             }
         };
 
-        function computeFc(params) {
-            const seed = makeHemo({ cbfAmp: 0.20, cmrAmp: 0.05, cbfPhase: 0, cmrPhase: 0, grubb: 0.38, noise: 0, seed: 42 });
-            const tgt = makeHemo(Object.assign({ noise: 0, seed: 71 }, params));
-            return pearson(Array.from(seed.bold), Array.from(tgt.bold));
+        /* ------------------------------------------------------------- *
+         *  Broadband rs-fMRI-like simulator for heatmap precision.      *
+         *  Drive is a sum of sinusoids uniformly spaced in 0.01-0.1 Hz, *
+         *  with 1/sqrt(f) amplitude weighting (pink-ish rs-fMRI band).  *
+         *  Seed and target share the same underlying drive per MC run;  *
+         *  delays are applied as genuine temporal shifts (each freq     *
+         *  picks up 2*pi*f*tau), so scenario 2 becomes genuinely non-   *
+         *  linear rather than a single-tone phase rotation. Four        *
+         *  independent Monte-Carlo realisations of the drive plus       *
+         *  measurement noise are averaged per grid cell.                *
+         * ------------------------------------------------------------- */
+        const HEAT_TR = 2.0;                  // seconds per sample (rs-fMRI TR)
+        const HEAT_NSAMP = 180;               // 360 s = 6 min
+        const HEAT_FLOW = 0.01;               // Hz, low edge of rs-fMRI band
+        const HEAT_FHIGH = 0.10;              // Hz, high edge of rs-fMRI band
+        const HEAT_NFREQ = 48;                // sinusoidal components
+        const HEAT_MC = 4;                    // Monte-Carlo runs per cell
+        const HEAT_NOISE_STD = 0.0015;        // measurement noise on BOLD (fractional)
+
+        // Precompute one set of {freq, amp, phase} per MC run so seed and target
+        // share the same neural drive and any Pearson change reflects only the
+        // hemodynamic/metabolic manipulation.
+        const HEAT_DRIVES = (function () {
+            const drives = [];
+            for (let m = 0; m < HEAT_MC; m++) {
+                const rng = seededRandom(1013 + m * 911);
+                const freqs = new Float64Array(HEAT_NFREQ);
+                const amps = new Float64Array(HEAT_NFREQ);
+                const phases = new Float64Array(HEAT_NFREQ);
+                let power = 0;
+                for (let k = 0; k < HEAT_NFREQ; k++) {
+                    const frac = (k + 0.5) / HEAT_NFREQ;
+                    freqs[k] = HEAT_FLOW + (HEAT_FHIGH - HEAT_FLOW) * frac;
+                    amps[k] = 1 / Math.sqrt(freqs[k]);   // 1/f-ish spectrum
+                    phases[k] = rng() * 2 * Math.PI;
+                    power += 0.5 * amps[k] * amps[k];    // var of sum of sines
+                }
+                // Normalise so var(drive) ~= 1 across realisations
+                const s = 1 / Math.sqrt(power);
+                for (let k = 0; k < HEAT_NFREQ; k++) amps[k] *= s;
+                drives.push({ freqs, amps, phases });
+            }
+            return drives;
+        })();
+
+        // Evaluate a delayed version of the drive at each sample time.
+        // Cache per (drive, delay) pair so repeated cells reuse signal arrays.
+        const HEAT_DRIVE_CACHE = new Map();
+        function driveSamples(mIdx, delaySec) {
+            const key = mIdx + '|' + delaySec.toFixed(3);
+            const cached = HEAT_DRIVE_CACHE.get(key);
+            if (cached) return cached;
+            const d = HEAT_DRIVES[mIdx];
+            const out = new Float64Array(HEAT_NSAMP);
+            for (let i = 0; i < HEAT_NSAMP; i++) {
+                const t = i * HEAT_TR;
+                let s = 0;
+                for (let k = 0; k < HEAT_NFREQ; k++) {
+                    const w = 2 * Math.PI * d.freqs[k];
+                    s += d.amps[k] * Math.sin(w * (t - delaySec) + d.phases[k]);
+                }
+                out[i] = s;
+            }
+            HEAT_DRIVE_CACHE.set(key, out);
+            return out;
+        }
+
+        function simulateBoldBB(mIdx, params, noiseRng) {
+            const { cbfAmp, cmrAmp, cbfDelay, cmrDelay, grubb } = params;
+            const alpha = BETA - grubb;
+            const cbfSig = driveSamples(mIdx, cbfDelay);
+            const cmrSig = driveSamples(mIdx, cmrDelay);
+            const bold = new Float64Array(HEAT_NSAMP);
+            for (let i = 0; i < HEAT_NSAMP; i++) {
+                let b = M_CAL * (alpha * cbfAmp * cbfSig[i] - BETA * cmrAmp * cmrSig[i]);
+                if (noiseRng) b += HEAT_NOISE_STD * gaussPair(noiseRng);
+                bold[i] = b;
+            }
+            return bold;
+        }
+
+        const SEED_PARAMS = { cbfAmp: 0.20, cmrAmp: 0.05, cbfDelay: 0, cmrDelay: 0, grubb: 0.38 };
+
+        function computeFcBB(targetParams) {
+            let accR = 0;
+            for (let m = 0; m < HEAT_MC; m++) {
+                // Independent noise for seed and target, same underlying drive.
+                const seedRng = seededRandom(7001 + m * 101);
+                const tgtRng = seededRandom(9001 + m * 181);
+                const seedBold = simulateBoldBB(m, SEED_PARAMS, seedRng);
+                const tgtBold = simulateBoldBB(m, targetParams, tgtRng);
+                accR += pearson(Array.from(seedBold), Array.from(tgtBold));
+            }
+            return accR / HEAT_MC;
         }
 
         // Color ramp (-1..1): blue -> grey -> orange
@@ -2029,8 +2136,9 @@
             return 'rgb(' + c.join(',') + ')';
         }
 
-        // Cache grids per scenario (30x30)
-        const GRID_N = 30;
+        // Cache grids per scenario. 41x41 gives ~2.5% parameter resolution
+        // across each axis, matching the density of the paper's published maps.
+        const GRID_N = 41;
         const gridCache = {};
         function computeGrid(name) {
             if (gridCache[name]) return gridCache[name];
@@ -2083,35 +2191,95 @@
 
             mapSvg.appendChild(svg('rect', { x: padL - 1, y: padT - 1, width: plotW + 2, height: plotH + 2, fill: '#0f172a' }));
 
-            const cw = plotW / GRID_N;
-            const ch = plotH / GRID_N;
-            for (let j = 0; j < GRID_N; j++) {
-                for (let i = 0; i < GRID_N; i++) {
-                    const r = grid[j * GRID_N + i];
-                    const x = padL + i * cw;
-                    const y = padT + (GRID_N - 1 - j) * ch;
+            // Bilinear-interpolated rendering.  We sample the 41x41 computed
+            // grid onto a finer display lattice (SUB*GRID_N along each axis) so
+            // the colour field looks smooth without hiding the underlying grid
+            // density from the numerical readout.
+            const SUB = 2;                               // subpixel oversampling
+            const N = GRID_N;
+            const cw = plotW / ((N - 1) * SUB);
+            const ch = plotH / ((N - 1) * SUB);
+            function sampleBilinear(u, v) {
+                // u, v in [0, N-1]
+                const i0 = Math.min(N - 2, Math.max(0, Math.floor(u)));
+                const j0 = Math.min(N - 2, Math.max(0, Math.floor(v)));
+                const tu = u - i0;
+                const tv = v - j0;
+                const a = grid[j0 * N + i0];
+                const b = grid[j0 * N + i0 + 1];
+                const c = grid[(j0 + 1) * N + i0];
+                const d = grid[(j0 + 1) * N + i0 + 1];
+                return (1 - tu) * (1 - tv) * a + tu * (1 - tv) * b
+                     + (1 - tu) * tv * c + tu * tv * d;
+            }
+            const SUBS = (N - 1) * SUB;
+            for (let jj = 0; jj < SUBS; jj++) {
+                const v = (jj + 0.5) / SUB;
+                for (let ii = 0; ii < SUBS; ii++) {
+                    const u = (ii + 0.5) / SUB;
+                    const r = sampleBilinear(u, v);
+                    const x = padL + ii * cw;
+                    const y = padT + (SUBS - 1 - jj) * ch;
                     mapSvg.appendChild(svg('rect', {
-                        x: x, y: y, width: cw + 0.4, height: ch + 0.4,
+                        x: x, y: y, width: cw + 0.3, height: ch + 0.3,
                         fill: colorRamp(r)
                     }));
                 }
             }
 
-            // Zero contour (approximate isoline r=0 via marching squares -- simplified: just highlight band)
-            for (let j = 0; j < GRID_N - 1; j++) {
-                for (let i = 0; i < GRID_N - 1; i++) {
-                    const a = grid[j * GRID_N + i];
-                    const b = grid[j * GRID_N + (i + 1)];
-                    const c = grid[(j + 1) * GRID_N + i];
-                    const d = grid[(j + 1) * GRID_N + (i + 1)];
-                    const minV = Math.min(a, b, c, d);
-                    const maxV = Math.max(a, b, c, d);
-                    if (minV <= 0 && maxV >= 0) {
-                        const x = padL + i * cw;
-                        const y = padT + (GRID_N - 1 - j - 1) * ch;
-                        mapSvg.appendChild(svg('rect', {
-                            x: x, y: y, width: cw * 2, height: ch * 2,
-                            fill: 'none', stroke: '#0f172a', 'stroke-width': 0.4, opacity: 0.4
+            // Proper zero iso-contour via marching squares on the high-precision
+            // grid.  Each edge that crosses r = 0 is linearly interpolated, and
+            // the two crossing points within a cell are joined by a line.
+            const MS = [
+                [],                     // 0000
+                [[3, 0]],               // 0001
+                [[0, 1]],               // 0010
+                [[3, 1]],               // 0011
+                [[1, 2]],               // 0100
+                [[3, 0], [1, 2]],       // 0101 (ambiguous; draw both)
+                [[0, 2]],               // 0110
+                [[3, 2]],               // 0111
+                [[2, 3]],               // 1000
+                [[0, 2]],               // 1001 (ambiguous; pick one)
+                [[0, 1], [2, 3]],       // 1010
+                [[1, 2]],               // 1011
+                [[1, 3]],               // 1100
+                [[0, 1]],               // 1101
+                [[0, 3]],               // 1110
+                []                      // 1111
+            ];
+            const gx0 = padL;
+            const gy0 = padT + plotH;                    // y axis inverted
+            const gdx = plotW / (N - 1);
+            const gdy = plotH / (N - 1);
+            function edgePoint(e, i, j, a, b, c, d) {
+                // Corner order used here: 0=(i,j), 1=(i+1,j), 2=(i+1,j+1), 3=(i,j+1)
+                // Edges: 0 bottom, 1 right, 2 top, 3 left
+                let x, y, t;
+                if (e === 0)      { t = a / (a - b); x = i + t;     y = j; }
+                else if (e === 1) { t = b / (b - c); x = i + 1;     y = j + t; }
+                else if (e === 2) { t = d / (d - c); x = i + t;     y = j + 1; }
+                else              { t = a / (a - d); x = i;         y = j + t; }
+                return { x: gx0 + x * gdx, y: gy0 - y * gdy };
+            }
+            for (let j = 0; j < N - 1; j++) {
+                for (let i = 0; i < N - 1; i++) {
+                    const a = grid[j * N + i];
+                    const b = grid[j * N + i + 1];
+                    const c = grid[(j + 1) * N + i + 1];
+                    const d = grid[(j + 1) * N + i];
+                    let code = 0;
+                    if (a > 0) code |= 1;
+                    if (b > 0) code |= 2;
+                    if (c > 0) code |= 4;
+                    if (d > 0) code |= 8;
+                    const edges = MS[code];
+                    for (const seg of edges) {
+                        const p = edgePoint(seg[0], i, j, a, b, c, d);
+                        const q = edgePoint(seg[1], i, j, a, b, c, d);
+                        mapSvg.appendChild(svg('line', {
+                            x1: p.x, y1: p.y, x2: q.x, y2: q.y,
+                            stroke: '#0f172a', 'stroke-width': 1, opacity: 0.55
                         }));
                     }
                 }
@@ -2196,9 +2364,36 @@
         document.querySelectorAll('[data-heat-preset]').forEach(btn => {
             btn.addEventListener('click', () => {
                 const p = btn.getAttribute('data-heat-preset');
-                if (p === 'healthy') { els.xIn.value = 90; els.yIn.value = 20; }
-                else if (p === 'flip') { els.xIn.value = 12; els.yIn.value = 75; }
-                else if (p === 'center') { els.xIn.value = 50; els.yIn.value = 50; }
+                const sc = scenarios[scenario];
+                // Helper: value -> slider percent [0..100] given current scenario axis.
+                const frac = (v, lo, hi) => Math.max(0, Math.min(100, 100 * (v - lo) / (hi - lo)));
+                if (p === 'healthy') {
+                    // Scenario-specific physiologically healthy operating points.
+                    if (scenario === 'amp') {
+                        els.xIn.value = frac(0.20, sc.xLow, sc.xHigh);
+                        els.yIn.value = frac(0.05, sc.yLow, sc.yHigh);
+                    } else if (scenario === 'delay') {
+                        els.xIn.value = frac(0, sc.xLow, sc.xHigh);
+                        els.yIn.value = frac(0, sc.yLow, sc.yHigh);
+                    } else {
+                        els.xIn.value = frac(0.38, sc.xLow, sc.xHigh);
+                        els.yIn.value = frac(0.20, sc.yLow, sc.yHigh);
+                    }
+                } else if (p === 'flip') {
+                    // A spot where BOLD-FC tends to cross through zero.
+                    if (scenario === 'amp') {
+                        els.xIn.value = frac(0.06, sc.xLow, sc.xHigh);
+                        els.yIn.value = frac(0.22, sc.yLow, sc.yHigh);
+                    } else if (scenario === 'delay') {
+                        els.xIn.value = frac(-4, sc.xLow, sc.xHigh);
+                        els.yIn.value = frac(3, sc.yLow, sc.yHigh);
+                    } else {
+                        els.xIn.value = frac(0.70, sc.xLow, sc.xHigh);
+                        els.yIn.value = frac(0.09, sc.yLow, sc.yHigh);
+                    }
+                } else if (p === 'center') {
+                    els.xIn.value = 50; els.yIn.value = 50;
+                }
                 render();
             });
         });

@@ -1,4 +1,4 @@
-# Neurovascular Modeling — Project Website
+# Neurovascular Modeling: Project Website
 
 A static project website for the NeuroImage (2020) article:
 
@@ -11,11 +11,11 @@ The site explains the paper's motivation and results for a broad audience, and
 ships with three self-contained **in-browser simulations** that reproduce the
 qualitative behaviour of the paper's adjusted balloon model:
 
-1. **Balloon Model Explorer** — tweak CBF, CMRO<sub>2</sub> and CBV dynamics
+1. **Balloon Model Explorer**: tweak CBF, CMRO<sub>2</sub> and CBV dynamics
    and watch the resulting BOLD signal.
-2. **BOLD-FC Simulator** — compare two simulated regions (seed vs. target),
+2. **BOLD-FC Simulator**: compare two simulated regions (seed vs. target),
    see both BOLD time courses and a live Pearson correlation / scatter plot.
-3. **Scenario Heatmap** — 2-D landscapes of BOLD-FC over pairs of physiological
+3. **Scenario Heatmap**: 2-D landscapes of BOLD-FC over pairs of physiological
    parameters for each of the three scenarios (amplitudes / delays / CBV).
 
 All demos use a linearised Davis-style BOLD model
@@ -23,22 +23,30 @@ All demos use a linearised Davis-style BOLD model
 − β·ΔCMRO<sub>2</sub>/CMRO<sub>2,0</sub>]) and run entirely in the browser
 with no external libraries.
 
+The Scenario Heatmap follows the paper's methodology more closely than the
+single-tone demos: the seed and target regions are driven by a shared
+broadband signal filtered to the canonical resting-state band
+(0.01–0.1 Hz, sampled at TR = 2 s over 6 min), the Pearson correlation of
+each parameter combination is averaged over four independent Monte-Carlo
+realisations of drive and measurement noise, and the grid is refined to
+41 × 41 cells with a bilinear interpolation overlay for smooth rendering.
+
 ## Site sections
 
-- **Overview** — TL;DR and pipeline teaser.
-- **Background: why the plumbing matters** — primer on BOLD, CBF, CMRO<sub>2</sub>,
+- **Overview**: TL;DR and pipeline teaser.
+- **Background: why the plumbing matters**: primer on BOLD, CBF, CMRO<sub>2</sub>,
   CBV and neurovascular coupling.
-- **Abstract** — the published abstract verbatim.
-- **Methods at a glance** — four-step simulation pipeline.
-- **Inside the balloon model** — explainer plus Balloon Model Explorer demo.
-- **Three simulation scenarios** — illustrated summary cards.
-- **BOLD-FC simulator** — interactive two-region simulator with scatter plot.
-- **Scenario heatmap** — 2-D BOLD-FC landscape for each scenario.
-- **Key findings** — six take-aways from the paper.
-- **Clinical implications** — what the results mean for rs-fMRI practice.
-- **Glossary** — quick reference for all acronyms and concepts.
-- **Authors** — corresponding author, co-authors and funding.
-- **Cite this work** — one-click BibTeX citation.
+- **Abstract**: the published abstract verbatim.
+- **Methods at a glance**: four-step simulation pipeline.
+- **Inside the balloon model**: explainer plus Balloon Model Explorer demo.
+- **Three simulation scenarios**: illustrated summary cards.
+- **BOLD-FC simulator**: interactive two-region simulator with scatter plot.
+- **Scenario heatmap**: 2-D BOLD-FC landscape for each scenario.
+- **Key findings**: six take-aways from the paper.
+- **Clinical implications**: what the results mean for rs-fMRI practice.
+- **Glossary**: quick reference for all acronyms and concepts.
+- **Authors**: corresponding author, co-authors and funding.
+- **Cite this work**: one-click BibTeX citation.
 
 ## Structure
 
