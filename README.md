@@ -102,14 +102,26 @@ To enable it once:
 The site will then be served at
 `https://<your-username>.github.io/neurovascular_modeling/`.
 
-## Content
+## Educational disclaimer and resources
 
-All figures in `files/images/` are schematic illustrations generated for this
-summary website; they are not the original journal figures. The paper itself
-should be consulted for the complete results, equations and figures. The
-interactive demos reproduce the qualitative behaviour of the paper's three
-scenarios but use a simplified linearised model intended for pedagogical
-exploration, not quantitative reanalysis.
+All explainers, figures and in-browser simulators on this site are **toy
+examples for educational purposes only**. They rely on a linearised
+Davis-style BOLD model and a small set of synthetic inputs, deliberately
+sacrificing numerical fidelity for interactivity. They are *not* a
+reproduction of the paper's quantitative analyses and should not be used for
+scientific reanalysis, clinical inference, or benchmarking.
+
+The schematic figures in `files/images/` are illustrations generated for this
+companion site; they are not the original journal figures.
+
+For anything serious, use the primary sources, all open access:
+
+- Peer-reviewed article (full methods, statistics and discussion):
+  <https://doi.org/10.1016/j.neuroimage.2020.116871>
+- Data and custom Matlab code (Zenodo, citable archive):
+  <https://zenodo.org/record/3773316>
+- Matlab BOLD simulation source (GitLab LRZ, maintained by the authors):
+  <https://gitlab.lrz.de/nmrm_lab/public_projects/bold-simulation>
 
 ## Citation
 

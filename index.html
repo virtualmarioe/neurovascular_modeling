@@ -96,6 +96,12 @@
             max-width: 900px; margin: 0 auto 28px;
         }
         .hero-affiliations sup { color: #334155; font-weight: 600; margin-right: 2px; }
+        .hero-affiliations a {
+            color: #334155; text-decoration: none;
+            border-bottom: 1px dotted #cbd5e1;
+            transition: color 0.15s ease, border-color 0.15s ease;
+        }
+        .hero-affiliations a:hover { color: #d97706; border-bottom-color: #d97706; }
         .hero-buttons { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
         .hero-btn {
             display: inline-flex; align-items: center; gap: 8px;
@@ -188,6 +194,34 @@
             color: #422006; font-size: 0.94rem; line-height: 1.75;
         }
         .takeaway strong { color: #92400e; }
+
+        /* ===== Disclaimer section ===== */
+        .disclaimer-section { padding: 60px 0; background: #fffbeb; border-top: 1px solid #fde68a; border-bottom: 1px solid #fde68a; }
+        .disclaimer-card {
+            max-width: 960px; margin: 0 auto;
+            padding: 28px 32px; border-radius: 16px;
+            background: #fff; border: 1px solid #fde68a;
+            box-shadow: 0 8px 24px rgba(146, 64, 14, 0.05);
+        }
+        .disclaimer-intro { font-size: 0.98rem; color: #422006; line-height: 1.75; margin-bottom: 22px; }
+        .disclaimer-intro strong { color: #92400e; }
+        .resource-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px; margin-top: 20px;
+        }
+        .resource-link {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 16px 18px; border-radius: 12px;
+            background: #fffbeb; border: 1px solid #fde68a;
+            text-decoration: none; color: #422006;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+        }
+        .resource-link:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(146, 64, 14, 0.10); border-color: #f59e0b; }
+        .resource-link svg { flex-shrink: 0; width: 22px; height: 22px; stroke: #d97706; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; margin-top: 2px; }
+        .resource-link .r-title { font-weight: 700; font-size: 0.95rem; color: #92400e; margin-bottom: 4px; display: block; }
+        .resource-link .r-desc  { font-size: 0.82rem; color: #78350f; line-height: 1.55; }
+        .resource-link .r-host  { font-size: 0.75rem; color: #b45309; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; margin-top: 6px; display: block; word-break: break-all; }
 
         /* ===== Interactive demo (shared layout) ===== */
         .demo {
@@ -416,6 +450,12 @@
         .author-role.lead { background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; }
         .author-names { font-size: 0.98rem; color: #334155; line-height: 2; }
         .author-names strong { color: #0f172a; font-weight: 600; }
+        .author-names a {
+            color: #475569; text-decoration: none;
+            border-bottom: 1px dotted #cbd5e1;
+            transition: color 0.15s ease, border-color 0.15s ease;
+        }
+        .author-names a:hover { color: #d97706; border-bottom-color: #d97706; }
         .author-affiliation { font-size: 0.85rem; color: #64748b; margin-top: 8px; line-height: 1.7; font-style: italic; }
 
         /* ===== Footer ===== */
@@ -502,6 +542,7 @@
             <a href="#findings" class="nav-link">Key Findings</a>
             <a href="#implications" class="nav-link">Clinical Implications</a>
             <a href="#glossary" class="nav-link">Glossary</a>
+            <a href="#disclaimer" class="nav-link">Disclaimer</a>
             <a href="#authors" class="nav-link">Authors</a>
             <a href="#bibtex" class="nav-link">Cite</a>
         </div>
@@ -1305,6 +1346,74 @@
                         Acquisition parameters: TR sets the temporal resolution of the BOLD time series; SNR sets
                         how much the time course is contaminated by measurement noise.
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== DISCLAIMER & RESOURCES ===== -->
+    <section id="disclaimer" class="disclaimer-section">
+        <div class="container">
+            <h2 class="section-title">Educational disclaimer &amp; resources</h2>
+            <p class="section-desc">
+                This page is a didactic companion to the paper, not a reimplementation of it.
+            </p>
+            <div class="disclaimer-card fade-in">
+                <p class="disclaimer-intro">
+                    <strong>For educational use only.</strong> All explainers, sliders, heatmaps and the
+                    three in-browser simulators on this page are <em>toy examples</em> built to make the
+                    paper's qualitative story tangible in the browser. They rely on a linearised
+                    Davis-style BOLD model and a small set of synthetic inputs, and deliberately sacrifice
+                    numerical fidelity for interactivity. They are <strong>not</strong> a reproduction of
+                    the paper's quantitative analyses and should <strong>not</strong> be used for any
+                    scientific reanalysis, clinical inference, or benchmarking.
+                </p>
+                <p class="disclaimer-intro" style="margin-bottom: 0;">
+                    The full, peer-reviewed methodology (the adjusted Buxton&ndash;Obata balloon model, the
+                    rs-fMRI-specific simulation parameters, statistical evaluation, and robustness checks
+                    across SNR and TR) is described in the NeuroImage&nbsp;2020 paper. The corresponding
+                    <strong>data and Matlab simulation code are open access</strong> and published
+                    alongside the paper. Use those resources for any serious scientific work.
+                </p>
+                <div class="resource-grid">
+                    <a class="resource-link" href="https://doi.org/10.1016/j.neuroimage.2020.116871"
+                        target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                        <span>
+                            <span class="r-title">Peer-reviewed article</span>
+                            <span class="r-desc">Full methods, simulations, statistics and clinical discussion (NeuroImage, 2020).</span>
+                            <span class="r-host">doi.org/10.1016/j.neuroimage.2020.116871</span>
+                        </span>
+                    </a>
+                    <a class="resource-link" href="https://zenodo.org/record/3773316"
+                        target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>
+                            <span class="r-title">Data &amp; code archive (Zenodo)</span>
+                            <span class="r-desc">Supplementary data and the custom Matlab code used by the paper, citable and long-term archived.</span>
+                            <span class="r-host">zenodo.org/record/3773316</span>
+                        </span>
+                    </a>
+                    <a class="resource-link" href="https://gitlab.lrz.de/nmrm_lab/public_projects/bold-simulation"
+                        target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                        </svg>
+                        <span>
+                            <span class="r-title">Matlab simulation source (GitLab LRZ)</span>
+                            <span class="r-desc">The original BOLD simulation repository maintained by the authors at TU Munich.</span>
+                            <span class="r-host">gitlab.lrz.de/nmrm_lab/public_projects/bold-simulation</span>
+                        </span>
+                    </a>
                 </div>
             </div>
         </div>
