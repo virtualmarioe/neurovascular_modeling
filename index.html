@@ -336,10 +336,25 @@
             background: linear-gradient(180deg, rgba(51, 65, 85, 0.92), rgba(15, 23, 42, 0.98));
             border-color: rgba(186, 199, 216, 0.5);
         }
+        .scatter-tooltip.st-tip-cbf {
+            background: linear-gradient(160deg, rgba(2, 132, 199, 0.55), rgba(15, 23, 42, 0.96));
+            border-color: rgba(125, 211, 252, 0.65);
+        }
+        .scatter-tooltip.st-tip-cmr {
+            background: linear-gradient(160deg, rgba(190, 18, 60, 0.5), rgba(15, 23, 42, 0.96));
+            border-color: rgba(251, 113, 133, 0.65);
+        }
+        .scatter-tooltip.st-tip-cbv {
+            background: linear-gradient(160deg, rgba(21, 128, 61, 0.5), rgba(15, 23, 42, 0.96));
+            border-color: rgba(134, 239, 172, 0.65);
+        }
         .scatter-tooltip.visible { opacity: 1; }
         .scatter-tooltip .st-row { display: flex; justify-content: space-between; gap: 16px; min-width: 13em; }
         .scatter-tooltip .st-key { color: #f1f5f9; font-weight: 600; }
         .scatter-tooltip .st-val { color: #ffffff; font-weight: 800; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); }
+        .scatter-tooltip .st-val.st-cbf { color: #7dd3fc; }
+        .scatter-tooltip .st-val.st-cmr { color: #fda4af; }
+        .scatter-tooltip .st-val.st-cbv { color: #86efac; }
 
         /* ===== Interactive demo (shared layout) ===== */
         .demo {
@@ -1147,10 +1162,16 @@
                                 <span style="color:#0ea5e9;font-weight:700;">CBF</span> &middot;
                                 <span style="color:#dc2626;font-weight:700;">CMRO<sub>2</sub></span> &middot;
                                 <span style="color:#16a34a;font-weight:700;">CBV</span>
-                                &nbsp;&middot; fractional change around baseline
+                                &nbsp;&middot; fractional change around baseline.
+                                <strong>Hover</strong> for a sample readout, <strong>click or drag</strong> empty space to
+                                pin a time crosshair (mirrored on the BOLD plot), or <strong>drag a curve</strong> to
+                                set its slider directly.
                             </p>
                         </div>
-                        <svg class="demo-svg" id="balloonInputs" viewBox="0 0 520 180" role="img" aria-label="Simulated CBF, CMRO2 and CBV time courses"></svg>
+                        <div class="scatter-plot-wrap">
+                            <svg class="demo-svg" id="balloonInputs" viewBox="0 0 520 180" role="img" aria-label="Simulated CBF, CMRO2 and CBV time courses"></svg>
+                            <div class="scatter-tooltip" id="balInputsTip" aria-hidden="true"></div>
+                        </div>
                     </div>
                     <div class="demo-panel">
                         <div class="demo-panel-head">
@@ -1890,6 +1911,8 @@
             });
             svgEl.appendChild(lg);
         }
+
+        return { padL, padR, padT, padB, plotW, plotH, xRange, yRange, xToPx, yToPx };
     }
 
     /* ================================================================= *
@@ -1915,6 +1938,32 @@
             cmrR: document.getElementById('balCmrR')
         };
 
+        // Time-window shown on the inputs/BOLD plots
+        const X_WIN = [0, 80];
+        const N_SHOW = X_WIN[1];
+
+        // Buffers + persistent overlay state
+        const inputsBuf = {
+            t: null, cbfPct: null, cmrPct: null, cbvPct: null, boldPct: null,
+            geomInputs: null, geomBold: null
+        };
+        const inputsTip = document.getElementById('balInputsTip');
+        let inputsPinIdx = Math.floor(N_SHOW / 2);
+        let inputsHoverIdx = -1;
+        let inputsScrubDrag = false;
+        let curveDrag = { active: false, ch: null, raf: 0, pendingY: 0, pendingT: 0, pendingJ: 0, lastEvt: null };
+
+        const CHANNELS = [
+            { key: 'cbf', label: 'CBF',                 color: '#0ea5e9', dotFill: '#0ea5e9', tipClass: 'st-tip-cbf', valClass: 'st-cbf' },
+            { key: 'cmr', label: 'CMRO\u2082',          color: '#dc2626', dotFill: '#dc2626', tipClass: 'st-tip-cmr', valClass: 'st-cmr' },
+            { key: 'cbv', label: 'CBV',                 color: '#16a34a', dotFill: '#16a34a', tipClass: 'st-tip-cbv', valClass: 'st-cbv' }
+        ];
+
+        function fmtPct(v) {
+            const sign = v >= 0 ? '+' : '\u2212';
+            return sign + Math.abs(v).toFixed(1) + '%';
+        }
+
         function render() {
             const cbfAmp = +els.cbfAmp.value / 100;     // 0..0.4
             const cmrAmp = +els.cmrAmp.value / 100;     // 0..0.4
@@ -1926,41 +1975,349 @@
             els.cmrDelayVal.textContent = cmrDelay.toFixed(1) + '\u00a0s';
             els.cbvVal.textContent = grubb.toFixed(2);
 
-            const cmrPhase = 2 * Math.PI * FREQ * cmrDelay; // delay -> phase lag
+            const cmrPhase = 2 * Math.PI * FREQ * cmrDelay;
             const h = makeHemo({ cbfAmp, cmrAmp, cbfPhase: 0, cmrPhase, grubb, noise: 0, seed: 7 });
 
-            const xWin = [0, 80]; // show 80 s
-            const idxMax = xWin[1];
-            const t = Array.from(TIME.slice(0, idxMax));
+            const t = Array.from(TIME.slice(0, N_SHOW));
+            const cbfPct = Array.from(h.cbf.slice(0, N_SHOW)).map(v => v * 100);
+            const cmrPct = Array.from(h.cmr.slice(0, N_SHOW)).map(v => v * 100);
+            const cbvPct = Array.from(h.cbv.slice(0, N_SHOW)).map(v => v * 100);
+            const boldPct = Array.from(h.bold.slice(0, N_SHOW)).map(v => v * 100);
 
-            // Inputs plot: CBF, CMRO2, CBV (scaled to %)
-            plotLines(inputsSvg, [
-                { x: t, y: Array.from(h.cbf.slice(0, idxMax)).map(v => v * 100), color: '#0ea5e9', width: 2 },
-                { x: t, y: Array.from(h.cmr.slice(0, idxMax)).map(v => v * 100), color: '#dc2626', width: 2 },
-                { x: t, y: Array.from(h.cbv.slice(0, idxMax)).map(v => v * 100), color: '#16a34a', width: 1.5, opacity: 0.85 }
-            ], xWin, [-45, 45], {
+            inputsBuf.t = t;
+            inputsBuf.cbfPct = cbfPct;
+            inputsBuf.cmrPct = cmrPct;
+            inputsBuf.cbvPct = cbvPct;
+            inputsBuf.boldPct = boldPct;
+
+            inputsBuf.geomInputs = plotLines(inputsSvg, [
+                { x: t, y: cbfPct, color: '#0ea5e9', width: 2 },
+                { x: t, y: cmrPct, color: '#dc2626', width: 2 },
+                { x: t, y: cbvPct, color: '#16a34a', width: 1.5, opacity: 0.85 }
+            ], X_WIN, [-45, 45], {
                 yTicks: 4, xTicks: 4, xLabel: 'time (s)',
                 yFmt: v => v.toFixed(0) + '%',
                 xFmt: v => v.toFixed(0)
             });
 
-            // BOLD plot (show in %)
-            const boldPct = Array.from(h.bold.slice(0, idxMax)).map(v => v * 100);
-            plotLines(boldSvg, [
+            inputsBuf.geomBold = plotLines(boldSvg, [
                 { x: t, y: boldPct, color: '#0f172a', width: 2 }
-            ], xWin, [-2.5, 2.5], {
+            ], X_WIN, [-2.5, 2.5], {
                 yTicks: 4, xTicks: 4, xLabel: 'time (s)',
                 yFmt: v => v.toFixed(1) + '%',
                 xFmt: v => v.toFixed(0)
             });
 
-            // KPIs
-            const amp = rms(h.bold) * Math.SQRT2 * 100; // peak amplitude in %
+            const amp = rms(h.bold) * Math.SQRT2 * 100;
             els.boldAmp.textContent = amp.toFixed(2) + '%';
             const rCbf = pearson(Array.from(h.bold), Array.from(h.cbf));
             const rCmr = pearson(Array.from(h.bold), Array.from(h.cmr));
             els.cbfR.textContent = (rCbf >= 0 ? '+' : '\u2212') + Math.abs(rCbf).toFixed(2);
             els.cmrR.textContent = (rCmr >= 0 ? '+' : '\u2212') + Math.abs(rCmr).toFixed(2);
+
+            inputsPinIdx = Math.max(0, Math.min(N_SHOW - 1, inputsPinIdx));
+            drawOverlays();
+        }
+
+        // -------------------- Overlays (pinned crosshair + hover ring) --------------------
+
+        function drawOverlays() {
+            if (!inputsBuf.t) return;
+            const gI = inputsBuf.geomInputs, gB = inputsBuf.geomBold;
+            if (!gI || !gB) return;
+
+            const pin = inputsPinIdx;
+            const hov = (inputsHoverIdx >= 0 && inputsHoverIdx !== pin) ? inputsHoverIdx : -1;
+            const tSec = inputsBuf.t[pin];
+
+            // ---- Inputs plot overlay ----
+            const ix = gI.xToPx(tSec);
+            const cbfY = gI.yToPx(inputsBuf.cbfPct[pin]);
+            const cmrY = gI.yToPx(inputsBuf.cmrPct[pin]);
+            const cbvY = gI.yToPx(inputsBuf.cbvPct[pin]);
+            inputsSvg.appendChild(svg('line', {
+                x1: ix, x2: ix, y1: gI.padT, y2: gI.padT + gI.plotH,
+                stroke: '#0f172a', 'stroke-width': 1, opacity: 0.3, 'pointer-events': 'none'
+            }));
+            const dot = (cy, fill) => svg('circle', { cx: ix, cy: cy, r: 4.5, fill: '#fff', stroke: fill, 'stroke-width': 2, 'pointer-events': 'none' });
+            inputsSvg.appendChild(dot(cbfY, '#0ea5e9'));
+            inputsSvg.appendChild(dot(cmrY, '#dc2626'));
+            inputsSvg.appendChild(dot(cbvY, '#16a34a'));
+
+            if (hov >= 0) {
+                const hxI = gI.xToPx(inputsBuf.t[hov]);
+                inputsSvg.appendChild(svg('line', {
+                    x1: hxI, x2: hxI, y1: gI.padT, y2: gI.padT + gI.plotH,
+                    stroke: '#0f172a', 'stroke-width': 1, opacity: 0.15, 'stroke-dasharray': '2 3', 'pointer-events': 'none'
+                }));
+            }
+
+            // ---- BOLD plot mirror crosshair ----
+            const bx = gB.xToPx(tSec);
+            const by = gB.yToPx(inputsBuf.boldPct[pin]);
+            boldSvg.appendChild(svg('line', {
+                x1: bx, x2: bx, y1: gB.padT, y2: gB.padT + gB.plotH,
+                stroke: '#0f172a', 'stroke-width': 1, opacity: 0.3, 'pointer-events': 'none'
+            }));
+            boldSvg.appendChild(svg('line', {
+                x1: gB.padL, x2: gB.padL + gB.plotW, y1: by, y2: by,
+                stroke: '#0f172a', 'stroke-width': 1, opacity: 0.18, 'pointer-events': 'none'
+            }));
+            boldSvg.appendChild(svg('circle', {
+                cx: bx, cy: by, r: 5.5, fill: '#fff', stroke: '#0f172a', 'stroke-width': 2, 'pointer-events': 'none'
+            }));
+            boldSvg.appendChild(svg('circle', {
+                cx: bx, cy: by, r: 2.2, fill: '#0f172a', 'pointer-events': 'none'
+            }));
+        }
+
+        // -------------------- Pointer mapping helpers --------------------
+
+        function pointerToInputsSvg(evt) {
+            const rect = inputsSvg.getBoundingClientRect();
+            const vb = inputsSvg.viewBox.baseVal;
+            return {
+                cx: (evt.clientX - rect.left) * (vb.width / rect.width),
+                cy: (evt.clientY - rect.top) * (vb.height / rect.height)
+            };
+        }
+
+        function pointerToInputsData(evt) {
+            const g = inputsBuf.geomInputs;
+            if (!g) return null;
+            const { cx, cy } = pointerToInputsSvg(evt);
+            const inX = cx >= g.padL - 2 && cx <= g.padL + g.plotW + 2;
+            const inY = cy >= g.padT - 2 && cy <= g.padT + g.plotH + 2;
+            const inPlot = inX && inY;
+            const tFrac = (cx - g.padL) / g.plotW;
+            const tClamped = Math.max(0, Math.min(1, tFrac));
+            const tSec = g.xRange[0] + (g.xRange[1] - g.xRange[0]) * tClamped;
+            const j = Math.max(0, Math.min(N_SHOW - 1, Math.round(tClamped * (N_SHOW - 1))));
+            const yPct = g.yRange[1] - (cy - g.padT) / g.plotH * (g.yRange[1] - g.yRange[0]);
+            return { inPlot, cx, cy, j, tSec, yPct };
+        }
+
+        function distToCurveAtX(cy, jSample, channelKey) {
+            const g = inputsBuf.geomInputs;
+            const arr = channelKey === 'cbf' ? inputsBuf.cbfPct
+                     : channelKey === 'cmr' ? inputsBuf.cmrPct
+                     : inputsBuf.cbvPct;
+            const j0 = Math.max(0, jSample - 1);
+            const j1 = Math.min(N_SHOW - 1, jSample + 1);
+            let best = Infinity;
+            for (let j = j0; j <= j1; j++) {
+                const dy = g.yToPx(arr[j]) - cy;
+                const d = dy * dy;
+                if (d < best) best = d;
+            }
+            return best;
+        }
+
+        function nearestCurve(evt) {
+            const p = pointerToInputsData(evt);
+            if (!p || !p.inPlot) return { ch: null, dist2: Infinity, p };
+            let best = { ch: null, dist2: Infinity };
+            for (const c of CHANNELS) {
+                const d2 = distToCurveAtX(p.cy, p.j, c.key);
+                if (d2 < best.dist2) best = { ch: c.key, dist2: d2 };
+            }
+            return Object.assign(best, { p });
+        }
+
+        // -------------------- Tooltip --------------------
+
+        function tipHtmlForSample(j, primaryCh) {
+            const tSec = inputsBuf.t[j];
+            const rows = [
+                '<span class="st-row"><span class="st-key">Time</span><span class="st-val">' + tSec.toFixed(0) + ' s</span></span>'
+            ];
+            for (const c of CHANNELS) {
+                const arr = c.key === 'cbf' ? inputsBuf.cbfPct
+                         : c.key === 'cmr' ? inputsBuf.cmrPct
+                         : inputsBuf.cbvPct;
+                rows.push(
+                    '<span class="st-row"><span class="st-key">' + c.label + '</span>' +
+                    '<span class="st-val ' + c.valClass + '">' + fmtPct(arr[j]) + '</span></span>'
+                );
+            }
+            const cls = primaryCh
+                ? CHANNELS.find(c => c.key === primaryCh).tipClass
+                : 'st-tip-neu';
+            return { html: rows.join(''), tipClass: cls };
+        }
+
+        function positionTip(evt) {
+            if (!inputsTip) return;
+            const wrap = inputsTip.parentElement;
+            if (!wrap) return;
+            const wrect = wrap.getBoundingClientRect();
+            const tw = inputsTip.offsetWidth, th = inputsTip.offsetHeight;
+            const cx = evt.clientX - wrect.left, cy = evt.clientY - wrect.top;
+            let x = cx + 14, y = cy + 14;
+            if (x + tw > wrect.width - 4) x = cx - tw - 14;
+            if (y + th > wrect.height - 4) y = cy - th - 14;
+            if (x < 4) x = 4; if (y < 4) y = 4;
+            inputsTip.style.left = x + 'px';
+            inputsTip.style.top = y + 'px';
+        }
+
+        function showTip(evt, j, primaryCh) {
+            if (!inputsTip) return;
+            const { html, tipClass } = tipHtmlForSample(j, primaryCh);
+            inputsTip.innerHTML = html;
+            inputsTip.classList.remove('st-tip-neu', 'st-tip-cbf', 'st-tip-cmr', 'st-tip-cbv', 'st-tip-pos', 'st-tip-neg');
+            inputsTip.classList.add(tipClass);
+            positionTip(evt);
+            inputsTip.classList.add('visible');
+        }
+
+        function hideTip() {
+            if (inputsTip) inputsTip.classList.remove('visible');
+        }
+
+        // -------------------- Curve drag → slider re-fit --------------------
+
+        // Map pointer y at time t to a slider value for the dragged channel.
+        // CBF/CMR are sinusoids: y%/100 = amp * sin(2π f t − phase). Solve for amp.
+        // CBV uses Grubb: cbv = (1 + cbf(t))^grubb − 1. Given current cbf(t), solve for grubb.
+        function fitChannelToPointer(channelKey, tSec, yPct) {
+            const yFrac = Math.max(-1, Math.min(1, yPct / 100));
+            if (channelKey === 'cbf') {
+                const s = Math.sin(2 * Math.PI * FREQ * tSec);
+                if (Math.abs(s) < 0.18) return;
+                let amp = yFrac / s;                 // 0..0.40 range on slider
+                amp = Math.max(0, Math.min(0.40, amp));
+                els.cbfAmp.value = Math.round(amp * 100);
+            } else if (channelKey === 'cmr') {
+                const cmrDelay = +els.cmrDelay.value / 10;
+                const cmrPhase = 2 * Math.PI * FREQ * cmrDelay;
+                const s = Math.sin(2 * Math.PI * FREQ * tSec - cmrPhase);
+                if (Math.abs(s) < 0.18) return;
+                let amp = yFrac / s;
+                amp = Math.max(0, Math.min(0.40, amp));
+                els.cmrAmp.value = Math.round(amp * 100);
+            } else {
+                // CBV: derive grubb from current cbf(t) and pointer's cbv y.
+                const cbfAmp = +els.cbfAmp.value / 100;
+                const cbf_t = cbfAmp * Math.sin(2 * Math.PI * FREQ * tSec); // cbfPhase = 0
+                const base = 1 + cbf_t;
+                const target = 1 + yFrac;
+                if (base <= 0.05 || target <= 0.05) return;
+                const lb = Math.log(base);
+                if (Math.abs(lb) < 0.04) return;     // cbf near baseline → ill-conditioned
+                let grubb = Math.log(target) / lb;
+                grubb = Math.max(0, Math.min(0.80, grubb));
+                els.cbv.value = Math.round(grubb * 100);
+            }
+        }
+
+        function applyCurveDrag() {
+            curveDrag.raf = 0;
+            if (!curveDrag.active) return;
+            fitChannelToPointer(curveDrag.ch, curveDrag.pendingT, curveDrag.pendingY);
+            inputsPinIdx = curveDrag.pendingJ;
+            inputsHoverIdx = -1;
+            render();
+            if (curveDrag.lastEvt) showTip(curveDrag.lastEvt, inputsPinIdx, curveDrag.ch);
+        }
+
+        // -------------------- Pointer handlers --------------------
+
+        inputsSvg.style.cursor = 'crosshair';
+        inputsSvg.style.touchAction = 'none';
+
+        inputsSvg.addEventListener('pointerdown', (e) => {
+            if (!inputsBuf.t) return;
+            const near = nearestCurve(e);
+            if (!near.p || !near.p.inPlot) return;
+            // Curve drag wins if pointer is within ~7 px of a curve.
+            if (near.ch && near.dist2 < 7 * 7) {
+                curveDrag.active = true;
+                curveDrag.ch = near.ch;
+                curveDrag.pendingT = near.p.tSec;
+                curveDrag.pendingY = near.p.yPct;
+                curveDrag.pendingJ = near.p.j;
+                curveDrag.lastEvt = e;
+                inputsSvg.style.cursor = 'grabbing';
+                try { inputsSvg.setPointerCapture(e.pointerId); } catch (_) {}
+                if (!curveDrag.raf) curveDrag.raf = requestAnimationFrame(applyCurveDrag);
+                e.preventDefault();
+                return;
+            }
+            inputsScrubDrag = true;
+            inputsPinIdx = near.p.j;
+            inputsHoverIdx = -1;
+            try { inputsSvg.setPointerCapture(e.pointerId); } catch (_) {}
+            showTip(e, inputsPinIdx, null);
+            redrawOverlays();
+            e.preventDefault();
+        });
+
+        inputsSvg.addEventListener('pointermove', (e) => {
+            if (curveDrag.active) {
+                const p = pointerToInputsData(e);
+                if (!p) return;
+                curveDrag.pendingT = p.tSec;
+                curveDrag.pendingY = p.yPct;
+                curveDrag.pendingJ = p.j;
+                curveDrag.lastEvt = e;
+                if (!curveDrag.raf) curveDrag.raf = requestAnimationFrame(applyCurveDrag);
+                e.preventDefault();
+                return;
+            }
+            const near = nearestCurve(e);
+            if (!near.p || !near.p.inPlot) {
+                if (!inputsScrubDrag) {
+                    inputsHoverIdx = -1;
+                    hideTip();
+                    redrawOverlays();
+                }
+                return;
+            }
+            if (inputsScrubDrag) {
+                inputsPinIdx = near.p.j;
+                inputsHoverIdx = -1;
+            } else {
+                inputsHoverIdx = near.p.j;
+                inputsSvg.style.cursor = (near.ch && near.dist2 < 7 * 7) ? 'grab' : 'crosshair';
+            }
+            const primary = (!inputsScrubDrag && near.ch && near.dist2 < 14 * 14) ? near.ch : null;
+            const showJ = inputsScrubDrag ? inputsPinIdx : near.p.j;
+            showTip(e, showJ, primary);
+            redrawOverlays();
+        });
+
+        function endDrag(e) {
+            if (curveDrag.active) {
+                curveDrag.active = false;
+                if (curveDrag.raf) { cancelAnimationFrame(curveDrag.raf); curveDrag.raf = 0; }
+                inputsSvg.style.cursor = 'crosshair';
+                fitChannelToPointer(curveDrag.ch, curveDrag.pendingT, curveDrag.pendingY);
+                inputsPinIdx = curveDrag.pendingJ;
+                render();
+            }
+            inputsScrubDrag = false;
+            try { inputsSvg.releasePointerCapture(e.pointerId); } catch (_) {}
+        }
+        inputsSvg.addEventListener('pointerup', endDrag);
+        inputsSvg.addEventListener('pointercancel', endDrag);
+        inputsSvg.addEventListener('pointerleave', () => {
+            if (curveDrag.active) {
+                curveDrag.active = false;
+                if (curveDrag.raf) { cancelAnimationFrame(curveDrag.raf); curveDrag.raf = 0; }
+            }
+            inputsSvg.style.cursor = 'crosshair';
+            inputsScrubDrag = false;
+            inputsHoverIdx = -1;
+            hideTip();
+            redrawOverlays();
+        });
+
+        // Pin/hover state changed but parameters did not — redo the SVG so
+        // overlays reflect the new state. plotLines clears+repaints; with 80
+        // samples this is cheap and keeps a single source of truth.
+        function redrawOverlays() {
+            render();
         }
 
         const presets = {
@@ -2061,7 +2418,7 @@
             }
         };
 
-        // OLS on scatter pair (%, %) � also used to drive fit-to-slope re-simulation
+        // OLS on scatter pair (%, %) � also used to drive fit-to-slope re-simulation
         function olsOnArrays(fa, fb) {
             const n = fa.length;
             if (n < 2) return { ma: 0, mb: 0, slope: 0, intercept: 0 };
