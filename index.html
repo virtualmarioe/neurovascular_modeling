@@ -48,10 +48,9 @@
         .nav.scrolled { box-shadow: 0 1px 12px rgba(0, 0, 0, 0.06); }
         .nav-inner {
             display: flex; align-items: center; justify-content: center;
-            gap: 6px; padding: 12px 0; overflow-x: auto;
-            -webkit-overflow-scrolling: touch; scrollbar-width: none;
+            gap: 6px; padding: 12px 0;
+            flex-wrap: wrap;
         }
-        .nav-inner::-webkit-scrollbar { display: none; }
         .nav-link {
             padding: 7px 14px; border-radius: 999px;
             font-size: 0.82rem; font-weight: 500; color: #334155;
@@ -66,6 +65,47 @@
         }
         .nav-home svg { stroke: currentColor; }
         .nav-home:hover { color: #d97706; background: #fff7ed; }
+        .nav-group { position: relative; display: inline-flex; }
+        .nav-trigger {
+            background: transparent; border: none; cursor: pointer;
+            font: inherit;
+            display: inline-flex; align-items: center; gap: 6px;
+        }
+        .nav-trigger.has-active { color: #0f172a; background: #f1f5f9; font-weight: 600; }
+        .nav-caret {
+            width: 12px; height: 12px; flex-shrink: 0;
+            stroke: currentColor; fill: none; stroke-width: 2;
+            stroke-linecap: round; stroke-linejoin: round;
+            transition: transform 0.2s ease;
+        }
+        .nav-trigger[aria-expanded="true"] .nav-caret { transform: rotate(180deg); }
+        .nav-menu {
+            position: absolute;
+            top: calc(100% + 8px); left: 50%;
+            transform: translateX(-50%) translateY(-4px);
+            min-width: 180px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 14px;
+            box-shadow: 0 14px 36px rgba(15, 23, 42, 0.14);
+            padding: 8px; z-index: 110;
+            display: flex; flex-direction: column; gap: 2px;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.15s ease, transform 0.15s ease;
+        }
+        .nav-group.open .nav-menu {
+            opacity: 1; pointer-events: auto;
+            transform: translateX(-50%) translateY(0);
+        }
+        .nav-sublink {
+            padding: 8px 14px; border-radius: 10px;
+            font-size: 0.85rem; font-weight: 500; color: #334155;
+            text-decoration: none; white-space: nowrap;
+            transition: background 0.15s ease, color 0.15s ease;
+        }
+        .nav-sublink:hover { background: #f1f5f9; color: #0f172a; }
+        .nav-sublink.active { background: #f1f5f9; color: #0f172a; font-weight: 600; }
 
         /* ===== Hero ===== */
         .hero {
@@ -724,18 +764,34 @@
                 </svg>
                 <span>Home</span>
             </a>
-            <a href="#overview" class="nav-link active">Overview</a>
-            <a href="#abstract" class="nav-link">Abstract</a>
-            <a href="#methods" class="nav-link">Methods</a>
-            <a href="#scenarios" class="nav-link">Scenarios</a>
-            <a href="#findings" class="nav-link">Findings</a>
-            <a href="#implications" class="nav-link">Implications</a>
-            <a href="#background" class="nav-link">Background</a>
-            <a href="#balloon" class="nav-link">Balloon Model</a>
-            <a href="#simulator" class="nav-link">Simulator</a>
-            <a href="#heatmap" class="nav-link">Heatmap</a>
-            <a href="#glossary" class="nav-link">Glossary</a>
-            <a href="#authors" class="nav-link">Authors</a>
+            <div class="nav-group" data-nav-group="science">
+                <button type="button" class="nav-link nav-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="nav-menu-science">
+                    Science
+                    <svg class="nav-caret" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="nav-menu" id="nav-menu-science" role="menu">
+                    <a href="#overview" class="nav-link nav-sublink active" role="menuitem">Overview</a>
+                    <a href="#abstract" class="nav-link nav-sublink" role="menuitem">Abstract</a>
+                    <a href="#methods" class="nav-link nav-sublink" role="menuitem">Methods</a>
+                    <a href="#scenarios" class="nav-link nav-sublink" role="menuitem">Scenarios</a>
+                    <a href="#findings" class="nav-link nav-sublink" role="menuitem">Findings</a>
+                    <a href="#implications" class="nav-link nav-sublink" role="menuitem">Implications</a>
+                    <a href="#authors" class="nav-link nav-sublink" role="menuitem">Authors</a>
+                </div>
+            </div>
+            <div class="nav-group" data-nav-group="education">
+                <button type="button" class="nav-link nav-trigger" aria-expanded="false" aria-haspopup="true" aria-controls="nav-menu-education">
+                    Education
+                    <svg class="nav-caret" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+                </button>
+                <div class="nav-menu" id="nav-menu-education" role="menu">
+                    <a href="#background" class="nav-link nav-sublink" role="menuitem">Background</a>
+                    <a href="#balloon" class="nav-link nav-sublink" role="menuitem">Balloon Model</a>
+                    <a href="#simulator" class="nav-link nav-sublink" role="menuitem">Simulator</a>
+                    <a href="#heatmap" class="nav-link nav-sublink" role="menuitem">Heatmap</a>
+                    <a href="#glossary" class="nav-link nav-sublink" role="menuitem">Glossary</a>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -3559,6 +3615,7 @@
 
         const sections = document.querySelectorAll('section[id]');
         const navLinks = document.querySelectorAll('.nav-link');
+        const navGroups = document.querySelectorAll('.nav-group');
         function updateActiveNav() {
             const scrollY = window.scrollY + 120;
             let currentId = null;
@@ -3568,11 +3625,51 @@
                 if (scrollY >= top && scrollY < bottom) currentId = section.getAttribute('id');
             });
             navLinks.forEach(link => {
-                link.classList.toggle('active', link.getAttribute('href') === '#' + currentId);
+                const href = link.getAttribute('href');
+                if (!href) return;
+                link.classList.toggle('active', href === '#' + currentId);
+            });
+            navGroups.forEach(group => {
+                const trigger = group.querySelector('.nav-trigger');
+                const hasActive = !!group.querySelector('.nav-sublink.active');
+                if (trigger) trigger.classList.toggle('has-active', hasActive);
             });
         }
         window.addEventListener('scroll', updateActiveNav, { passive: true });
         updateActiveNav();
+
+        function closeAllNavGroups(except) {
+            navGroups.forEach(group => {
+                if (group === except) return;
+                if (!group.classList.contains('open')) return;
+                group.classList.remove('open');
+                const trigger = group.querySelector('.nav-trigger');
+                if (trigger) trigger.setAttribute('aria-expanded', 'false');
+            });
+        }
+        navGroups.forEach(group => {
+            const trigger = group.querySelector('.nav-trigger');
+            if (!trigger) return;
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const willOpen = !group.classList.contains('open');
+                closeAllNavGroups(group);
+                group.classList.toggle('open', willOpen);
+                trigger.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+            });
+            group.querySelectorAll('.nav-sublink').forEach(link => {
+                link.addEventListener('click', () => {
+                    group.classList.remove('open');
+                    trigger.setAttribute('aria-expanded', 'false');
+                });
+            });
+        });
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.nav-group')) closeAllNavGroups(null);
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeAllNavGroups(null);
+        });
 
         const copyBtn = document.getElementById('copy-bibtex');
         if (copyBtn) {
