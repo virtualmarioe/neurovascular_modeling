@@ -1236,9 +1236,14 @@
                                 Linearised Davis-style output:
                                 &Delta;BOLD/B<sub>0</sub> &asymp; (&beta;&nbsp;&minus;&nbsp;&alpha;)&middot;&Delta;CBF/CBF<sub>0</sub>
                                 &minus; &beta;&middot;&Delta;CMRO<sub>2</sub>/CMRO<sub>2,0</sub>.
+                                <strong>Hover</strong> for a sample readout or <strong>click/drag</strong>
+                                to pin a time crosshair (mirrored on the inputs plot).
                             </p>
                         </div>
-                        <svg class="demo-svg" id="balloonBold" viewBox="0 0 520 170" role="img" aria-label="Simulated BOLD time course"></svg>
+                        <div class="scatter-plot-wrap">
+                            <svg class="demo-svg" id="balloonBold" viewBox="0 0 520 170" role="img" aria-label="Simulated BOLD time course"></svg>
+                            <div class="scatter-tooltip" id="balBoldTip" aria-hidden="true"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -1345,10 +1350,15 @@
                             <p class="demo-hint">
                                 <span style="color:#0f172a;font-weight:700;">Seed</span> vs
                                 <span style="color:#d97706;font-weight:700;">Target</span>
-                                &nbsp;&middot; 0.05&nbsp;Hz synthetic drive + physiological noise
+                                &nbsp;&middot; 0.05&nbsp;Hz synthetic drive + physiological noise.
+                                <strong>Hover</strong> for a sample readout or <strong>click/drag</strong>
+                                to pin a time crosshair (mirrored on the scatter).
                             </p>
                         </div>
-                        <svg class="demo-svg" id="simSignals" viewBox="0 0 520 170" role="img" aria-label="Seed and target BOLD time courses"></svg>
+                        <div class="scatter-plot-wrap">
+                            <svg class="demo-svg" id="simSignals" viewBox="0 0 520 170" role="img" aria-label="Seed and target BOLD time courses"></svg>
+                            <div class="scatter-tooltip" id="simSignalsTip" aria-hidden="true"></div>
+                        </div>
                     </div>
                     <div class="demo-panel">
                         <div class="demo-panel-head">
@@ -2004,9 +2014,12 @@
             geomInputs: null, geomBold: null
         };
         const inputsTip = document.getElementById('balInputsTip');
+        const boldTip = document.getElementById('balBoldTip');
         let inputsPinIdx = Math.floor(N_SHOW / 2);
         let inputsHoverIdx = -1;
+        let inputsHoverSrc = 'inputs';
         let inputsScrubDrag = false;
+        let boldScrubDrag = false;
         let curveDrag = { active: false, ch: null, raf: 0, pendingY: 0, pendingT: 0, pendingJ: 0, lastEvt: null };
 
         const CHANNELS = [
@@ -2125,6 +2138,14 @@
             boldSvg.appendChild(svg('circle', {
                 cx: bx, cy: by, r: 2.2, fill: '#0f172a', 'pointer-events': 'none'
             }));
+
+            if (hov >= 0) {
+                const hxB = gB.xToPx(inputsBuf.t[hov]);
+                boldSvg.appendChild(svg('line', {
+                    x1: hxB, x2: hxB, y1: gB.padT, y2: gB.padT + gB.plotH,
+                    stroke: '#0f172a', 'stroke-width': 1, opacity: 0.15, 'stroke-dasharray': '2 3', 'pointer-events': 'none'
+                }));
+            }
         }
 
         // -------------------- Pointer mapping helpers --------------------
@@ -2324,12 +2345,14 @@
             const near = nearestCurve(e);
             if (!near.p || !near.p.inPlot) {
                 if (!inputsScrubDrag) {
+                    inputsHoverSrc = 'inputs';
                     inputsHoverIdx = -1;
                     hideTip();
                     redrawOverlays();
                 }
                 return;
             }
+            inputsHoverSrc = 'inputs';
             if (inputsScrubDrag) {
                 inputsPinIdx = near.p.j;
                 inputsHoverIdx = -1;
@@ -2364,9 +2387,11 @@
             }
             inputsSvg.style.cursor = 'crosshair';
             inputsScrubDrag = false;
-            inputsHoverIdx = -1;
-            hideTip();
-            redrawOverlays();
+            if (inputsHoverSrc === 'inputs') {
+                inputsHoverIdx = -1;
+                hideTip();
+                redrawOverlays();
+            }
         });
 
         // Pin/hover state changed but parameters did not — redo the SVG so
@@ -2375,6 +2400,117 @@
         function redrawOverlays() {
             render();
         }
+
+        // -------------------- BOLD panel: hover tooltip + time scrub --------------------
+
+        function pointerToBoldSvg(evt) {
+            const rect = boldSvg.getBoundingClientRect();
+            const vb = boldSvg.viewBox.baseVal;
+            return {
+                cx: (evt.clientX - rect.left) * (vb.width / rect.width),
+                cy: (evt.clientY - rect.top) * (vb.height / rect.height)
+            };
+        }
+
+        function pointerToBoldData(evt) {
+            const g = inputsBuf.geomBold;
+            if (!g) return null;
+            const { cx, cy } = pointerToBoldSvg(evt);
+            const inX = cx >= g.padL - 2 && cx <= g.padL + g.plotW + 2;
+            const inY = cy >= g.padT - 2 && cy <= g.padT + g.plotH + 2;
+            const tFrac = Math.max(0, Math.min(1, (cx - g.padL) / g.plotW));
+            const tSec = g.xRange[0] + (g.xRange[1] - g.xRange[0]) * tFrac;
+            const j = Math.max(0, Math.min(N_SHOW - 1, Math.round(tFrac * (N_SHOW - 1))));
+            return { inPlot: inX && inY, cx, cy, j, tSec };
+        }
+
+        function boldTipHtml(j) {
+            const tSec = inputsBuf.t[j];
+            return '<span class="st-row"><span class="st-key">Time</span><span class="st-val">' + tSec.toFixed(0) + ' s</span></span>' +
+                '<span class="st-row"><span class="st-key">BOLD</span><span class="st-val">' + fmtPct(inputsBuf.boldPct[j]) + '</span></span>';
+        }
+
+        function positionBoldTip(evt) {
+            if (!boldTip) return;
+            const wrap = boldTip.parentElement;
+            if (!wrap) return;
+            const wrect = wrap.getBoundingClientRect();
+            const tw = boldTip.offsetWidth, th = boldTip.offsetHeight;
+            const cx = evt.clientX - wrect.left, cy = evt.clientY - wrect.top;
+            let x = cx + 14, y = cy + 14;
+            if (x + tw > wrect.width - 4) x = cx - tw - 14;
+            if (y + th > wrect.height - 4) y = cy - th - 14;
+            if (x < 4) x = 4; if (y < 4) y = 4;
+            boldTip.style.left = x + 'px';
+            boldTip.style.top = y + 'px';
+        }
+
+        function showBoldTip(evt, j) {
+            if (!boldTip) return;
+            boldTip.innerHTML = boldTipHtml(j);
+            boldTip.classList.remove('st-tip-cbf', 'st-tip-cmr', 'st-tip-cbv', 'st-tip-pos', 'st-tip-neg');
+            boldTip.classList.add('st-tip-neu');
+            positionBoldTip(evt);
+            boldTip.classList.add('visible');
+        }
+
+        function hideBoldTip() {
+            if (boldTip) boldTip.classList.remove('visible');
+        }
+
+        boldSvg.style.cursor = 'crosshair';
+        boldSvg.style.touchAction = 'none';
+
+        boldSvg.addEventListener('pointerdown', (e) => {
+            if (!inputsBuf.t) return;
+            const p = pointerToBoldData(e);
+            if (!p || !p.inPlot) return;
+            boldScrubDrag = true;
+            inputsPinIdx = p.j;
+            inputsHoverIdx = -1;
+            try { boldSvg.setPointerCapture(e.pointerId); } catch (_) {}
+            showBoldTip(e, p.j);
+            redrawOverlays();
+            e.preventDefault();
+        });
+
+        boldSvg.addEventListener('pointermove', (e) => {
+            const p = pointerToBoldData(e);
+            if (!p || !p.inPlot) {
+                if (!boldScrubDrag) {
+                    inputsHoverSrc = 'bold';
+                    inputsHoverIdx = -1;
+                    hideBoldTip();
+                    redrawOverlays();
+                }
+                return;
+            }
+            inputsHoverSrc = 'bold';
+            if (boldScrubDrag) {
+                inputsPinIdx = p.j;
+                inputsHoverIdx = -1;
+            } else {
+                inputsHoverIdx = p.j;
+            }
+            const showJ = boldScrubDrag ? inputsPinIdx : p.j;
+            showBoldTip(e, showJ);
+            redrawOverlays();
+        });
+
+        function endBoldDrag(e) {
+            boldScrubDrag = false;
+            try { boldSvg.releasePointerCapture(e.pointerId); } catch (_) {}
+        }
+        boldSvg.addEventListener('pointerup', endBoldDrag);
+        boldSvg.addEventListener('pointercancel', endBoldDrag);
+        boldSvg.addEventListener('pointerleave', () => {
+            boldScrubDrag = false;
+            if (inputsHoverSrc === 'bold') {
+                inputsHoverIdx = -1;
+                hideBoldTip();
+                redrawOverlays();
+            }
+        });
 
         const presets = {
             healthy: { cbfAmp: 20, cmrAmp: 5, cmrDelay: 0, cbv: 38 },
@@ -2530,11 +2666,17 @@
 
         // Seed vs. target scatter: hover tooltip + click/drag time scrubber (shares axes with drawScatter)
         const SCATTER_PAD = { L: 40, R: 12, T: 12, B: 28 };
+        const SIG_X_WIN = [0, 120];
+        const SIG_Y_RANGE = [-2.5, 2.5];
         const scatterTip = document.getElementById('scatterHoverTooltip');
+        const sigTip = document.getElementById('simSignalsTip');
         const scatterBuf = { a: null, b: null, r: 0 };
+        const sigBuf = { t: null, seedY: null, tgtY: null, geom: null };
         let scatterPinIdx = Math.floor((NSAMP - 1) / 2);
         let scatterHoverIdx = -1;
+        let scatterHoverSrc = 'scatter';
         let scatterDrag = false;
+        let sigDrag = false;
         let olsLineDrag = false;
         let olsLineDragRaf = 0;
         let olsLinePendingS = 0;
@@ -2546,6 +2688,45 @@
             scatterPinIdx = Math.max(0, Math.min(n - 1, scatterPinIdx));
             if (scatterHoverIdx >= n) scatterHoverIdx = -1;
             drawScatter(scSvg, scatterBuf.a, scatterBuf.b, scatterBuf.r, { pin: scatterPinIdx, hover: scatterHoverIdx });
+            paintSig();
+        }
+
+        function paintSig() {
+            if (!sigBuf.t) return;
+            sigBuf.geom = plotLines(sigSvg, [
+                { x: sigBuf.t, y: sigBuf.seedY, color: '#0f172a', width: 2 },
+                { x: sigBuf.t, y: sigBuf.tgtY, color: '#d97706', width: 2 }
+            ], SIG_X_WIN, SIG_Y_RANGE, {
+                yTicks: 4, xTicks: 4, xLabel: 'time (s)',
+                yFmt: v => v.toFixed(1) + '%',
+                xFmt: v => v.toFixed(0)
+            });
+            drawSigOverlay();
+        }
+
+        function drawSigOverlay() {
+            const g = sigBuf.geom;
+            if (!g || !sigBuf.t) return;
+            const nWin = sigBuf.t.length;
+            const pin = scatterPinIdx;
+            const hov = (scatterHoverIdx >= 0 && scatterHoverIdx !== pin) ? scatterHoverIdx : -1;
+            if (pin >= 0 && pin < nWin) {
+                const px = g.xToPx(sigBuf.t[pin]);
+                sigSvg.appendChild(svg('line', {
+                    x1: px, x2: px, y1: g.padT, y2: g.padT + g.plotH,
+                    stroke: '#0f172a', 'stroke-width': 1, opacity: 0.3, 'pointer-events': 'none'
+                }));
+                const dot = (cy, fill) => svg('circle', { cx: px, cy: cy, r: 4.5, fill: '#fff', stroke: fill, 'stroke-width': 2, 'pointer-events': 'none' });
+                sigSvg.appendChild(dot(g.yToPx(sigBuf.seedY[pin]), '#0f172a'));
+                sigSvg.appendChild(dot(g.yToPx(sigBuf.tgtY[pin]), '#d97706'));
+            }
+            if (hov >= 0 && hov < nWin) {
+                const hx = g.xToPx(sigBuf.t[hov]);
+                sigSvg.appendChild(svg('line', {
+                    x1: hx, x2: hx, y1: g.padT, y2: g.padT + g.plotH,
+                    stroke: '#0f172a', 'stroke-width': 1, opacity: 0.15, 'stroke-dasharray': '2 3', 'pointer-events': 'none'
+                }));
+            }
         }
 
         function scatterEventToIndex(evt) {
@@ -2656,11 +2837,13 @@
             if (!h.inPlot) {
                 if (!scatterDrag) {
                     scatterTip.classList.remove('visible');
+                    scatterHoverSrc = 'scatter';
                     scatterHoverIdx = -1;
                     paintScatter();
                 }
                 return;
             }
+            scatterHoverSrc = 'scatter';
             scatterHoverIdx = scatterDrag ? -1 : h.j;
             if (scatterDrag) scatterPinIdx = h.j;
             const { html, r } = scatterTipHtml(h.j);
@@ -2748,9 +2931,124 @@
             scSvg.style.cursor = 'crosshair';
             if (olsLineDragRaf) { cancelAnimationFrame(olsLineDragRaf); olsLineDragRaf = 0; }
             scatterDrag = false;
+            if (scatterHoverSrc === 'scatter') {
+                scatterHoverIdx = -1;
+                if (scatterTip) scatterTip.classList.remove('visible');
+                paintScatter();
+            }
+        });
+
+        // -------------------- Signals plot: hover tooltip + time scrub --------------------
+
+        function pointerToSigSvg(evt) {
+            const rect = sigSvg.getBoundingClientRect();
+            const vb = sigSvg.viewBox.baseVal;
+            return {
+                cx: (evt.clientX - rect.left) * (vb.width / rect.width),
+                cy: (evt.clientY - rect.top) * (vb.height / rect.height)
+            };
+        }
+
+        function pointerToSigData(evt) {
+            const g = sigBuf.geom;
+            if (!g || !sigBuf.t) return null;
+            const { cx, cy } = pointerToSigSvg(evt);
+            const inX = cx >= g.padL - 2 && cx <= g.padL + g.plotW + 2;
+            const inY = cy >= g.padT - 2 && cy <= g.padT + g.plotH + 2;
+            const tFrac = Math.max(0, Math.min(1, (cx - g.padL) / g.plotW));
+            const nWin = sigBuf.t.length;
+            const j = Math.max(0, Math.min(nWin - 1, Math.round(tFrac * (nWin - 1))));
+            return { inPlot: inX && inY, cx, cy, j };
+        }
+
+        function sigTipHtml(j) {
+            const sa = sigBuf.seedY[j] >= 0 ? '+' : '\u2212';
+            const sb = sigBuf.tgtY[j] >= 0 ? '+' : '\u2212';
+            return '<span class="st-row"><span class="st-key">Time</span><span class="st-val">' + sigBuf.t[j].toFixed(0) + ' s</span></span>' +
+                '<span class="st-row"><span class="st-key">Seed</span><span class="st-val">' + sa + Math.abs(sigBuf.seedY[j]).toFixed(2) + '%</span></span>' +
+                '<span class="st-row"><span class="st-key">Target</span><span class="st-val">' + sb + Math.abs(sigBuf.tgtY[j]).toFixed(2) + '%</span></span>';
+        }
+
+        function positionSigTip(evt) {
+            if (!sigTip) return;
+            const wrap = sigTip.parentElement;
+            if (!wrap) return;
+            const wrect = wrap.getBoundingClientRect();
+            const tw = sigTip.offsetWidth, th = sigTip.offsetHeight;
+            const cx = evt.clientX - wrect.left, cy = evt.clientY - wrect.top;
+            let x = cx + 14, y = cy + 14;
+            if (x + tw > wrect.width - 4) x = cx - tw - 14;
+            if (y + th > wrect.height - 4) y = cy - th - 14;
+            if (x < 4) x = 4; if (y < 4) y = 4;
+            sigTip.style.left = x + 'px';
+            sigTip.style.top = y + 'px';
+        }
+
+        function showSigTip(evt, j) {
+            if (!sigTip) return;
+            sigTip.innerHTML = sigTipHtml(j);
+            sigTip.classList.remove('st-tip-pos', 'st-tip-neg');
+            const r0 = scatterBuf.r;
+            sigTip.classList.add(r0 < 0 ? 'st-tip-neg' : r0 > 0 ? 'st-tip-pos' : 'st-tip-neu');
+            positionSigTip(evt);
+            sigTip.classList.add('visible');
+        }
+
+        function hideSigTip() {
+            if (sigTip) sigTip.classList.remove('visible');
+        }
+
+        sigSvg.style.cursor = 'crosshair';
+        sigSvg.style.touchAction = 'none';
+
+        sigSvg.addEventListener('pointerdown', (e) => {
+            const p = pointerToSigData(e);
+            if (!p || !p.inPlot) return;
+            sigDrag = true;
+            scatterPinIdx = p.j;
             scatterHoverIdx = -1;
-            if (scatterTip) scatterTip.classList.remove('visible');
+            try { sigSvg.setPointerCapture(e.pointerId); } catch (_) {}
+            showSigTip(e, p.j);
             paintScatter();
+            e.preventDefault();
+        });
+
+        sigSvg.addEventListener('pointermove', (e) => {
+            const p = pointerToSigData(e);
+            if (!p || !p.inPlot) {
+                if (!sigDrag) {
+                    scatterHoverSrc = 'signals';
+                    scatterHoverIdx = -1;
+                    hideSigTip();
+                    paintScatter();
+                }
+                return;
+            }
+            scatterHoverSrc = 'signals';
+            if (sigDrag) {
+                scatterPinIdx = p.j;
+                scatterHoverIdx = -1;
+            } else {
+                scatterHoverIdx = p.j;
+            }
+            const showJ = sigDrag ? scatterPinIdx : p.j;
+            showSigTip(e, showJ);
+            paintScatter();
+        });
+
+        function endSigDrag(e) {
+            sigDrag = false;
+            try { sigSvg.releasePointerCapture(e.pointerId); } catch (_) {}
+        }
+        sigSvg.addEventListener('pointerup', endSigDrag);
+        sigSvg.addEventListener('pointercancel', endSigDrag);
+        sigSvg.addEventListener('pointerleave', () => {
+            sigDrag = false;
+            if (scatterHoverSrc === 'signals') {
+                scatterHoverIdx = -1;
+                hideSigTip();
+                paintScatter();
+            }
         });
 
         function configureSliders() {
@@ -2790,22 +3088,14 @@
             const tParams = Object.assign({ noise, seed: 29 }, d.toParams(a, b));
             const tgt = makeHemo(tParams);
 
-            const xWin = [0, 120];
-            const nShow = xWin[1];
+            const nShow = SIG_X_WIN[1];
             const t = Array.from(TIME.slice(0, nShow));
             const seedY = Array.from(seed.bold.slice(0, nShow)).map(v => v * 100);
             const tgtY = Array.from(tgt.bold.slice(0, nShow)).map(v => v * 100);
+            sigBuf.t = t;
+            sigBuf.seedY = seedY;
+            sigBuf.tgtY = tgtY;
 
-            plotLines(sigSvg, [
-                { x: t, y: seedY, color: '#0f172a', width: 2 },
-                { x: t, y: tgtY, color: '#d97706', width: 2 }
-            ], xWin, [-2.5, 2.5], {
-                yTicks: 4, xTicks: 4, xLabel: 'time (s)',
-                yFmt: v => v.toFixed(1) + '%',
-                xFmt: v => v.toFixed(0)
-            });
-
-            // Scatter plot: seed vs target
             const fullSeed = Array.from(seed.bold).map(v => v * 100);
             const fullTgt = Array.from(tgt.bold).map(v => v * 100);
             const r = pearson(fullSeed, fullTgt);
@@ -2813,6 +3103,8 @@
             scatterBuf.b = fullTgt;
             scatterBuf.r = r;
             scatterHoverIdx = -1;
+
+            paintSig();
             drawScatter(scSvg, fullSeed, fullTgt, r, { pin: scatterPinIdx, hover: scatterHoverIdx });
 
             // KPIs
