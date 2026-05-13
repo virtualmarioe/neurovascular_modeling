@@ -3436,9 +3436,9 @@
                 yAxis: 'Target CMRO<sub>2</sub> delay',
                 xShort: 'CBF delay',
                 yShort: 'CMRO<sub>2</sub> delay',
-                xLow: -6, xHigh: 6, xFmt: v => v.toFixed(1) + 's',
-                yLow: -6, yHigh: 6, yFmt: v => v.toFixed(1) + 's',
-                scenarioHint: 'X&nbsp;axis:&nbsp;target CBF delay. Y&nbsp;axis:&nbsp;target CMRO<sub>2</sub> delay. Amplitudes stay at healthy baseline.',
+                xLow: 0, xHigh: 10, xFmt: v => v.toFixed(1) + 's',
+                yLow: 0, yHigh: 10, yFmt: v => v.toFixed(1) + 's',
+                scenarioHint: 'X&nbsp;axis:&nbsp;target CBF delay (0&ndash;10&nbsp;s). Y&nbsp;axis:&nbsp;target CMRO<sub>2</sub> delay (0&ndash;10&nbsp;s). Amplitudes and CBV coupling stay at healthy baseline. <strong>Bottom rows</strong> (small CMRO<sub>2</sub> delay): BOLD-FC flips sign as CBF delay grows. <strong>Top rows</strong> (large CMRO<sub>2</sub> delay): BOLD-FC is attenuated but does not reverse — the non-linear regime.',
                 compute: (x, y) => computeFcBB({
                     cbfAmp: 0.20, cmrAmp: 0.05,
                     cbfDelay: x, cmrDelay: y,
@@ -3891,8 +3891,8 @@
                         els.xIn.value = frac(0.06, sc.xLow, sc.xHigh);
                         els.yIn.value = frac(0.22, sc.yLow, sc.yHigh);
                     } else if (scenario === 'delay') {
-                        els.xIn.value = frac(-4, sc.xLow, sc.xHigh);
-                        els.yIn.value = frac(3, sc.yLow, sc.yHigh);
+                        els.xIn.value = frac(5, sc.xLow, sc.xHigh);
+                        els.yIn.value = frac(1, sc.yLow, sc.yHigh);
                     } else {
                         els.xIn.value = frac(0.70, sc.xLow, sc.xHigh);
                         els.yIn.value = frac(0.09, sc.yLow, sc.yHigh);
