@@ -476,6 +476,13 @@
         }
         .slider-hint { font-size: 0.72rem; color: #64748b; line-height: 1.55; }
 
+        .slider-cbf input[type=range]::-webkit-slider-thumb { background: #0ea5e9; box-shadow: 0 1px 4px rgba(14,165,233,0.35); }
+        .slider-cbf input[type=range]::-moz-range-thumb    { background: #0ea5e9; border: 2px solid #fff; }
+        .slider-cmr input[type=range]::-webkit-slider-thumb { background: #dc2626; box-shadow: 0 1px 4px rgba(220,38,38,0.35); }
+        .slider-cmr input[type=range]::-moz-range-thumb    { background: #dc2626; border: 2px solid #fff; }
+        .slider-cbv input[type=range]::-webkit-slider-thumb { background: #16a34a; box-shadow: 0 1px 4px rgba(22,163,74,0.35); }
+        .slider-cbv input[type=range]::-moz-range-thumb    { background: #16a34a; border: 2px solid #fff; }
+
         .pillbar { display: flex; gap: 6px; flex-wrap: wrap; }
         .pillbar button {
             flex: 1 1 auto; min-width: 70px;
@@ -1377,26 +1384,26 @@
                         </div>
                     </div>
 
-                    <div class="slider">
-                        <label><span>CBF amplitude <em>(% of baseline)</em></span><span id="balCbfAmpVal">20%</span></label>
+                    <div class="slider slider-cbf">
+                        <label><span><span style="color:#0ea5e9;font-weight:700">CBF</span> amplitude <em>(% of baseline)</em></span><span id="balCbfAmpVal">20%</span></label>
                         <input type="range" id="balCbfAmp" min="0" max="40" value="20" step="1">
                         <div class="slider-hint">How strongly cerebral blood flow oscillates around its resting value.</div>
                     </div>
 
-                    <div class="slider">
-                        <label><span>CMRO<sub>2</sub> amplitude <em>(% of baseline)</em></span><span id="balCmrAmpVal">5%</span></label>
+                    <div class="slider slider-cmr">
+                        <label><span><span style="color:#dc2626;font-weight:700">CMRO<sub>2</sub></span> amplitude <em>(% of baseline)</em></span><span id="balCmrAmpVal">5%</span></label>
                         <input type="range" id="balCmrAmp" min="0" max="40" value="5" step="1">
                         <div class="slider-hint">Oxygen consumption typically co-varies with CBF but with much smaller amplitude.</div>
                     </div>
 
-                    <div class="slider">
-                        <label><span>CMRO<sub>2</sub> delay <em>(s, vs. CBF)</em></span><span id="balCmrDelayVal">0.0&nbsp;s</span></label>
+                    <div class="slider slider-cmr">
+                        <label><span><span style="color:#dc2626;font-weight:700">CMRO<sub>2</sub></span> delay <em>(s, vs. CBF)</em></span><span id="balCmrDelayVal">0.0&nbsp;s</span></label>
                         <input type="range" id="balCmrDelay" min="-60" max="60" value="0" step="1">
                         <div class="slider-hint">Phase lag of oxygen consumption relative to blood-flow changes.</div>
                     </div>
 
-                    <div class="slider">
-                        <label><span>CBF&ndash;CBV coupling <em>(Grubb exponent)</em></span><span id="balCbvVal">0.38</span></label>
+                    <div class="slider slider-cbv">
+                        <label><span><span style="color:#0ea5e9;font-weight:700">CBF</span>&ndash;<span style="color:#16a34a;font-weight:700">CBV</span> coupling <em>(Grubb exponent)</em></span><span id="balCbvVal">0.38</span></label>
                         <input type="range" id="balCbv" min="0" max="80" value="38" step="1">
                         <div class="slider-hint">Classical Grubb value is 0.38; scenario&nbsp;3 varies this coupling.</div>
                     </div>
