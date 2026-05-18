@@ -1472,8 +1472,9 @@
                                 <span style="color:#0f172a;font-weight:700;">Seed</span> vs
                                 <span style="color:#d97706;font-weight:700;">Target</span>
                                 &nbsp;&middot; 0.05&nbsp;Hz synthetic drive + physiological noise.
-                                <strong>Hover</strong> for a sample readout or <strong>click/drag</strong>
-                                to pin a time crosshair (mirrored on the scatter).
+                                <strong>Hover</strong> for a sample readout, <strong>click/drag</strong>
+                                empty space to pin a time crosshair, or <strong>drag the target curve</strong>
+                                to adjust slider&nbsp;A.
                             </p>
                         </div>
                         <div class="scatter-plot-wrap">
@@ -2799,6 +2800,7 @@
         let scatterDrag = false;
         let sigDrag = false;
         let olsLineDrag = false;
+        const sigCurveDrag = { active: false, raf: 0, pendingJ: 0, pendingBoldPct: 0, lastEvt: null };
         let olsLineDragRaf = 0;
         let olsLinePendingS = 0;
         let olsDragS0 = 0, olsDragMa0 = 0, olsDragY0 = 0;
@@ -3119,12 +3121,86 @@
             if (sigTip) sigTip.classList.remove('visible');
         }
 
+        // Squared pixel distance from pointer to nearest sample on the target curve.
+        function distSqToTargetCurve(evt) {
+            const g = sigBuf.geom;
+            if (!g || !sigBuf.tgtY) return Infinity;
+            const { cx, cy } = pointerToSigSvg(evt);
+            if (cx < g.padL - 2 || cx > g.padL + g.plotW + 2 ||
+                cy < g.padT - 2 || cy > g.padT + g.plotH + 2) return Infinity;
+            const tFrac = Math.max(0, Math.min(1, (cx - g.padL) / g.plotW));
+            const nWin = sigBuf.t.length;
+            const j = Math.max(0, Math.min(nWin - 1, Math.round(tFrac * (nWin - 1))));
+            const px = g.xToPx(sigBuf.t[j]);
+            const py = g.yToPx(sigBuf.tgtY[j]);
+            return (cx - px) * (cx - px) + (cy - py) * (cy - py);
+        }
+
+        // Convert pointer position to { boldPct, j } in signal-plot data space.
+        function pointerToSigY(evt) {
+            const g = sigBuf.geom;
+            if (!g) return null;
+            const { cx, cy } = pointerToSigSvg(evt);
+            const [yMin, yMax] = SIG_Y_RANGE;
+            const boldPct = Math.max(yMin, Math.min(yMax,
+                yMax - (cy - g.padT) / g.plotH * (yMax - yMin)));
+            const tFrac = Math.max(0, Math.min(1, (cx - g.padL) / g.plotW));
+            const nWin = sigBuf.t.length;
+            const j = Math.max(0, Math.min(nWin - 1, Math.round(tFrac * (nWin - 1))));
+            return { boldPct, j };
+        }
+
+        // Hill-climb slider A so that the noise-free target BOLD at sample tIdx ≈ boldTargetPct.
+        function fitSliderAToPoint(tIdx, boldTargetPct) {
+            const d = scenarioDefs[scenario];
+            const rb = Math.round(Math.max(d.bMin, Math.min(d.bMax, +els.B.value)));
+            let ra = Math.round(Math.max(d.aMin, Math.min(d.aMax, +els.A.value)));
+            function boldAt(ra_) {
+                const tParams = Object.assign({ noise: 0, seed: 29 }, d.toParams(ra_ * d.aScale, rb * d.bScale));
+                return makeHemo(tParams).bold[tIdx] * 100;
+            }
+            const err = v => Math.abs(boldAt(v) - boldTargetPct);
+            let bestE = err(ra);
+            for (const step of [4, 2, 1]) {
+                for (let it = 0; it < 30; it++) {
+                    let improved = false;
+                    for (const da of [step, -step]) {
+                        const na = Math.max(d.aMin, Math.min(d.aMax, ra + da));
+                        if (na === ra) continue;
+                        const e = err(na);
+                        if (e < bestE - 1e-7) { bestE = e; ra = na; improved = true; }
+                    }
+                    if (!improved) break;
+                }
+            }
+            els.A.value = ra;
+        }
+
+        function applySigCurveDrag() {
+            sigCurveDrag.raf = 0;
+            if (!sigCurveDrag.active) return;
+            fitSliderAToPoint(sigCurveDrag.pendingJ, sigCurveDrag.pendingBoldPct);
+            render();
+        }
+
         sigSvg.style.cursor = 'crosshair';
         sigSvg.style.touchAction = 'none';
 
         sigSvg.addEventListener('pointerdown', (e) => {
             const p = pointerToSigData(e);
             if (!p || !p.inPlot) return;
+            if (distSqToTargetCurve(e) < 7 * 7) {
+                sigCurveDrag.active = true;
+                const sv = pointerToSigY(e);
+                sigCurveDrag.pendingJ = sv ? sv.j : p.j;
+                sigCurveDrag.pendingBoldPct = sv ? sv.boldPct : sigBuf.tgtY[p.j];
+                sigCurveDrag.lastEvt = e;
+                sigSvg.style.cursor = 'grabbing';
+                try { sigSvg.setPointerCapture(e.pointerId); } catch (_) {}
+                if (!sigCurveDrag.raf) sigCurveDrag.raf = requestAnimationFrame(applySigCurveDrag);
+                e.preventDefault();
+                return;
+            }
             sigDrag = true;
             scatterPinIdx = p.j;
             scatterHoverIdx = -1;
@@ -3135,16 +3211,26 @@
         });
 
         sigSvg.addEventListener('pointermove', (e) => {
+            if (sigCurveDrag.active) {
+                const sv = pointerToSigY(e);
+                if (sv) { sigCurveDrag.pendingJ = sv.j; sigCurveDrag.pendingBoldPct = sv.boldPct; }
+                sigCurveDrag.lastEvt = e;
+                if (!sigCurveDrag.raf) sigCurveDrag.raf = requestAnimationFrame(applySigCurveDrag);
+                e.preventDefault();
+                return;
+            }
             const p = pointerToSigData(e);
             if (!p || !p.inPlot) {
                 if (!sigDrag) {
                     scatterHoverSrc = 'signals';
                     scatterHoverIdx = -1;
                     hideSigTip();
+                    sigSvg.style.cursor = 'crosshair';
                     paintScatter();
                 }
                 return;
             }
+            sigSvg.style.cursor = distSqToTargetCurve(e) < 7 * 7 ? 'grab' : 'crosshair';
             scatterHoverSrc = 'signals';
             if (sigDrag) {
                 scatterPinIdx = p.j;
@@ -3158,13 +3244,26 @@
         });
 
         function endSigDrag(e) {
+            if (sigCurveDrag.active) {
+                sigCurveDrag.active = false;
+                if (sigCurveDrag.raf) { cancelAnimationFrame(sigCurveDrag.raf); sigCurveDrag.raf = 0; }
+                const sv = pointerToSigY(e);
+                if (sv) fitSliderAToPoint(sv.j, sv.boldPct);
+                render();
+                sigSvg.style.cursor = 'crosshair';
+            }
             sigDrag = false;
             try { sigSvg.releasePointerCapture(e.pointerId); } catch (_) {}
         }
         sigSvg.addEventListener('pointerup', endSigDrag);
         sigSvg.addEventListener('pointercancel', endSigDrag);
         sigSvg.addEventListener('pointerleave', () => {
+            if (sigCurveDrag.active) {
+                sigCurveDrag.active = false;
+                if (sigCurveDrag.raf) { cancelAnimationFrame(sigCurveDrag.raf); sigCurveDrag.raf = 0; }
+            }
             sigDrag = false;
+            sigSvg.style.cursor = 'crosshair';
             if (scatterHoverSrc === 'signals') {
                 scatterHoverIdx = -1;
                 hideSigTip();
