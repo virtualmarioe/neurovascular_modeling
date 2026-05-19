@@ -15,7 +15,7 @@
     <meta property="og:type" content="article">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image" content="files/images/teaser.png">
-    <link rel="icon" type="image/png" href="files/images/logo.png">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
@@ -114,7 +114,7 @@
                 radial-gradient(ellipse at top, rgba(245, 158, 11, 0.07), transparent 60%),
                 radial-gradient(ellipse at bottom, rgba(15, 23, 42, 0.04), transparent 60%);
         }
-        .hero-logo { width: 96px; height: auto; margin-bottom: 22px; }
+        .hero-logo { width: 96px; height: auto; margin: 0 auto 22px; display: block; }
         .hero-venue {
             display: inline-block;
             font-size: 0.72rem; font-weight: 700;
@@ -134,7 +134,7 @@
         }
         .hero-authors {
             font-size: 1rem; color: #0f172a; font-weight: 600;
-            line-height: 1.75; margin-bottom: 6px;
+            line-height: 1.75; margin-bottom: 28px;
         }
         .hero-authors sup { font-weight: 500; color: #64748b; font-size: 0.7em; }
         .hero-affiliations {
@@ -558,15 +558,6 @@
                 box-shadow 0.32s ease,
                 border-color 0.28s ease;
         }
-        .finding-card::before {
-            content: '';
-            position: absolute;
-            inset: 0 0 auto 0;
-            height: 3px;
-            border-radius: 20px 20px 0 0;
-            background: linear-gradient(90deg, #ea580c 0%, #f59e0b 38%, #fbbf24 72%, #fde68a 100%);
-            z-index: 1;
-        }
         .finding-card::after {
             content: '';
             position: absolute;
@@ -629,16 +620,6 @@
                 box-shadow 0.3s ease,
                 border-color 0.25s ease;
         }
-        .impl-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; bottom: 0;
-            width: 5px;
-            border-radius: 20px 0 0 20px;
-            background: linear-gradient(180deg, #38bdf8 0%, #6366f1 52%, #0f172a 100%);
-            box-shadow: 2px 0 12px rgba(56, 189, 248, 0.25);
-            z-index: 1;
-        }
         .impl-card::after {
             content: '';
             position: absolute;
@@ -666,7 +647,6 @@
             letter-spacing: -0.018em;
             color: #0f172a;
             margin: 0 0 10px;
-            padding-left: 14px;
             line-height: 1.32;
         }
         .impl-card p {
@@ -675,7 +655,6 @@
             font-size: 0.9rem;
             color: #475569;
             line-height: 1.72;
-            padding-left: 14px;
             margin: 0;
         }
         /* On desktop, lock to three columns so the orphan 4th card can be
@@ -837,26 +816,22 @@
     <!-- ===== HERO ===== -->
     <header class="hero" id="top">
         <div class="container">
-            <img src="files/images/logo.png" alt="Project logo" class="hero-logo">
+            <svg class="hero-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-label="Brain icon" role="img">
+                <text x="50%" y="54%" font-size="82" text-anchor="middle" dominant-baseline="central">🧠</text>
+            </svg>
             <div class="hero-venue">NeuroImage &middot; Vol.&nbsp;218 &middot; September&nbsp;2020</div>
             <h1 class="hero-title">
                 Modeling the impact of neurovascular coupling impairments on BOLD-based functional connectivity at rest
             </h1>
             <p class="hero-subtitle">
-                A simulation study showing how plausible alterations in cerebral blood flow, oxygen metabolism and
+                A simulation study showing how alterations in cerebral blood flow, oxygen metabolism and
                 blood volume can, on their own, reshape, and even reverse, the sign of resting-state
                 BOLD functional connectivity.
             </p>
             <p class="hero-authors">
-                <strong>Mario E. Archila-Mel&eacute;ndez</strong><sup>1,2</sup> &nbsp;&middot;&nbsp;
-                <strong>Christian Sorg</strong><sup>1,2,3</sup> &nbsp;&middot;&nbsp;
-                <strong>Christine Preibisch</strong><sup>1,2,4</sup>
-            </p>
-            <p class="hero-affiliations">
-                <sup>1</sup>Department of Neuroradiology, Klinikum rechts der Isar, Technical University of Munich, Munich, Germany &nbsp;&middot;&nbsp;
-                <sup>2</sup>TUM-Neuroimaging Center, Technical University of Munich, Munich, Germany &nbsp;&middot;&nbsp;
-                <sup>3</sup>Department of Psychiatry, Klinikum rechts der Isar, Technical University of Munich, Munich, Germany &nbsp;&middot;&nbsp;
-                <sup>4</sup>Clinic for Neurology, Klinikum rechts der Isar, Technical University of Munich, Munich, Germany
+                <strong>Mario E. Archila-Mel&eacute;ndez</strong> &nbsp;&middot;&nbsp;
+                <strong>Christian Sorg</strong> &nbsp;&middot;&nbsp;
+                <strong>Christine Preibisch</strong>
             </p>
             <div class="hero-buttons">
                 <a href="https://doi.org/10.1016/j.neuroimage.2020.116871" class="hero-btn" target="_blank" rel="noopener">
@@ -892,7 +867,6 @@
                 </button>
                 <div class="nav-menu" id="nav-menu-science" role="menu">
                     <a href="#overview" class="nav-link nav-sublink active" role="menuitem">Overview</a>
-                    <a href="#abstract" class="nav-link nav-sublink" role="menuitem">Abstract</a>
                     <a href="#methods" class="nav-link nav-sublink" role="menuitem">Methods</a>
                     <a href="#scenarios" class="nav-link nav-sublink" role="menuitem">Scenarios</a>
                     <a href="#findings" class="nav-link nav-sublink" role="menuitem">Findings</a>
@@ -956,56 +930,6 @@
         </div>
     </section>
     <!-- ===== ABSTRACT ===== -->
-    <section id="abstract">
-        <div class="container">
-            <h2 class="section-title">Abstract</h2>
-            <div class="abstract-card fade-in">
-                <p>
-                    Functional magnetic resonance imaging (fMRI) of blood oxygenation level dependent (BOLD) signals
-                    during the resting-state is widely used to study functional connectivity (FC) of slowly
-                    fluctuating ongoing brain activity (BOLD-FC) in humans with and without brain diseases. While
-                    physiological impairments (e.g. aberrant perfusion or vascular reactivity) are common
-                    in neurological and psychiatric disorders, their impact on BOLD-FC is widely unknown and ignored.
-                    The aim of our simulation study was therefore to investigate the influence of impaired
-                    neurovascular coupling on resting-state BOLD-FC.
-                </p>
-                <p>
-                    Simulated BOLD signals comprising intra- and extravascular contributions were derived from an
-                    adjusted balloon model, which allows for independent definitions of cerebral blood flow (CBF)
-                    and cerebral metabolic rate of oxygen (CMRO<sub>2</sub>) responses, elicited by a synthetic
-                    oscillatory input signal with low-frequency (0.05&nbsp;Hz) amplitude modulations. BOLD-FC was
-                    then defined by correlations between physiological reference BOLD time curves (seeds of seed-based
-                    BOLD-FC) and test BOLD time curves (targets of BOLD-FC) featuring altered physiological variables
-                    (CMRO<sub>2</sub>, CBF, cerebral blood volume (CBV)). Impact of impaired neurovascular coupling
-                    on BOLD-FC was investigated for three different scenarios with independent changes in
-                    (1) CBF and CMRO<sub>2</sub> amplitudes, (2) CBF and CMRO<sub>2</sub> delays, and (3) coupling
-                    between CBF and CBV.
-                </p>
-                <p>
-                    For scenario&nbsp;1, we found linear influences of CMRO<sub>2</sub> and CBF amplitudes on BOLD-FC:
-                    for a given CMRO<sub>2</sub> amplitude, BOLD-FC changes from negative to positive FC with
-                    increasing CBF amplitude, and increasing CMRO<sub>2</sub> amplitude simply shifts this dependence
-                    linearly. For scenario&nbsp;2, CMRO<sub>2</sub> and CBF delays had a complex non-linear effect on
-                    BOLD-FC: for small CMRO<sub>2</sub> delays, BOLD-FC changes from positive to negative BOLD-FC with
-                    increasing CBF delays, but for large CMRO<sub>2</sub> delays positive BOLD-FC simply diminishes
-                    with increasing CBF delay. For scenario&nbsp;3, changes in CBF&ndash;CBV coupling have almost no
-                    effect on BOLD-FC. None of these changes were critically influenced by signal-to-noise ratio or
-                    temporal resolution.
-                </p>
-                <p>
-                    Our results demonstrate the importance of alterations in neurovascular coupling for aberrant
-                    resting-state BOLD-FC. Based on our data, we suggest to complement BOLD-FC studies, at
-                    least of at-risk patient populations, with perfusion and oxygenation sensitive MRI. In
-                    cases where this is not available, we recommend careful interpretation of BOLD-FC results
-                    considering previous findings about hemodynamic&ndash;metabolic changes. Accurate modeling of
-                    the hemodynamic&ndash;metabolic context might in the future improve both our understanding of
-                    the crucial interplay between vascular, hemodynamic and neuronal components of intrinsic BOLD-FC
-                    and the evaluation of aberrant BOLD-FC in brain diseases with vascular&ndash;hemodynamic
-                    impairments.
-                </p>
-            </div>
-        </div>
-    </section>
     <!-- ===== METHODS ===== -->
     <section id="methods">
         <div class="container">
@@ -1207,9 +1131,6 @@
             <aside class="edu-disclaimer fade-in" role="note" aria-labelledby="eduDisclaimerTitle">
                 <div class="edu-disclaimer-icon" aria-hidden="true">i</div>
                 <div class="edu-disclaimer-body">
-                    <div class="edu-disclaimer-title" id="eduDisclaimerTitle">
-                        A note about the demos below
-                    </div>
                     <p>
                         The three live demos below, namely the <strong>Balloon Model Explorer</strong>,
                         the <strong>BOLD-FC Simulator</strong> and the <strong>Scenario Heatmap</strong>,
@@ -1779,11 +1700,7 @@
     <!-- ===== AUTHORS & CONTRIBUTIONS ===== -->
     <section id="authors" class="authors-section">
         <div class="container">
-            <h2 class="section-title">Authors &amp; contributions</h2>
-            <p class="section-desc">
-                Contributions reflect the <em>Author contributions</em> and <em>CRediT</em> statements of the
-                published NeuroImage&nbsp;2020 article.
-            </p>
+            <h2 class="section-title">Authors</h2>
 
             <div class="author-group">
                 <div class="author-names">
@@ -1793,9 +1710,6 @@
                     Department of Diagnostic and Interventional Neuroradiology &middot;
                     TUM-Neuroimaging Center<br>
                     Klinikum rechts der Isar, Technical University of Munich, Munich, Germany<br>
-                    <em>Conception and design of the study, simulations of electrophysiology, analysis and
-                        interpretation of data, drafting and critical revision of the article, writing
-                        &ndash; original draft.</em><br>
                     <a href="mailto:mario.archila@tum.de">mario.archila@tum.de</a>
                 </div>
             </div>
@@ -1808,8 +1722,6 @@
                     Department of Diagnostic and Interventional Neuroradiology &middot;
                     Department of Psychiatry &middot; TUM-Neuroimaging Center<br>
                     Klinikum rechts der Isar, Technical University of Munich, Munich, Germany<br>
-                    <em>Conception and design of the study, analysis and interpretation of data, drafting
-                        and critical revision of the article, writing &ndash; original draft.</em><br>
                     <a href="mailto:christian.sorg@tum.de">christian.sorg@tum.de</a>
                 </div>
             </div>
@@ -1822,9 +1734,6 @@
                     Department of Diagnostic and Interventional Neuroradiology &middot;
                     Clinic for Neurology &middot; TUM-Neuroimaging Center<br>
                     Klinikum rechts der Isar, Technical University of Munich, Munich, Germany<br>
-                    <em>Conception and design of the study, simulations of the BOLD signal, analysis and
-                        interpretation of data, drafting and critical revision of the article, writing
-                        &ndash; original draft.</em><br>
                     <a href="mailto:preibisch@tum.de">preibisch@tum.de</a>
                 </div>
             </div>
