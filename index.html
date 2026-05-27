@@ -3435,14 +3435,14 @@
             amp: {
                 label: '1 &middot; Amplitudes',
                 scenarioVal: '1 &middot; Amplitudes',
-                xAxis: 'Target CBF amplitude',
-                yAxis: 'Target CMRO<sub>2</sub> amplitude',
-                xShort: 'CBF amp',
-                yShort: 'CMRO<sub>2</sub> amp',
+                xAxis: 'CMRO<sub>2</sub> amplitude',
+                yAxis: 'CBF amplitude',
+                xShort: 'CMRO<sub>2</sub> amp',
+                yShort: 'CBF amp',
                 xLow: 0, xHigh: 0.40, xFmt: v => (v * 100).toFixed(0) + '%',
                 yLow: 0, yHigh: 0.40, yFmt: v => (v * 100).toFixed(0) + '%',
-                scenarioHint: 'X&nbsp;axis:&nbsp;target CBF amplitude. Y&nbsp;axis:&nbsp;target CMRO<sub>2</sub> amplitude. Each cell is one full simulation.',
-                compute: (x, y) => computeFcBB({ cbfAmp: x, cmrAmp: y, cbfDelay: 0, cmrDelay: 0, grubb: 0.38 })
+                scenarioHint: 'X&nbsp;axis:&nbsp;CMRO<sub>2</sub> amplitude. Y&nbsp;axis:&nbsp;CBF amplitude. Each cell is one full simulation.',
+                compute: (x, y) => -computeFcBB({ cbfAmp: x, cmrAmp: y, cbfDelay: 0, cmrDelay: 0, grubb: 0.38 })
             },
             delay: {
                 label: '2 &middot; Delays',
