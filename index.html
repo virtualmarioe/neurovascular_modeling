@@ -482,6 +482,10 @@
         .slider-cmr input[type=range]::-moz-range-thumb    { background: #dc2626; border: 2px solid #fff; }
         .slider-cbv input[type=range]::-webkit-slider-thumb { background: #16a34a; box-shadow: 0 1px 4px rgba(22,163,74,0.35); }
         .slider-cbv input[type=range]::-moz-range-thumb    { background: #16a34a; border: 2px solid #fff; }
+        .slider-heat-x input[type=range]::-webkit-slider-thumb { background: #A91101; box-shadow: 0 1px 4px rgba(169,17,1,0.35); }
+        .slider-heat-x input[type=range]::-moz-range-thumb    { background: #A91101; border: 2px solid #fff; }
+        .slider-heat-y input[type=range]::-webkit-slider-thumb { background: #4997D0; box-shadow: 0 1px 4px rgba(73,151,208,0.35); }
+        .slider-heat-y input[type=range]::-moz-range-thumb    { background: #4997D0; border: 2px solid #fff; }
 
         .pillbar { display: flex; gap: 6px; flex-wrap: wrap; }
         .pillbar button {
@@ -3435,12 +3439,14 @@
             amp: {
                 label: '1 &middot; Amplitudes',
                 scenarioVal: '1 &middot; Amplitudes',
-                xAxis: 'CMRO<sub>2</sub> amplitude',
-                yAxis: 'CBF amplitude',
+                xAxis: 'CMRO<sub>2</sub> amplitude (m1)',
+                yAxis: 'CBF amplitude (f1)',
                 xShort: 'CMRO<sub>2</sub> amp',
                 yShort: 'CBF amp',
-                xLow: 0, xHigh: 0.40, xFmt: v => (v * 100).toFixed(0) + '%',
-                yLow: 0, yHigh: 0.40, yFmt: v => (v * 100).toFixed(0) + '%',
+                xAxisColor: '#A91101',
+                yAxisColor: '#4997D0',
+                xLow: 0, xHigh: 0.40, xFmt: v => (1.0 + v * 0.75).toFixed(2),
+                yLow: 0, yHigh: 0.40, yFmt: v => (1.0 + v * 1.5).toFixed(2),
                 scenarioHint: 'X&nbsp;axis:&nbsp;CMRO<sub>2</sub> amplitude. Y&nbsp;axis:&nbsp;CBF amplitude. Each cell is one full simulation.',
                 compute: (x, y) => -computeFcBB({ cbfAmp: x, cmrAmp: y, cbfDelay: 0, cmrDelay: 0, grubb: 0.38 })
             },
@@ -3619,10 +3625,18 @@
             // Update labels
             els.scenarioVal.innerHTML = sc.scenarioVal;
             els.scenarioHint.innerHTML = sc.scenarioHint;
-            els.xLabel.innerHTML = '<span>' + sc.xAxis + '</span>';
-            els.yLabel.innerHTML = '<span>' + sc.yAxis + '</span>';
-            els.xLab.innerHTML = sc.xShort;
-            els.yLab.innerHTML = sc.yShort;
+
+            // Slider thumb colors — only for amp scenario
+            const xSlider = els.xIn.closest('.slider');
+            const ySlider = els.yIn.closest('.slider');
+            xSlider.classList.toggle('slider-heat-x', scenario === 'amp');
+            ySlider.classList.toggle('slider-heat-y', scenario === 'amp');
+            const xC = sc.xAxisColor ? ' style="color:' + sc.xAxisColor + ';font-weight:700"' : '';
+            const yC = sc.yAxisColor ? ' style="color:' + sc.yAxisColor + ';font-weight:700"' : '';
+            els.xLabel.innerHTML = '<span><span' + xC + '>' + sc.xAxis + '</span></span>';
+            els.yLabel.innerHTML = '<span><span' + yC + '>' + sc.yAxis + '</span></span>';
+            els.xLab.innerHTML = '<span' + xC + '>' + sc.xShort + '</span>';
+            els.yLab.innerHTML = '<span' + yC + '>' + sc.yShort + '</span>';
 
             const xFrac = +els.xIn.value / 100;
             const yFrac = +els.yIn.value / 100;
@@ -3834,11 +3848,11 @@
             // Axis titles
             mapSvg.appendChild(svg('text', {
                 x: padL + plotW / 2, y: H - 8, 'text-anchor': 'middle',
-                'font-size': '10px', fill: '#0f172a', 'font-weight': 700, 'font-family': 'Inter'
+                'font-size': '10px', fill: sc.xAxisColor || '#0f172a', 'font-weight': 700, 'font-family': 'Inter'
             })).textContent = sc.xAxis.replace(/<[^>]+>/g, '');
             const yT = svg('text', {
                 x: 14, y: padT + plotH / 2, 'text-anchor': 'middle',
-                'font-size': '10px', fill: '#0f172a', 'font-weight': 700,
+                'font-size': '10px', fill: sc.yAxisColor || '#0f172a', 'font-weight': 700,
                 'font-family': 'Inter', transform: `rotate(-90 14 ${padT + plotH / 2})`
             });
             yT.textContent = sc.yAxis.replace(/<[^>]+>/g, '');
