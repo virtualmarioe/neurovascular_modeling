@@ -3457,6 +3457,8 @@
                 yAxis: 'CBF delay (τ<sub>f</sub>)',
                 xShort: 'CMRO<sub>2</sub> delay',
                 yShort: 'CBF delay',
+                xAxisColor: '#A91101',
+                yAxisColor: '#4997D0',
                 xLow: 0.5, xHigh: 8, xFmt: v => v.toFixed(1) + 's',
                 yLow: 0.5, yHigh: 8, yFmt: v => v.toFixed(1) + 's',
                 scenarioHint: 'Reproduces the paper&rsquo;s Fig.&nbsp;6H orientation. X&nbsp;axis:&nbsp;CMRO<sub>2</sub> delay τ<sub>m</sub> (0.5&ndash;8&nbsp;s). Y&nbsp;axis:&nbsp;CBF delay τ<sub>f</sub> (0.5&ndash;8&nbsp;s). Amplitudes and CBV coupling stay at healthy baseline. <strong>Left columns</strong> (small τ<sub>m</sub>): BOLD-FC flips from positive to negative as CBF delay grows — the strong negative lobe in the upper-left. <strong>Right columns</strong> (large τ<sub>m</sub>): positive BOLD-FC simply diminishes without reversing — the non-linear regime.',
@@ -3626,11 +3628,12 @@
             els.scenarioVal.innerHTML = sc.scenarioVal;
             els.scenarioHint.innerHTML = sc.scenarioHint;
 
-            // Slider thumb colors — only for amp scenario
+            // Slider thumb colors — for scenarios whose x is CMRO₂ (red) and y is CBF (blue)
             const xSlider = els.xIn.closest('.slider');
             const ySlider = els.yIn.closest('.slider');
-            xSlider.classList.toggle('slider-heat-x', scenario === 'amp');
-            ySlider.classList.toggle('slider-heat-y', scenario === 'amp');
+            const colorThumbs = scenario === 'amp' || scenario === 'delay';
+            xSlider.classList.toggle('slider-heat-x', colorThumbs);
+            ySlider.classList.toggle('slider-heat-y', colorThumbs);
             const xC = sc.xAxisColor ? ' style="color:' + sc.xAxisColor + ';font-weight:700"' : '';
             const yC = sc.yAxisColor ? ' style="color:' + sc.yAxisColor + ';font-weight:700"' : '';
             els.xLabel.innerHTML = '<span><span' + xC + '>' + sc.xAxis + '</span></span>';
