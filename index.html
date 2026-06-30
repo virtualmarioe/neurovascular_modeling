@@ -3453,16 +3453,16 @@
             delay: {
                 label: '2 &middot; Delays',
                 scenarioVal: '2 &middot; Delays',
-                xAxis: 'Target CBF delay',
-                yAxis: 'Target CMRO<sub>2</sub> delay',
-                xShort: 'CBF delay',
-                yShort: 'CMRO<sub>2</sub> delay',
-                xLow: 0, xHigh: 10, xFmt: v => v.toFixed(1) + 's',
-                yLow: 0, yHigh: 10, yFmt: v => v.toFixed(1) + 's',
-                scenarioHint: 'X&nbsp;axis:&nbsp;target CBF delay (0&ndash;10&nbsp;s). Y&nbsp;axis:&nbsp;target CMRO<sub>2</sub> delay (0&ndash;10&nbsp;s). Amplitudes and CBV coupling stay at healthy baseline. <strong>Bottom rows</strong> (small CMRO<sub>2</sub> delay): BOLD-FC flips sign as CBF delay grows. <strong>Top rows</strong> (large CMRO<sub>2</sub> delay): BOLD-FC is attenuated but does not reverse — the non-linear regime.',
+                xAxis: 'CMRO<sub>2</sub> delay (τ<sub>m</sub>)',
+                yAxis: 'CBF delay (τ<sub>f</sub>)',
+                xShort: 'CMRO<sub>2</sub> delay',
+                yShort: 'CBF delay',
+                xLow: 0.5, xHigh: 8, xFmt: v => v.toFixed(1) + 's',
+                yLow: 0.5, yHigh: 8, yFmt: v => v.toFixed(1) + 's',
+                scenarioHint: 'Reproduces the paper&rsquo;s Fig.&nbsp;6H orientation. X&nbsp;axis:&nbsp;CMRO<sub>2</sub> delay τ<sub>m</sub> (0.5&ndash;8&nbsp;s). Y&nbsp;axis:&nbsp;CBF delay τ<sub>f</sub> (0.5&ndash;8&nbsp;s). Amplitudes and CBV coupling stay at healthy baseline. <strong>Left columns</strong> (small τ<sub>m</sub>): BOLD-FC flips from positive to negative as CBF delay grows — the strong negative lobe in the upper-left. <strong>Right columns</strong> (large τ<sub>m</sub>): positive BOLD-FC simply diminishes without reversing — the non-linear regime.',
                 compute: (x, y) => computeFcBB({
                     cbfAmp: 0.20, cmrAmp: 0.05,
-                    cbfDelay: x, cmrDelay: y,
+                    cbfDelay: y, cmrDelay: x,
                     grubb: 0.38
                 })
             },
