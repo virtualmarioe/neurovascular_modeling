@@ -1586,9 +1586,11 @@
                 "zero-crossing" diagonal; the dependence is essentially linear. The <em>delays</em> map shows a
                 curved, ring-like zero contour; the dependence is strongly non-linear because each frequency in
                 the broadband drive accumulates a different phase shift for the same temporal delay. The
-                <em>CBV-coupling</em> map is almost uniformly orange; BOLD-FC barely moves as the Grubb
-                exponent varies. That is the paper's central geometrical story, and it now survives the
-                switch from a single-tone drive to a realistic, noise-averaged rs-fMRI-band drive.
+                <em>CBV-coupling</em> map is overwhelmingly orange &mdash; CBV coupling is a weak lever &mdash;
+                with only a small negative (blue) lobe in the upper-left, where strong, fast CBV coupling briefly
+                anti-correlates the target (matching the paper's Fig.&nbsp;6I). That is the paper's central
+                geometrical story, and it now survives the switch from a single-tone drive to a realistic,
+                noise-averaged rs-fMRI-band drive.
             </div>
         </div>
     </section>
@@ -3471,17 +3473,17 @@
             cbv: {
                 label: '3 &middot; CBV',
                 scenarioVal: '3 &middot; CBV coupling',
-                xAxis: 'Target Grubb exponent',
-                yAxis: 'Target CBF amplitude',
-                xShort: 'Grubb &alpha;',
-                yShort: 'CBF amp',
-                xLow: 0, xHigh: 0.80, xFmt: v => v.toFixed(2),
-                yLow: 0.10, yHigh: 0.30, yFmt: v => (v * 100).toFixed(0) + '%',
-                scenarioHint: 'X&nbsp;axis:&nbsp;CBF&ndash;CBV coupling (Grubb exponent &alpha;<sub>v</sub>,&nbsp;0 to&nbsp;0.80). Y&nbsp;axis:&nbsp;target CBF amplitude held to the physiological 10&ndash;30&nbsp;% range. Notice how flat this surface is across both axes.',
+                xAxis: 'CBV delay &tau;<sub>v</sub>',
+                yAxis: 'Grubb exponent &alpha;<sub>v</sub>',
+                xShort: '&tau;<sub>v</sub>',
+                yShort: '&alpha;<sub>v</sub>',
+                xLow: 0, xHigh: 30, xFmt: v => v.toFixed(1) + 's',
+                yLow: 0.025, yHigh: 0.400, yFmt: v => v.toFixed(3),
+                scenarioHint: 'Reproduces the paper&rsquo;s Fig.&nbsp;6I (slower CBV response). X&nbsp;axis:&nbsp;CBV response delay &tau;<sub>v</sub> relative to CBF (0&ndash;30&nbsp;s). Y&nbsp;axis:&nbsp;CBF&ndash;CBV coupling strength (Grubb exponent &alpha;<sub>v</sub>,&nbsp;0.025&ndash;0.40). BOLD-FC is positive (orange) across almost the whole landscape &mdash; CBV coupling is a weak lever &mdash; except a small negative (blue) lobe in the <strong>upper-left</strong>, where strong, fast CBV coupling (high&nbsp;&alpha;<sub>v</sub>, low&nbsp;&tau;<sub>v</sub>) briefly anti-correlates the target.',
                 compute: (x, y) => computeFcBB({
-                    cbfAmp: y, cmrAmp: 0.05,
+                    cbfAmp: 0.20, cmrAmp: 0.05,
                     cbfDelay: 0, cmrDelay: 0,
-                    grubb: x
+                    grubb: y, cbvDelay: x, cbvGain: 6
                 })
             }
         };
@@ -3554,13 +3556,22 @@
         }
 
         function simulateBoldBB(mIdx, params, noiseRng) {
-            const { cbfAmp, cmrAmp, cbfDelay, cmrDelay, grubb } = params;
-            const alpha = BETA - grubb;
+            const { cbfAmp, cmrAmp, cbfDelay, cmrDelay, grubb, cbvDelay = 0, cbvGain = 1 } = params;
             const cbfSig = driveSamples(mIdx, cbfDelay);
             const cmrSig = driveSamples(mIdx, cmrDelay);
+            // Venous CBV follows CBF with an extra lag tau_v (cbvDelay); its
+            // volume term lowers BOLD with weight grubb (the Grubb exponent).
+            // With cbvDelay=0 and cbvGain=1 this collapses exactly to the
+            // standard (beta - grubb)*CBF - beta*CMRO2 linearised Davis form,
+            // so scenarios 1 and 2 are unaffected. cbvGain>1 deliberately
+            // exaggerates the *target's* CBV sensitivity so scenario 3's
+            // otherwise-negligible effect becomes visible and reproduces the
+            // distribution of the paper's Fig. 6I (a qualitative match, not a
+            // physical claim — the real lobe comes from full balloon dynamics).
+            const cbvSig = cbvDelay === 0 ? cbfSig : driveSamples(mIdx, cbfDelay + cbvDelay);
             const bold = new Float64Array(HEAT_NSAMP);
             for (let i = 0; i < HEAT_NSAMP; i++) {
-                let b = M_CAL * (alpha * cbfAmp * cbfSig[i] - BETA * cmrAmp * cmrSig[i]);
+                let b = M_CAL * (BETA * cbfAmp * cbfSig[i] - cbvGain * grubb * cbfAmp * cbvSig[i] - BETA * cmrAmp * cmrSig[i]);
                 if (noiseRng) b += HEAT_NOISE_STD * gaussPair(noiseRng);
                 bold[i] = b;
             }
