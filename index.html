@@ -3666,6 +3666,9 @@
             const rHere = grid[jj * GRID_N + ii];
             const sign = rHere >= 0 ? '+' : '\u2212';
             els.fc.textContent = sign + Math.abs(rHere).toFixed(2);
+            // Colour the value by sign, matching the Seed-vs-target scatter palette
+            // (positive #d97706, negative #2563eb; neutral light grey at exactly 0).
+            els.fc.style.color = rHere < 0 ? '#2563eb' : rHere > 0 ? '#d97706' : '#e2e8f0';
 
             // Render heatmap
             const vb = mapSvg.viewBox.baseVal;
