@@ -509,6 +509,30 @@
         .presets button.reset { border-color: #d97706; color: #d97706; }
         .presets button.reset:hover { background: #d97706; color: #fff; }
 
+        /* ===== Balloon primer (newcomer intro) ===== */
+        .primer-step {
+            font-size: 0.82rem; color: #334155; line-height: 1.6;
+            background: #f8fafc; border: 1px solid #e2e8f0;
+            border-radius: 10px; padding: 12px 14px;
+        }
+        .primer-step strong { color: #0f172a; }
+        .primer-step em { color: #0f172a; font-style: italic; }
+        .primer-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+        .primer-play {
+            padding: 9px 18px; font-size: 0.82rem; font-weight: 700;
+            border-radius: 999px; border: none; background: #0f172a; color: #fff;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+            transition: all 0.15s ease;
+        }
+        .primer-play:hover { background: #1e293b; }
+        .primer-play.playing { background: #0ea5e9; }
+        .primer-reset {
+            padding: 9px 16px; font-size: 0.8rem; font-weight: 600;
+            border-radius: 999px; border: 1px solid #d97706; background: #fff;
+            color: #d97706; cursor: pointer; transition: all 0.15s ease;
+        }
+        .primer-reset:hover { background: #d97706; color: #fff; }
+
         /* ===== Scenario cards (existing) ===== */
         .scenario-grid {
             display: grid;
@@ -885,6 +909,7 @@
                 </button>
                 <div class="nav-menu" id="nav-menu-education" role="menu">
                     <a href="#background" class="nav-link nav-sublink" role="menuitem">Background</a>
+                    <a href="#balloon-primer" class="nav-link nav-sublink" role="menuitem">Meet the Balloon</a>
                     <a href="#balloon" class="nav-link nav-sublink" role="menuitem">Balloon Model</a>
                     <a href="#simulator" class="nav-link nav-sublink" role="menuitem">Simulator</a>
                     <a href="#heatmap" class="nav-link nav-sublink" role="menuitem">Heatmap</a>
@@ -1212,6 +1237,116 @@
                 (on their own, with <em>no change</em> in the underlying neural input) generate the
                 connectivity differences routinely reported in patient populations? This paper answers that question
                 with a forward simulation you can reproduce in-browser below.
+            </div>
+        </div>
+    </section>
+    <!-- ===== BALLOON MODEL PRIMER (newcomer intro) ===== -->
+    <section id="balloon-primer">
+        <div class="container">
+            <span class="section-eyebrow">Start here</span>
+            <h2 class="section-title">Meet the balloon</h2>
+            <p class="exp-intro">
+                Before the equations, the picture. Imagine a small, stretchy <em>balloon</em> plumbed into the
+                bloodstream: an artery feeds it fresh, oxygen-rich blood, and a narrower vein drains it away. That
+                balloon is a tiny patch of brain tissue, and the MRI scanner never sees neurons firing. It
+                only sees how <strong>red</strong> (oxygenated) or <strong>blue</strong> (deoxygenated) the blood
+                inside the balloon is. Send one burst of neural activity through it below and watch what happens.
+            </p>
+
+            <div class="exp-cards fade-in">
+                <div class="exp-card">
+                    <h4><span style="color:#0ea5e9;font-weight:800">Flow in</span> &middot; CBF</h4>
+                    <p>
+                        A neural pulse opens the arteries. Fresh oxygenated blood rushes in and flushes dark
+                        deoxyhemoglobin out of the balloon, which <em>raises</em> the BOLD signal.
+                    </p>
+                </div>
+                <div class="exp-card">
+                    <h4><span style="color:#dc2626;font-weight:800">Oxygen use</span> &middot; CMRO<sub>2</sub></h4>
+                    <p>
+                        The tissue also burns more oxygen, creating <em>more</em> deoxyhemoglobin. That works against
+                        the flow and <em>lowers</em> BOLD, but it lags behind, and is usually the weaker pull.
+                    </p>
+                </div>
+                <div class="exp-card">
+                    <h4><span style="color:#16a34a;font-weight:800">Balloon size</span> &middot; CBV</h4>
+                    <p>
+                        All that inflow physically <em>inflates</em> the balloon. It swells quickly but shrinks
+                        slowly, and that lazy deflation is the secret behind the BOLD "undershoot".
+                    </p>
+                </div>
+            </div>
+
+            <div class="demo fade-in" id="primerDemo">
+                <div class="demo-plots">
+                    <div class="demo-panel">
+                        <div class="demo-panel-head">
+                            <h4>The balloon</h4>
+                            <p class="demo-hint">
+                                Size = blood volume (CBV). Colour = oxygenation: deep
+                                <span style="color:#1e3a8a;font-weight:700">blue</span> is deoxygenated (low BOLD),
+                                warm <span style="color:#dc2626;font-weight:700">red</span> is oxygenated (high BOLD).
+                                The bar on the right is the live BOLD signal.
+                            </p>
+                        </div>
+                        <div class="scatter-plot-wrap">
+                            <svg class="demo-svg" id="primerBalloon" viewBox="0 0 520 240" role="img" aria-label="Animated venous balloon inflating with blood flow"></svg>
+                        </div>
+                    </div>
+                    <div class="demo-panel">
+                        <div class="demo-panel-head">
+                            <h4>Resulting BOLD signal change in percentage</h4>
+                            <p class="demo-hint">
+                                The signal an fMRI scanner would record over time. Watch it rise during the pulse,
+                                then dip <em>below</em> baseline afterwards.
+                            </p>
+                        </div>
+                        <div class="scatter-plot-wrap">
+                            <svg class="demo-svg" id="primerBold" viewBox="0 0 520 170" role="img" aria-label="BOLD signal over time"></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="demo-controls">
+                    <div class="kpis-row">
+                        <div class="kpi kpi-hero">
+                            <div class="kpi-label">BOLD signal change</div>
+                            <div class="kpi-value" id="primerBoldVal">0.0%</div>
+                        </div>
+                        <div class="kpi">
+                            <div class="kpi-label">CBF</div>
+                            <div class="kpi-value" id="primerCbfVal">+0%</div>
+                            <div class="kpi-sub">Flow in</div>
+                        </div>
+                        <div class="kpi">
+                            <div class="kpi-label">CBV</div>
+                            <div class="kpi-value" id="primerCbvVal">+0%</div>
+                            <div class="kpi-sub">balloon size</div>
+                        </div>
+                    </div>
+
+                    <div class="primer-step" id="primerStep">
+                        Press <strong>Trigger neural pulse</strong> to send one burst of activity through the balloon
+                        and trace the BOLD response.
+                    </div>
+
+                    <div class="primer-btns">
+                        <button type="button" class="primer-play" id="primerPlay" aria-label="Trigger neural pulse">
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+                            <span id="primerPlayLabel">Trigger neural pulse</span>
+                        </button>
+                        <button type="button" class="primer-reset" id="primerReset">Reset</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="takeaway">
+                <strong>The "aha": why does BOLD dip below baseline afterwards?</strong> When the pulse ends, blood
+                <em>flow</em> switches off almost immediately, but the <em>balloon</em> is still swollen and
+                deflates only slowly. For a few seconds it holds an oversized pool of deoxygenated blood, so the
+                signal drops <em>below</em> where it started. That post-stimulus undershoot is a purely
+                <em>vascular</em> effect, with no change at all in the neural input. Now open the
+                <a href="#balloon">Explorer</a> below to turn each knob yourself.
             </div>
         </div>
     </section>
@@ -1586,8 +1721,8 @@
                 "zero-crossing" diagonal; the dependence is essentially linear. The <em>delays</em> map shows a
                 curved, ring-like zero contour; the dependence is strongly non-linear because each frequency in
                 the broadband drive accumulates a different phase shift for the same temporal delay. The
-                <em>CBV-coupling</em> map is overwhelmingly orange &mdash; CBV coupling is a weak lever &mdash;
-                with only a small negative (blue) lobe in the upper-left, where strong, fast CBV coupling briefly
+                <em>CBV-coupling</em> map is overwhelmingly orange (CBV coupling is a weak lever), with only a
+                small negative (blue) lobe in the upper-left, where strong, fast CBV coupling briefly
                 anti-correlates the target (matching the paper's Fig.&nbsp;6I). That is the paper's central
                 geometrical story, and it now survives the switch from a single-tone drive to a realistic,
                 noise-averaged rs-fMRI-band drive.
@@ -2431,7 +2566,7 @@
             }
         });
 
-        // Pin/hover state changed but parameters did not — redo the SVG so
+        // Pin/hover state changed but parameters did not, redo the SVG so
         // overlays reflect the new state. plotLines clears+repaints; with 80
         // samples this is cheap and keeps a single source of truth.
         function redrawOverlays() {
@@ -2571,6 +2706,177 @@
             });
         });
         render();
+    })();
+
+    /* ================================================================= *
+     *  1b) BALLOON MODEL PRIMER  (animated "trigger a neural pulse")     *
+     *  Clean teaching model (phenomenological, not the full Buxton ODE): *
+     *  CBF tracks the neural pulse; CMRO2 lags; CBV (the balloon) fills  *
+     *  fast and deflates slowly; BOLD = flow - metabolism - volume. The  *
+     *  slow balloon deflation is what produces the post-stimulus         *
+     *  undershoot, which is the whole pedagogical point.                 *
+     * ================================================================= */
+
+    (function () {
+        const balloonSvg = document.getElementById('primerBalloon');
+        const boldSvg = document.getElementById('primerBold');
+        if (!balloonSvg || !boldSvg) return;
+
+        const playBtn = document.getElementById('primerPlay');
+        const playLabel = document.getElementById('primerPlayLabel');
+        const resetBtn = document.getElementById('primerReset');
+        const stepEl = document.getElementById('primerStep');
+        const boldValEl = document.getElementById('primerBoldVal');
+        const cbfValEl = document.getElementById('primerCbfVal');
+        const cbvValEl = document.getElementById('primerCbvVal');
+
+        const DT = 0.05, T = 24, N = Math.round(T / DT);
+        const STIM_ON = 2, STIM_OFF = 8;
+        function neural(t) {
+            return 0.5 * (1 + Math.tanh((t - STIM_ON) / 0.5)) *
+                   0.5 * (1 + Math.tanh((STIM_OFF - t) / 0.5));
+        }
+        // Pre-integrate the whole time course once.
+        const data = (function () {
+            const arr = [];
+            let v = 1;
+            for (let i = 0; i <= N; i++) {
+                const t = i * DT;
+                const HD = 1.0;                          // hemodynamic lag: BOLD follows the neural pulse
+                const f = 1 + 0.60 * neural(t - HD);     // CBF
+                const m = 1 + 0.28 * neural(t - HD - 0.8); // CMRO2 (lagged, weaker)
+                const target = Math.pow(f, 0.38);        // CBV ~ CBF^Grubb (much smaller swing than flow)
+                const tau = target > v ? 1.6 : 4.2;      // balloon: inflate fast, deflate slow
+                v += (target - v) / tau * DT;
+                const bold = 2.6 * (f - 1) - 1.1 * (m - 1) - 1.9 * (v - 1);
+                arr.push({ t: t, f: f, m: m, v: v, bold: bold });
+            }
+            return arr;
+        })();
+
+        const DEOXY = [30, 58, 138], OXY = [220, 38, 38];
+        function mix(a, b, t) {
+            t = Math.max(0, Math.min(1, t));
+            return 'rgb(' + Math.round(a[0] + (b[0] - a[0]) * t) + ',' +
+                            Math.round(a[1] + (b[1] - a[1]) * t) + ',' +
+                            Math.round(a[2] + (b[2] - a[2]) * t) + ')';
+        }
+        function txt(parent, x, y, str, o) {
+            o = o || {};
+            const el = svg('text', { x: x, y: y, 'text-anchor': o.anchor || 'start',
+                'font-size': (o.size || 10) + 'px', fill: o.fill || '#334155',
+                'font-family': 'Inter', 'font-weight': o.weight || 400 });
+            el.textContent = str;
+            parent.appendChild(el);
+        }
+
+        function drawBalloon(s) {
+            clearSVG(balloonSvg);
+            const cx = 200, cy = 115;
+            const ry = 46 + (s.v - 1) * 150;
+            const rx = 38 + (s.v - 1) * 90;
+            const fill = mix(DEOXY, OXY, 0.45 + s.bold * 0.55);
+            const inW = 5 + (s.f - 1) * 16;
+            balloonSvg.appendChild(svg('line', { x1: cx, y1: 22, x2: cx, y2: cy - ry - 2,
+                stroke: '#64748b', 'stroke-width': inW, 'stroke-linecap': 'round', opacity: 0.6 }));
+            balloonSvg.appendChild(svg('path', { d: 'M' + (cx - 7) + ',' + (cy - ry + 4) + ' L' + cx + ',' + (cy - ry - 8) + ' L' + (cx + 7) + ',' + (cy - ry + 4) + ' Z', fill: '#64748b', opacity: 0.6 }));
+            balloonSvg.appendChild(svg('ellipse', { cx: cx, cy: cy, rx: rx, ry: ry, fill: fill, stroke: '#0f172a', 'stroke-width': 1.5 }));
+            balloonSvg.appendChild(svg('path', { d: 'M' + (cx - 7) + ',' + (cy + ry - 2) + ' L' + cx + ',' + (cy + ry + 12) + ' L' + (cx + 7) + ',' + (cy + ry - 2) + ' Z', fill: fill, stroke: '#0f172a', 'stroke-width': 1 }));
+            balloonSvg.appendChild(svg('line', { x1: cx, y1: cy + ry + 12, x2: cx, y2: 220, stroke: '#64748b', 'stroke-width': 4, 'stroke-linecap': 'round', opacity: 0.6 }));
+            txt(balloonSvg, cx, 14, 'arterial CBF', { fill: '#94a3b8', size: 10, anchor: 'middle' });
+            txt(balloonSvg, cx, 234, 'venous drain', { fill: '#94a3b8', size: 10, anchor: 'middle' });
+            // Live BOLD meter (right side)
+            const mx = 430, my0 = 40, my1 = 196, mid = (my0 + my1) / 2;
+            balloonSvg.appendChild(svg('line', { x1: mx - 26, y1: mid, x2: mx + 26, y2: mid, stroke: '#cbd5e1', 'stroke-dasharray': '3 3' }));
+            const barTop = s.bold >= 0 ? mid - s.bold / 1.4 * (mid - my0) : mid;
+            const barBot = s.bold >= 0 ? mid : mid + (-s.bold) / 0.7 * (my1 - mid);
+            balloonSvg.appendChild(svg('rect', { x: mx - 16, y: barTop, width: 32, height: Math.max(0.5, barBot - barTop), fill: s.bold >= 0 ? '#d97706' : '#2563eb' }));
+            txt(balloonSvg, mx, my0 - 20, '% BOLD signal', { fill: '#475569', size: 10, anchor: 'middle', weight: 700 });
+            txt(balloonSvg, mx, my0 - 8, 'change', { fill: '#475569', size: 10, anchor: 'middle', weight: 700 });
+        }
+
+        const BP = { l: 42, r: 12, t: 14, b: 24, W: 520, H: 170 };
+        function bx(t) { return BP.l + t / T * (BP.W - BP.l - BP.r); }
+        function by(b) { const lo = -0.7, hi = 1.4; return BP.t + (hi - b) / (hi - lo) * (BP.H - BP.t - BP.b); }
+        function drawBold(upTo) {
+            clearSVG(boldSvg);
+            // Grey band marking the stimulus window, behind both traces.
+            boldSvg.appendChild(svg('rect', { x: bx(STIM_ON), y: BP.t, width: bx(STIM_OFF) - bx(STIM_ON), height: BP.H - BP.t - BP.b, fill: '#f1f5f9' }));
+            // Neural pulse drawn as a square boxcar line near the top.
+            const nLo = 38, nHi = 14;
+            const nd = 'M' + bx(0) + ',' + nLo + ' L' + bx(STIM_ON) + ',' + nLo +
+                       ' L' + bx(STIM_ON) + ',' + nHi + ' L' + bx(STIM_OFF) + ',' + nHi +
+                       ' L' + bx(STIM_OFF) + ',' + nLo + ' L' + bx(T) + ',' + nLo;
+            boldSvg.appendChild(svg('path', { d: nd, fill: 'none', stroke: '#d97706', 'stroke-width': 1.5, 'stroke-linejoin': 'round' }));
+            boldSvg.appendChild(svg('line', { x1: bx(0), y1: by(0), x2: bx(T), y2: by(0), stroke: '#cbd5e1', 'stroke-dasharray': '3 3' }));
+            let d = '';
+            for (let i = 0; i <= upTo; i++) d += (i === 0 ? 'M' : 'L') + bx(data[i].t).toFixed(1) + ',' + by(data[i].bold).toFixed(1);
+            if (d) boldSvg.appendChild(svg('path', { d: d, fill: 'none', stroke: '#0f172a', 'stroke-width': 2.2, 'stroke-linejoin': 'round' }));
+            if (upTo >= 0) {
+                const p = data[upTo];
+                boldSvg.appendChild(svg('circle', { cx: bx(p.t), cy: by(p.bold), r: 4, fill: p.bold >= 0 ? '#d97706' : '#2563eb' }));
+            }
+            txt(boldSvg, bx(STIM_ON) + 4, nHi - 5, 'neural pulse', { fill: '#d97706', size: 9 });
+            txt(boldSvg, bx(0) - 4, by(0) + 3, '0', { fill: '#94a3b8', size: 9, anchor: 'end' });
+            txt(boldSvg, 516, 165, 'time', { fill: '#94a3b8', size: 9, anchor: 'end' });
+            const yl = svg('text', { x: 11, y: (BP.t + BP.H - BP.b) / 2, 'text-anchor': 'middle',
+                'font-size': '9px', fill: '#64748b', 'font-family': 'Inter', 'font-weight': 600,
+                transform: 'rotate(-90 11 ' + ((BP.t + BP.H - BP.b) / 2) + ')' });
+            yl.textContent = '% BOLD signal change';
+            boldSvg.appendChild(yl);
+        }
+
+        function narrate(t) {
+            if (t < STIM_ON) return 'Resting. Flow, volume and oxygen are balanced, so BOLD sits at baseline.';
+            if (t < 3.5) return '<strong>Pulse!</strong> Arteries open, CBF surges in and flushes out deoxyhemoglobin, so the balloon reddens and BOLD climbs.';
+            if (t < STIM_OFF) return 'During activity the balloon keeps inflating (CBV rises), but flow still outpaces oxygen use, so BOLD stays high.';
+            if (t < 12) return 'Activity stops. Flow falls almost at once, but the swollen balloon can only deflate <em>slowly</em>.';
+            if (t < 17) return 'The still-large balloon holds extra deoxygenated blood, so BOLD sinks <em>below</em> baseline, the <strong>post-stimulus undershoot</strong>.';
+            return 'The balloon finishes deflating and BOLD returns to rest. That undershoot was purely vascular, and the neural input never changed.';
+        }
+
+        function frame(idx) {
+            const s = data[idx];
+            drawBalloon(s);
+            drawBold(idx);
+            boldValEl.textContent = (s.bold >= 0 ? '+' : '−') + Math.abs(s.bold).toFixed(1) + '%';
+            cbfValEl.textContent = '+' + Math.round((s.f - 1) * 100) + '%';
+            cbvValEl.textContent = '+' + Math.round((s.v - 1) * 100) + '%';
+            stepEl.innerHTML = narrate(s.t);
+        }
+
+        const REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        let idx = 0, playing = false, raf = null, t0 = null;
+        function stopPlay() { playing = false; playBtn.classList.remove('playing'); if (raf) cancelAnimationFrame(raf); raf = null; }
+        function step(ts) {
+            if (t0 === null) t0 = ts;
+            idx = Math.min(N, Math.round((ts - t0) / 1000 * 2.2 / DT));
+            frame(idx);
+            if (idx >= N) { stopPlay(); playLabel.textContent = 'Trigger neural pulse'; return; }
+            raf = requestAnimationFrame(step);
+        }
+        playBtn.addEventListener('click', function () {
+            if (playing) return;
+            if (REDUCED) {
+                let peak = 0;
+                for (let i = 0; i < data.length; i++) if (data[i].bold > data[peak].bold) peak = i;
+                drawBalloon(data[peak]); drawBold(N);
+                boldValEl.textContent = '+' + data[peak].bold.toFixed(1) + '%';
+                cbfValEl.textContent = '+' + Math.round((data[peak].f - 1) * 100) + '%';
+                cbvValEl.textContent = '+' + Math.round((data[peak].v - 1) * 100) + '%';
+                stepEl.innerHTML = 'Reduced-motion view: the full BOLD response is shown at once. It rises during the pulse, then dips <em>below</em> baseline afterwards as the balloon slowly deflates.';
+                playLabel.textContent = 'Trigger neural pulse';
+                return;
+            }
+            playing = true; playBtn.classList.add('playing'); playLabel.textContent = 'Playing…';
+            t0 = null; idx = 0;
+            raf = requestAnimationFrame(step);
+        });
+        resetBtn.addEventListener('click', function () {
+            stopPlay(); idx = 0; frame(0); playLabel.textContent = 'Trigger neural pulse';
+        });
+
+        frame(0);
     })();
 
     /* ================================================================= *
@@ -3286,7 +3592,7 @@
             const n = a.length;
             const step = Math.max(1, Math.floor(n / 180));
 
-            // Dots (subsample) — draw underneath overlays
+            // Dots (subsample), draw underneath overlays
             for (let i = 0; i < n; i += step) {
                 const x = padL + plotW * (a[i] - xMin) / (xMax - xMin);
                 const y = padT + plotH * (yMax - b[i]) / (yMax - yMin);
@@ -3463,7 +3769,7 @@
                 yAxisColor: '#4997D0',
                 xLow: 0.5, xHigh: 8, xFmt: v => v.toFixed(1) + 's',
                 yLow: 0.5, yHigh: 8, yFmt: v => v.toFixed(1) + 's',
-                scenarioHint: 'Reproduces the paper&rsquo;s Fig.&nbsp;6H orientation. X&nbsp;axis:&nbsp;CMRO<sub>2</sub> delay τ<sub>m</sub> (0.5&ndash;8&nbsp;s). Y&nbsp;axis:&nbsp;CBF delay τ<sub>f</sub> (0.5&ndash;8&nbsp;s). Amplitudes and CBV coupling stay at healthy baseline. <strong>Left columns</strong> (small τ<sub>m</sub>): BOLD-FC flips from positive to negative as CBF delay grows — the strong negative lobe in the upper-left. <strong>Right columns</strong> (large τ<sub>m</sub>): positive BOLD-FC simply diminishes without reversing — the non-linear regime.',
+                scenarioHint: 'Reproduces the paper&rsquo;s Fig.&nbsp;6H orientation. X&nbsp;axis:&nbsp;CMRO<sub>2</sub> delay τ<sub>m</sub> (0.5&ndash;8&nbsp;s). Y&nbsp;axis:&nbsp;CBF delay τ<sub>f</sub> (0.5&ndash;8&nbsp;s). Amplitudes and CBV coupling stay at healthy baseline. <strong>Left columns</strong> (small τ<sub>m</sub>): BOLD-FC flips from positive to negative as CBF delay grows, the strong negative lobe in the upper-left. <strong>Right columns</strong> (large τ<sub>m</sub>): positive BOLD-FC simply diminishes without reversing, the non-linear regime.',
                 compute: (x, y) => computeFcBB({
                     cbfAmp: 0.20, cmrAmp: 0.05,
                     cbfDelay: y, cmrDelay: x,
@@ -3479,7 +3785,7 @@
                 yShort: '&alpha;<sub>v</sub>',
                 xLow: 0, xHigh: 30, xFmt: v => v.toFixed(1) + 's',
                 yLow: 0.025, yHigh: 0.400, yFmt: v => v.toFixed(3),
-                scenarioHint: 'Reproduces the paper&rsquo;s Fig.&nbsp;6I (slower CBV response). X&nbsp;axis:&nbsp;CBV response delay &tau;<sub>v</sub> relative to CBF (0&ndash;30&nbsp;s). Y&nbsp;axis:&nbsp;CBF&ndash;CBV coupling strength (Grubb exponent &alpha;<sub>v</sub>,&nbsp;0.025&ndash;0.40). BOLD-FC is positive (orange) across almost the whole landscape &mdash; CBV coupling is a weak lever &mdash; except a small negative (blue) lobe in the <strong>upper-left</strong>, where strong, fast CBV coupling (high&nbsp;&alpha;<sub>v</sub>, low&nbsp;&tau;<sub>v</sub>) briefly anti-correlates the target.',
+                scenarioHint: 'Reproduces the paper&rsquo;s Fig.&nbsp;6I (slower CBV response). X&nbsp;axis:&nbsp;CBV response delay &tau;<sub>v</sub> relative to CBF (0&ndash;30&nbsp;s). Y&nbsp;axis:&nbsp;CBF&ndash;CBV coupling strength (Grubb exponent &alpha;<sub>v</sub>,&nbsp;0.025&ndash;0.40). BOLD-FC is positive (orange) across almost the whole landscape (CBV coupling is a weak lever), except for a small negative (blue) lobe in the <strong>upper-left</strong>, where strong, fast CBV coupling (high&nbsp;&alpha;<sub>v</sub>, low&nbsp;&tau;<sub>v</sub>) briefly anti-correlates the target.',
                 compute: (x, y) => computeFcBB({
                     cbfAmp: 0.20, cmrAmp: 0.05,
                     cbfDelay: 0, cmrDelay: 0,
@@ -3567,7 +3873,7 @@
             // exaggerates the *target's* CBV sensitivity so scenario 3's
             // otherwise-negligible effect becomes visible and reproduces the
             // distribution of the paper's Fig. 6I (a qualitative match, not a
-            // physical claim — the real lobe comes from full balloon dynamics).
+            // physical claim, the real lobe comes from full balloon dynamics).
             const cbvSig = cbvDelay === 0 ? cbfSig : driveSamples(mIdx, cbfDelay + cbvDelay);
             const bold = new Float64Array(HEAT_NSAMP);
             for (let i = 0; i < HEAT_NSAMP; i++) {
@@ -3639,7 +3945,7 @@
             els.scenarioVal.innerHTML = sc.scenarioVal;
             els.scenarioHint.innerHTML = sc.scenarioHint;
 
-            // Slider thumb colors — for scenarios whose x is CMRO₂ (red) and y is CBF (blue)
+            // Slider thumb colors, for scenarios whose x is CMRO₂ (red) and y is CBF (blue)
             const xSlider = els.xIn.closest('.slider');
             const ySlider = els.yIn.closest('.slider');
             const colorThumbs = scenario === 'amp' || scenario === 'delay';
