@@ -578,6 +578,14 @@
             content: ""; width: 11px; height: 11px; border-radius: 3px;
             background: var(--c, #94a3b8); flex: 0 0 auto;
         }
+        .primer-math .eq-h { font-weight: 800; font-size: 0.78rem; letter-spacing: 0.05em; text-transform: uppercase; color: #475569; margin: 22px 0 2px; }
+        .primer-math .eq-h span { color: #94a3b8; font-weight: 700; }
+        .primer-math .eq-sub { font-size: 0.78rem; color: #64748b; margin: 2px 0 6px; }
+        .sym-table { width: 100%; border-collapse: collapse; margin: 8px 0 4px; font-size: 0.78rem; }
+        .sym-table th, .sym-table td { text-align: left; padding: 5px 9px; border-bottom: 1px solid #eef2f7; vertical-align: top; }
+        .sym-table th { color: #475569; font-weight: 700; }
+        .sym-table td:first-child { font-family: 'Cambria Math', Cambria, serif; font-weight: 700; white-space: nowrap; color: #0f172a; }
+        .obata-note { font-size: 0.78rem; color: #475569; background: #f8fafc; border: none; border-radius: 6px; padding: 9px 12px; margin: 8px 0; line-height: 1.6; }
         .eq-credit { margin-top: 16px; font-size: 0.75rem; color: #94a3b8; line-height: 1.65; }
         .eq-credit a { color: #b45309; text-decoration: none; border-bottom: 1px solid rgba(217, 119, 6, 0.35); }
         .eq-credit a:hover { border-bottom-color: #d97706; }
@@ -973,8 +981,9 @@
         <div class="container">
             <h2 class="section-title">Overview</h2>
             <p class="section-desc">
-                Resting-state fMRI maps how brain regions "talk" to one another by correlating their slow BOLD
-                fluctuations. But the BOLD signal is not neural activity; it is a hemodynamic proxy. This
+                Resting-state fMRI estimates the statistical covariation between slow BOLD fluctuations in
+                different regions, a dependency that may reflect neural coupling but also shared vascular
+                physiology, arousal, motion or respiration. And the BOLD signal itself is not neural activity; it is a hemodynamic proxy. This
                 paper asks a simple but consequential question: <em>how much of resting-state connectivity can be
                 explained by the vascular and metabolic machinery alone?</em>
             </p>
@@ -1247,7 +1256,8 @@
             <p class="exp-intro">
                 The BOLD signal used in virtually all functional MRI studies is not a direct readout of neural
                 activity: it reflects how local <em>blood flow</em>, <em>oxygen consumption</em> and
-                <em>blood volume</em> respond together to changes in neuronal firing. This chain of physiological
+                <em>blood volume</em> respond together to changes in local neural activity, chiefly synaptic input
+                and intracortical processing rather than spiking output alone. This chain of physiological
                 events is called <strong>neurovascular coupling</strong>. When it is intact, BOLD is a useful proxy
                 for neural activity. When it is impaired, as happens in stroke, small-vessel disease, Alzheimer's,
                 schizophrenia or simply healthy aging, BOLD signals <em>and</em> the connectivity networks
@@ -1258,9 +1268,11 @@
                 <div class="exp-card">
                     <h4>1. BOLD is <em>vascular</em>, not neural</h4>
                     <p>
-                        The BOLD contrast arises from the balance between oxygen <em>delivered</em> (CBF) and oxygen
-                        <em>used</em> (CMRO<sub>2</sub>) in tiny post-capillary vessels. Two different combinations
-                        of CBF and CMRO<sub>2</sub> can produce the exact same BOLD trace, or opposite ones.
+                        The immediate source of BOLD contrast is <em>deoxyhemoglobin</em>: CBF, CMRO<sub>2</sub> and
+                        CBV together set how much of this paramagnetic molecule sits in tiny post-capillary vessels,
+                        and it distorts the local magnetic field, shortening T<sub>2</sub><sup>*</sup> and dimming the
+                        MR signal. Two different combinations of CBF and CMRO<sub>2</sub> can leave the same
+                        deoxyhemoglobin content, and so the same BOLD trace, or opposite ones.
                     </p>
                 </div>
                 <div class="exp-card">
@@ -1297,9 +1309,11 @@
             <p class="exp-intro">
                 Before the equations, the picture. Imagine a small, stretchy <em>balloon</em> plumbed into the
                 bloodstream: an artery feeds it fresh, oxygen-rich blood, and a narrower vein drains it away. That
-                balloon is a tiny patch of brain tissue, and the MRI scanner never sees neurons firing. It
-                only sees how <strong>red</strong> (oxygenated) or <strong>blue</strong> (deoxygenated) the blood
-                inside the balloon is. Send one burst of neural activity through it below and watch what happens.
+                balloon is a tiny patch of brain tissue, and the MRI scanner never sees neurons firing. What it
+                senses is how much <strong>dark, oxygen-poor blood</strong> (deoxyhemoglobin) sits inside the
+                balloon: that molecule is magnetic, so it disturbs the scanner's field and dims the signal. (The
+                scanner reads magnetism, not literal colour; we keep the red/blue picture only as a visual
+                shorthand.) Send one burst of neural activity through it below and watch what happens.
             </p>
 
             <div class="exp-cards fade-in">
@@ -1406,8 +1420,10 @@
                 <strong>The "aha": why does BOLD dip below baseline afterwards?</strong> When the pulse ends, blood
                 <em>flow</em> switches off almost immediately, but the <em>balloon</em> is still swollen and
                 deflates only slowly. For a few seconds it holds an oversized pool of deoxygenated blood, so the
-                signal drops <em>below</em> where it started. That post-stimulus undershoot is a purely
-                <em>vascular</em> effect, with no change at all in the neural input. Now open the
+                signal drops <em>below</em> where it started. In this balloon model that post-stimulus undershoot is
+                a purely <em>vascular</em> effect, with no change at all in the neural input. (In real data an
+                undershoot can also carry a CBF undershoot, prolonged metabolism or vascular-compliance effects;
+                this demo isolates the volume mechanism.) Now open the
                 <a href="#balloon" class="link-accent">Explorer</a> below to turn each knob yourself.
             </div>
 
@@ -1424,34 +1440,85 @@
             <details class="primer-details">
                 <summary>Show me the math</summary>
                 <div class="primer-math">
-                    <p>The balloon is described by two coupled differential equations, for normalised blood
-                    volume <em style="color:#16a34a">v</em> and deoxyhemoglobin content <em style="color:#4338ca">q</em>,
-                    driven by inflow <em style="color:#0ea5e9">f</em>:</p>
+                    <p>It helps to keep three layers apart: the <strong>MR physics</strong> that turns
+                    deoxyhemoglobin into a signal, the <strong>physiology</strong> that sets how much deoxyhemoglobin
+                    is present, and the <strong>models</strong> used to link the two, of which this page shows three
+                    (classic balloon, the paper's adjusted model, and the linearised Davis form the browser demos run).</p>
+
+                    <div class="eq-h">1 &middot; MR physics <span>&mdash; deoxyhemoglobin &rarr; signal</span></div>
+                    <p class="eq-sub">Paramagnetic deoxyhemoglobin adds microscopic field inhomogeneities that raise the
+                    effective transverse relaxation rate <em style="color:#4338ca">R<sub>2</sub><sup>*</sup></em>. A
+                    gradient-echo image at echo time <em style="color:#94a3b8">TE</em> reads out:</p>
+
+                    <div class="eq" data-tex="\htmlData{term=S}{S(\htmlData{term=TE}{\textcolor{#94a3b8}{TE}})} \;=\; \textcolor{#94a3b8}{S_0}\,e^{-\htmlData{term=TE}{\textcolor{#94a3b8}{TE}}\,\htmlData{term=R2}{\textcolor{#4338ca}{\boldsymbol{R_2^{*}}}}} \qquad\Longrightarrow\qquad \frac{\Delta S}{S} \approx -\,\htmlData{term=TE}{\textcolor{#94a3b8}{TE}}\;\Delta\htmlData{term=R2}{\textcolor{#4338ca}{\boldsymbol{R_2^{*}}}}">S(TE) = S<sub>0</sub> e<sup>&minus;TE&middot;R<sub>2</sub>*</sup>,  &Delta;S/S &asymp; &minus;TE&middot;&Delta;R<sub>2</sub>*</div>
+
+                    <p class="eq-sub">More flow flushes deoxyhemoglobin out, lowers <em style="color:#4338ca">R<sub>2</sub><sup>*</sup></em>,
+                    and so <em>raises</em> the gradient-echo BOLD signal.</p>
+
+                    <div class="eq-h">2 &middot; Physiology: the classic balloon <span>&mdash; Buxton et&nbsp;al., 1998</span></div>
+                    <p class="eq-sub">Two coupled equations for normalised blood volume <em style="color:#16a34a">v</em>
+                    and deoxyhemoglobin content <em style="color:#4338ca">q</em>, driven by inflow
+                    <em style="color:#0ea5e9">f</em>. Here metabolism is <em>implicitly geared to flow</em> through the oxygen
+                    extraction term <em style="color:#0d9488">E(f)</em>:</p>
 
                     <div class="eq" data-tex="\frac{d\,\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}}{dt} \;=\; \frac{1}{\htmlData{term=tau}{\textcolor{#64748b}{\boldsymbol{\tau}}}}\,\underbrace{\left(\htmlData{term=f}{\textcolor{#0ea5e9}{\boldsymbol{f}}} - f_{\text{out}}\right)}_{\textcolor{#94a3b8}{\text{net inflow}}}, \qquad f_{\text{out}} = \underbrace{\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}^{\,1/\htmlData{term=alpha}{\textcolor{#b45309}{\boldsymbol{\alpha}}}}}_{\textcolor{#94a3b8}{\text{drainage}}}">dv/dt = (1/&tau;)(f &minus; f<sub>out</sub>),  f<sub>out</sub> = v<sup>1/&alpha;</sup></div>
 
                     <div class="eq" data-tex="\frac{d\,\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}}{dt} \;=\; \frac{1}{\htmlData{term=tau}{\textcolor{#64748b}{\boldsymbol{\tau}}}}\Bigl(\underbrace{\htmlData{term=f}{\textcolor{#0ea5e9}{\boldsymbol{f}}}\,\frac{\htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E(f)}}}}{\htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E_0}}}}}_{\textcolor{#94a3b8}{\text{oxygen in}}} - \underbrace{f_{\text{out}}\,\frac{\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}}{\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}}}_{\textcolor{#94a3b8}{\text{washed out}}}\Bigr), \qquad \htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E(f)}}} = 1 - (1-\htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E_0}}})^{\,1/\htmlData{term=f}{\textcolor{#0ea5e9}{\boldsymbol{f}}}}">dq/dt = (1/&tau;)(f&middot;E(f)/E<sub>0</sub> &minus; f<sub>out</sub>&middot;q/v),  E(f) = 1 &minus; (1&minus;E<sub>0</sub>)<sup>1/f</sup></div>
 
-                    <p>and the measured signal combines the volume and deoxyhemoglobin terms:</p>
+                    <div class="eq-h">3 &middot; The paper's adjusted model <span>&mdash; flow and metabolism unlocked</span></div>
+                    <p class="eq-sub">The study replaces the geared term <em style="color:#0d9488">f&middot;E(f)/E<sub>0</sub></em>
+                    with an <em>independently prescribed</em> oxygen-metabolism drive <em style="color:#dc2626">m(t)</em>
+                    (CMRO<sub>2</sub>), so CBF, CMRO<sub>2</sub> and CBV can be varied separately, the freedom the whole
+                    study rests on:</p>
+
+                    <div class="eq" data-tex="\frac{d\,\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}}{dt} \;=\; \frac{1}{\htmlData{term=tau}{\textcolor{#64748b}{\boldsymbol{\tau_0}}}}\Bigl(\underbrace{\htmlData{term=m}{\textcolor{#dc2626}{\boldsymbol{m(t)}}}}_{\textcolor{#94a3b8}{\text{CMRO}_2\text{, prescribed}}} - \underbrace{f_{\text{out}}\,\frac{\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}}{\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}}}_{\textcolor{#94a3b8}{\text{washed out}}}\Bigr)">dq/dt = (1/&tau;<sub>0</sub>)(m(t) &minus; f<sub>out</sub>&middot;q/v)</div>
+
+                    <p class="eq-sub">The measured signal then combines the volume and deoxyhemoglobin terms:</p>
 
                     <div class="eq" data-tex="\frac{\Delta S}{S} \;=\; \textcolor{#94a3b8}{V_0}\left[\,\underbrace{\textcolor{#94a3b8}{k_1}\bigl(1-\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}\bigr)}_{\textcolor{#94a3b8}{\text{deoxy content}}} + \underbrace{\textcolor{#94a3b8}{k_2}\Bigl(1-\tfrac{\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}}{\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}}\Bigr)}_{\textcolor{#94a3b8}{\text{deoxy concentration}}} + \underbrace{\textcolor{#94a3b8}{k_3}\bigl(1-\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}\bigr)}_{\textcolor{#94a3b8}{\text{blood volume}}}\right]">&Delta;S/S = V<sub>0</sub>[k<sub>1</sub>(1&minus;q) + k<sub>2</sub>(1&minus;q/v) + k<sub>3</sub>(1&minus;v)]</div>
 
+                    <p class="obata-note">The equation above is a <strong>compact pedagogical</strong> observation model.
+                    The peer-reviewed simulations use the Obata&nbsp;et&nbsp;al. intra-/extravascular form,
+                    &Delta;b/b<sub>0</sub>&nbsp;=&nbsp;V<sub>0</sub>[(k<sub>1</sub>+k<sub>2</sub>)(1&minus;q) &minus; (k<sub>2</sub>+k<sub>3</sub>)(1&minus;v)],
+                    with the paper's parameters (TE&nbsp;=&nbsp;30&nbsp;ms, V<sub>0</sub>&nbsp;=&nbsp;0.025,
+                    E<sub>0</sub>&nbsp;=&nbsp;0.4, &epsilon;&nbsp;=&nbsp;0.24, r<sub>0</sub>&nbsp;=&nbsp;178&nbsp;s<sup>&minus;1</sup>).
+                    The browser demos instead run a simplified linearised Davis form and should <strong>not</strong> be
+                    compared numerically with the published simulations.</p>
+
+                    <div class="eq-h">Demo engine &middot; linearised Davis <span>&mdash; what the sliders compute</span></div>
+                    <p class="eq-sub">Linearising the Davis model about rest gives the small-signal form the browser demos
+                    use, with an explicit calibration factor <em style="color:#94a3b8">M</em> that sets the amplitude scale:</p>
+
+                    <div class="eq" data-tex="\frac{\Delta\text{BOLD}}{B_0} \approx \htmlData{term=M}{\textcolor{#94a3b8}{\boldsymbol{M}}}\left[(\htmlData{term=beta}{\textcolor{#b45309}{\boldsymbol{\beta}}}-\htmlData{term=alpha}{\textcolor{#b45309}{\boldsymbol{\alpha}}})\,\frac{\Delta\,\htmlData{term=f}{\textcolor{#0ea5e9}{\text{CBF}}}}{\text{CBF}_0} - \htmlData{term=beta}{\textcolor{#b45309}{\boldsymbol{\beta}}}\,\frac{\Delta\,\htmlData{term=m}{\textcolor{#dc2626}{\text{CMRO}_2}}}{\text{CMRO}_{2,0}}\right]">&Delta;BOLD/B<sub>0</sub> &asymp; M[(&beta;&minus;&alpha;)&middot;&Delta;CBF/CBF<sub>0</sub> &minus; &beta;&middot;&Delta;CMRO<sub>2</sub>/CMRO<sub>2,0</sub>]</div>
+
                     <div class="eq-legend">
                         <span data-term="f" style="--c:#0ea5e9"><em style="color:#0ea5e9;font-style:normal;font-weight:700">f</em>&nbsp;&ndash;&nbsp;cerebral blood flow (CBF)</span>
+                        <span data-term="m" style="--c:#dc2626"><em style="color:#dc2626;font-style:normal;font-weight:700">m</em>&nbsp;&ndash;&nbsp;oxygen metabolism (CMRO<sub>2</sub>)</span>
                         <span data-term="v" style="--c:#16a34a"><em style="color:#16a34a;font-style:normal;font-weight:700">v</em>&nbsp;&ndash;&nbsp;cerebral blood volume (CBV)</span>
                         <span data-term="q" style="--c:#4338ca"><em style="color:#4338ca;font-style:normal;font-weight:700">q</em>&nbsp;&ndash;&nbsp;deoxyhemoglobin</span>
-                        <span data-term="alpha" style="--c:#b45309"><em style="color:#b45309;font-style:normal;font-weight:700">&alpha;</em>&nbsp;&ndash;&nbsp;Grubb exponent (CBF&ndash;CBV coupling)</span>
+                        <span data-term="alpha" style="--c:#b45309"><em style="color:#b45309;font-style:normal;font-weight:700">&alpha;</em>&nbsp;&ndash;&nbsp;Grubb / flow&ndash;volume exponent</span>
                         <span data-term="E" style="--c:#0d9488"><em style="color:#0d9488;font-style:normal;font-weight:700">E, E<sub>0</sub></em>&nbsp;&ndash;&nbsp;oxygen-extraction fraction</span>
                     </div>
                     <p class="eq-hint">Hover any coloured symbol, in the legend or the equations, for its definition.</p>
-                    <p class="eq-hint">Reading aid: every concept keeps one colour across the whole page &mdash; flow is the same sky-blue as the CBF curve, volume the same green as the balloon &mdash; so the symbols and the plots read as one picture. Colour is doubled with <strong>bold weight</strong> so the coding still works for colour-blind readers, the grey braces name each part in plain language, and the pale <em style="color:#94a3b8;font-style:normal">constants</em> recede so the physiology stands out.</p>
+                    <p class="eq-hint">Reading aid: every concept keeps one colour across the whole page, flow is the same sky-blue as the CBF curve, metabolism the same red as CMRO<sub>2</sub>, volume the same green as the balloon, so the symbols and the plots read as one picture. Colour is doubled with <strong>bold weight</strong> so the coding still works for colour-blind readers, the grey braces name each part in plain language, and the pale <em style="color:#94a3b8;font-style:normal">constants</em> recede so the physiology stands out.</p>
 
-                    <p>Here <em style="color:#64748b">&tau;</em> is the transit time and
-                    <em>V<sub>0</sub>, k<sub>1</sub>, k<sub>2</sub>, k<sub>3</sub></em> are calibration constants. The
-                    <strong>adjusted</strong> model relaxes the fixed
-                    <em style="color:#16a34a">v</em>&nbsp;=&nbsp;<em style="color:#0ea5e9">f</em><sup>&alpha;</sup> link,
-                    so CBF, CMRO<sub>2</sub> and CBV can be prescribed separately. The animation above uses a
-                    deliberately simplified version of these dynamics to keep the intuition front and centre.</p>
+                    <div class="eq-h">Symbols</div>
+                    <table class="sym-table">
+                        <thead><tr><th>Symbol</th><th>Meaning</th><th>Normalisation</th></tr></thead>
+                        <tbody>
+                            <tr><td>f(t)</td><td>Cerebral blood flow (CBF)</td><td>Dimensionless</td></tr>
+                            <tr><td>m(t)</td><td>Oxygen metabolism (CMRO<sub>2</sub>)</td><td>Dimensionless</td></tr>
+                            <tr><td>v(t)</td><td>Venous blood volume (CBV)</td><td>Dimensionless</td></tr>
+                            <tr><td>q(t)</td><td>Deoxyhemoglobin content</td><td>Dimensionless</td></tr>
+                            <tr><td>q(t)/v(t)</td><td>Relative deoxyhemoglobin concentration</td><td>Dimensionless</td></tr>
+                            <tr><td>&alpha;</td><td>Grubb / flow&ndash;volume exponent</td><td>&asymp;&nbsp;0.38 total; &alpha;<sub>v</sub>&nbsp;&asymp;&nbsp;0.2 venous</td></tr>
+                            <tr><td>&beta;</td><td>Deoxyhemoglobin signal exponent (field/geometry)</td><td>&asymp;&nbsp;1.5 at 3&nbsp;T</td></tr>
+                            <tr><td>E<sub>0</sub></td><td>Baseline oxygen-extraction fraction</td><td>Fraction (0.4)</td></tr>
+                            <tr><td>V<sub>0</sub></td><td>Baseline venous blood volume</td><td>Fraction (0.025)</td></tr>
+                            <tr><td>&tau;, &tau;<sub>0</sub></td><td>Transit time</td><td>Seconds</td></tr>
+                            <tr><td>M</td><td>Maximum Davis-model BOLD scale</td><td>Fraction / percent</td></tr>
+                        </tbody>
+                    </table>
 
                     <p class="eq-credit">The notation-design choices &mdash; one colour per concept, colour doubled with weight,
                     plain-language braces, and de-emphasised constants &mdash; follow principles catalogued in Fred Hohman&rsquo;s
@@ -1531,8 +1598,8 @@
                             <h4>Resulting BOLD signal</h4>
                             <p class="demo-hint">
                                 Linearised Davis-style output:
-                                &Delta;BOLD/B<sub>0</sub> &asymp; (&beta;&nbsp;&minus;&nbsp;&alpha;)&middot;&Delta;CBF/CBF<sub>0</sub>
-                                &minus; &beta;&middot;&Delta;CMRO<sub>2</sub>/CMRO<sub>2,0</sub>.
+                                &Delta;BOLD/B<sub>0</sub> &asymp; M&thinsp;[(&beta;&nbsp;&minus;&nbsp;&alpha;)&middot;&Delta;CBF/CBF<sub>0</sub>
+                                &minus; &beta;&middot;&Delta;CMRO<sub>2</sub>/CMRO<sub>2,0</sub>], with calibration factor&nbsp;M.
                                 <strong>Hover</strong> for a sample readout or <strong>click/drag</strong>
                                 to pin a time crosshair (mirrored on the inputs plot).
                             </p>
@@ -1581,7 +1648,7 @@
                     <div class="slider slider-cbv">
                         <label><span><span style="color:#0ea5e9;font-weight:700">CBF</span>&ndash;<span style="color:#16a34a;font-weight:700">CBV</span> coupling <em>(Grubb exponent)</em></span><span id="balCbvVal">0.38</span></label>
                         <input type="range" id="balCbv" min="0" max="80" value="38" step="1">
-                        <div class="slider-hint">Classical Grubb value is 0.38; scenario&nbsp;3 varies this coupling.</div>
+                        <div class="slider-hint">Classical Grubb value is &asymp;0.38, but venous-compartment and calibrated-fMRI work often use lower effective values (&alpha;<sub>v</sub>&nbsp;&asymp;&nbsp;0.2, as in this paper); scenario&nbsp;3 varies this coupling.</div>
                     </div>
 
                     <div class="presets">
@@ -1733,11 +1800,12 @@
             </div>
 
             <div class="takeaway">
-                <strong>Key observation:</strong> without touching the underlying neural input, realistic shifts in
-                the target region's CBF or CMRO<sub>2</sub> can move the measured BOLD-FC from a strong positive
-                correlation (&asymp;&nbsp;+0.9) to a strong negative one (&asymp;&nbsp;&minus;0.7). A researcher
-                comparing patients to controls with rs-fMRI alone would see a "connectivity difference",
-                yet the neural wiring is identical.
+                <strong>Key observation:</strong> within this simplified educational simulator, and without touching
+                the underlying neural input, parameter shifts in the target region's CBF or CMRO<sub>2</sub> can move
+                the measured BOLD-FC from strongly positive to strongly negative, even reversing its sign. The exact
+                values (here roughly +0.9 to &minus;0.7) are model- and noise-dependent and are not quantitative
+                predictions; a researcher comparing patients to controls with rs-fMRI alone would nonetheless see a
+                "connectivity difference", yet the neural wiring is identical.
             </div>
         </div>
     </section>
@@ -1856,8 +1924,9 @@
                 <div class="glossary-item">
                     <div class="glossary-term"><abbr title="Blood Oxygenation Level Dependent">BOLD</abbr></div>
                     <div class="glossary-def">
-                        MRI contrast sensitive to the amount of <em>deoxygenated</em> haemoglobin in a voxel. Rises
-                        when CBF increases faster than oxygen is consumed.
+                        MRI contrast sensitive to <em>deoxygenated</em> haemoglobin in a voxel, both its total content
+                        and its concentration in the venous compartment. Being paramagnetic, it shortens
+                        T<sub>2</sub><sup>*</sup>, so the signal rises when CBF increases faster than oxygen is consumed.
                     </div>
                 </div>
                 <div class="glossary-item">
@@ -1940,8 +2009,9 @@
                 <div class="glossary-item">
                     <div class="glossary-term">Grubb exponent (&alpha;)</div>
                     <div class="glossary-def">
-                        Empirical exponent that links CBV to CBF via CBV/CBV<sub>0</sub>&nbsp;=&nbsp;(CBF/CBF<sub>0</sub>)<sup>&alpha;</sup>;
-                        classical value &asymp;&nbsp;0.38.
+                        Empirical exponent that links CBV to CBF via CBV/CBV<sub>0</sub>&nbsp;=&nbsp;(CBF/CBF<sub>0</sub>)<sup>&alpha;</sup>.
+                        Classical value for total CBV &asymp;&nbsp;0.38&ndash;0.4; venous-compartment and calibrated-fMRI
+                        implementations often use lower effective values (&alpha;<sub>v</sub>&nbsp;&asymp;&nbsp;0.2, the paper's reference).
                     </div>
                 </div>
                 <div class="glossary-item">
@@ -2966,7 +3036,7 @@
             if (t < STIM_OFF) return 'During activity the balloon keeps inflating (CBV rises), but flow still outpaces oxygen use, so BOLD stays high.';
             if (t < 12) return 'Activity stops. Flow falls almost at once, but the swollen balloon can only deflate <em>slowly</em>.';
             if (t < 17) return 'The still-large balloon holds extra deoxygenated blood, so BOLD sinks <em>below</em> baseline, the <strong>post-stimulus undershoot</strong>.';
-            return 'The balloon finishes deflating and BOLD returns to rest. That undershoot was purely vascular, and the neural input never changed.';
+            return 'The balloon finishes deflating and BOLD returns to rest. In this model the undershoot was vascular, and the neural input never changed.';
         }
 
         function frame(idx) {
@@ -4625,7 +4695,13 @@
             q:     { name: 'q · deoxyhemoglobin', desc: 'Deoxygenated haemoglobin held in the balloon; more of it lowers BOLD.', hi: '#a5b4fc', bg: 'linear-gradient(160deg, rgba(67,56,202,0.5), rgba(15,23,42,0.96))', border: 'rgba(165,180,252,0.65)' },
             alpha: { name: 'α · Grubb exponent', desc: 'The CBF-CBV coupling strength; the adjusted model unlocks it.', hi: '#fcd34d', bg: 'linear-gradient(160deg, rgba(180,83,9,0.5), rgba(15,23,42,0.96))', border: 'rgba(253,224,71,0.6)' },
             E:     { name: 'E, E₀ · oxygen-extraction fraction', desc: 'Fraction of delivered oxygen the tissue pulls out of the blood.', hi: '#5eead4', bg: 'linear-gradient(160deg, rgba(13,148,136,0.5), rgba(15,23,42,0.96))', border: 'rgba(94,234,212,0.65)' },
-            tau:   { name: 'τ · transit time', desc: 'How long blood takes to cross the balloon; it sets the response speed.', hi: '#cbd5e1', bg: 'linear-gradient(160deg, rgba(100,116,139,0.5), rgba(15,23,42,0.96))', border: 'rgba(203,213,225,0.6)' }
+            tau:   { name: 'τ, τ₀ · transit time', desc: 'How long blood takes to cross the balloon; it sets the response speed.', hi: '#cbd5e1', bg: 'linear-gradient(160deg, rgba(100,116,139,0.5), rgba(15,23,42,0.96))', border: 'rgba(203,213,225,0.6)' },
+            m:     { name: 'm(t) · oxygen metabolism (CMRO₂)', desc: 'The metabolic demand. The adjusted model prescribes it independently of flow.', hi: '#fca5a5', bg: 'linear-gradient(160deg, rgba(220,38,38,0.5), rgba(15,23,42,0.96))', border: 'rgba(252,165,165,0.65)' },
+            beta:  { name: 'β · deoxyhemoglobin signal exponent', desc: 'How strongly deoxyhemoglobin weights the signal; ≈1.5 at 3 T, set by field and vessel geometry.', hi: '#fcd34d', bg: 'linear-gradient(160deg, rgba(180,83,9,0.5), rgba(15,23,42,0.96))', border: 'rgba(253,224,71,0.6)' },
+            R2:    { name: 'R₂* · transverse relaxation rate', desc: 'Rises with deoxyhemoglobin; more of it dephases spins and dims the gradient-echo signal.', hi: '#a5b4fc', bg: 'linear-gradient(160deg, rgba(67,56,202,0.5), rgba(15,23,42,0.96))', border: 'rgba(165,180,252,0.65)' },
+            TE:    { name: 'TE · echo time', desc: 'When the signal is read out; longer TE makes the image more BOLD-sensitive.', hi: '#cbd5e1', bg: 'linear-gradient(160deg, rgba(100,116,139,0.5), rgba(15,23,42,0.96))', border: 'rgba(203,213,225,0.6)' },
+            S:     { name: 'S(TE) · measured MR signal', desc: 'Gradient-echo magnitude at echo time TE; it decays as R₂* grows.', hi: '#cbd5e1', bg: 'linear-gradient(160deg, rgba(100,116,139,0.5), rgba(15,23,42,0.96))', border: 'rgba(203,213,225,0.6)' },
+            M:     { name: 'M · calibration factor', desc: 'The maximum BOLD scale in the Davis model; it fixes the amplitude of the percentage signal.', hi: '#cbd5e1', bg: 'linear-gradient(160deg, rgba(100,116,139,0.5), rgba(15,23,42,0.96))', border: 'rgba(203,213,225,0.6)' }
         };
         var tip = null, host = null;
         function ensureTip() {
