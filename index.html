@@ -309,42 +309,40 @@
         .heat-tooltip {
             position: absolute; pointer-events: none;
             top: 0; left: 0;
-            color: #f8fafc;
-            font-size: 0.78rem;
-            padding: 7px 10px; border-radius: 8px;
-            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.25);
-            border: 1px solid transparent;
+            display: flex; flex-direction: column; gap: 4px;
+            color: #f1f5f9;
+            font-size: 0.8rem; font-weight: 500;
+            padding: 9px 12px; border-radius: 9px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            border: 1.5px solid transparent;
             white-space: nowrap;
-            line-height: 1.35;
-            backdrop-filter: blur(2px);
-            -webkit-backdrop-filter: blur(2px);
+            line-height: 1.45;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             opacity: 0;
             transition: opacity 0.12s ease, background 0.12s ease, border-color 0.12s ease;
             z-index: 5;
             font-variant-numeric: tabular-nums;
         }
         .heat-tooltip.heat-tip-neg {
-            background: linear-gradient(145deg, rgba(37, 99, 235, 0.32), rgba(15, 23, 42, 0.78));
-            border-color: rgba(96, 165, 250, 0.35);
+            background: linear-gradient(160deg, rgba(29, 78, 216, 0.6), rgba(15, 23, 42, 0.96));
+            border-color: rgba(147, 197, 253, 0.65);
         }
         .heat-tooltip.heat-tip-pos {
-            background: linear-gradient(145deg, rgba(250, 204, 21, 0.22), rgba(15, 23, 42, 0.78));
-            border-color: rgba(250, 204, 21, 0.4);
+            background: linear-gradient(160deg, rgba(180, 83, 9, 0.45), rgba(15, 23, 42, 0.96));
+            border-color: rgba(253, 224, 71, 0.6);
         }
         .heat-tooltip.heat-tip-neu {
-            background: rgba(15, 23, 42, 0.7);
-            border-color: rgba(148, 163, 184, 0.25);
+            background: linear-gradient(180deg, rgba(51, 65, 85, 0.92), rgba(15, 23, 42, 0.98));
+            border-color: rgba(186, 199, 216, 0.5);
         }
         .heat-tooltip.visible { opacity: 1; }
-        .heat-tooltip .ht-row {
-            display: flex; justify-content: space-between;
-            gap: 14px;
-        }
-        .heat-tooltip .ht-key { color: #cbd5e1; font-weight: 500; }
-        .heat-tooltip .ht-val { color: #f8fafc; font-weight: 700; }
-        .heat-tooltip .ht-r-neg { color: #2563eb; }
-        .heat-tooltip .ht-r-pos { color: #d97706; }
-        .heat-tooltip .ht-r-neu { color: #94a3b8; }
+        .heat-tooltip .ht-row { display: flex; justify-content: space-between; gap: 16px; min-width: 12em; }
+        .heat-tooltip .ht-key { color: #f1f5f9; font-weight: 600; }
+        .heat-tooltip .ht-val { color: #ffffff; font-weight: 800; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6); }
+        .heat-tooltip .ht-r-neg { color: #93c5fd; }
+        .heat-tooltip .ht-r-pos { color: #fcd34d; }
+        .heat-tooltip .ht-r-neu { color: #cbd5e1; }
 
         /* Seed vs. target scatter (BOLD-FC simulator) */
         .scatter-plot-wrap { position: relative; }
@@ -2693,6 +2691,7 @@
         function showBoldTip(evt, j) {
             if (!boldTip) return;
             boldTip.innerHTML = boldTipHtml(j);
+            // Single variable (black BOLD trace), so keep a constant neutral base colour.
             boldTip.classList.remove('st-tip-cbf', 'st-tip-cmr', 'st-tip-cbv', 'st-tip-pos', 'st-tip-neg');
             boldTip.classList.add('st-tip-neu');
             positionBoldTip(evt);
