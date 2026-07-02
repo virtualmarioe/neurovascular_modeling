@@ -1466,7 +1466,7 @@
                     is present, and the <strong>models</strong> used to link the two: the classic balloon, the paper's
                     adjusted model and its Obata signal equation, and the linearised Davis form the browser demos run.</p>
 
-                    <div class="eq-h">1 &middot; MR physics <span>&mdash; deoxyhemoglobin &rarr; signal</span></div>
+                    <div class="eq-h">1 &middot; MR physics <span>&middot;&nbsp;deoxyhemoglobin &rarr; signal</span></div>
                     <p class="eq-sub">Paramagnetic deoxyhemoglobin adds microscopic field inhomogeneities that raise the
                     effective transverse relaxation rate <em style="color:#4338ca">R<sub>2</sub><sup>*</sup></em>. A
                     gradient-echo image at echo time <em style="color:#94a3b8">TE</em> reads out:</p>
@@ -1476,7 +1476,7 @@
                     <p class="eq-sub">More flow flushes deoxyhemoglobin out, lowers <em style="color:#4338ca">R<sub>2</sub><sup>*</sup></em>,
                     and so <em>raises</em> the gradient-echo BOLD signal.</p>
 
-                    <div class="eq-h">2 &middot; Physiology: the classic balloon <span>&mdash; Buxton et&nbsp;al., 1998</span></div>
+                    <div class="eq-h">2 &middot; Physiology: the classic balloon <span>&middot;&nbsp;Buxton et&nbsp;al., 1998</span></div>
                     <p class="eq-sub">Two coupled equations for normalised blood volume <em style="color:#16a34a">v</em>
                     and deoxyhemoglobin content <em style="color:#4338ca">q</em>, driven by inflow
                     <em style="color:#0ea5e9">f</em>. Here metabolism is <em>implicitly geared to flow</em> through the oxygen
@@ -1486,7 +1486,7 @@
 
                     <div class="eq" data-tex="\frac{d\,\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}}{dt} \;=\; \frac{1}{\htmlData{term=tau}{\textcolor{#64748b}{\boldsymbol{\tau}}}}\Bigl(\underbrace{\htmlData{term=f}{\textcolor{#0ea5e9}{\boldsymbol{f}}}\,\frac{\htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E(f)}}}}{\htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E_0}}}}}_{\textcolor{#94a3b8}{\text{oxygen in}}} - \underbrace{f_{\text{out}}\,\frac{\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}}{\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}}}_{\textcolor{#94a3b8}{\text{washed out}}}\Bigr), \qquad \htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E(f)}}} = 1 - (1-\htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E_0}}})^{\,1/\htmlData{term=f}{\textcolor{#0ea5e9}{\boldsymbol{f}}}}">dq/dt = (1/&tau;)(f&middot;E(f)/E_0 &minus; f_out&middot;q/v),  E(f) = 1 &minus; (1&minus;E_0)^(1/f)</div>
 
-                    <div class="eq-h">3 &middot; The paper's adjusted model <span>&mdash; flow and metabolism unlocked</span></div>
+                    <div class="eq-h">3 &middot; The paper's adjusted model <span>&middot;&nbsp;flow and metabolism unlocked</span></div>
                     <p class="eq-sub">The study drives inflow <em style="color:#0ea5e9">f<sub>in</sub></em> and metabolism
                     <em style="color:#dc2626">m</em> as <em>independent</em> linear responses to the neural input
                     <em style="color:#d97706">N(t)</em>, each a convolution (<em>&lowast;</em>) with a gamma kernel
@@ -1506,7 +1506,7 @@
                     The outflow <em>f<sub>out</sub>(t,&thinsp;v)</em> follows from volume/flow conservation and a
                     viscoelastic flow&ndash;volume relation.</p>
 
-                    <div class="eq-h">Published observation model <span>&mdash; Obata intra-/extravascular, used by the paper</span></div>
+                    <div class="eq-h">Published observation model <span>&middot;&nbsp;Obata intra-/extravascular, used by the paper</span></div>
                     <p class="eq-sub">The peer-reviewed BOLD signal is the Obata&nbsp;et&nbsp;al. form, with separate intra- and
                     extravascular weightings on the deoxyhemoglobin and volume terms:</p>
 
@@ -1514,13 +1514,13 @@
 
                     <p class="eq-sub" style="color:#94a3b8">Paper parameters: TE&nbsp;=&nbsp;30&nbsp;ms, V<sub>0</sub>&nbsp;=&nbsp;0.025, E<sub>0</sub>&nbsp;=&nbsp;0.4, &epsilon;&nbsp;=&nbsp;0.24, r<sub>0</sub>&nbsp;=&nbsp;178&nbsp;s<sup>&minus;1</sup>.</p>
 
-                    <div class="eq-h">Related compact form <span>&mdash; pedagogical shorthand</span></div>
+                    <div class="eq-h">Related compact form <span>&middot;&nbsp;pedagogical shorthand</span></div>
                     <p class="eq-sub">A compact three-term observation model common in hemodynamic modelling; the same physics,
                     easier to read term by term:</p>
 
                     <div class="eq" data-tex="\frac{\Delta S}{S} \;=\; \textcolor{#94a3b8}{V_0}\left[\,\underbrace{\textcolor{#94a3b8}{k_1}\bigl(1-\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}\bigr)}_{\textcolor{#94a3b8}{\text{deoxy content}}} + \underbrace{\textcolor{#94a3b8}{k_2}\Bigl(1-\tfrac{\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}}{\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}}\Bigr)}_{\textcolor{#94a3b8}{\text{deoxy concentration}}} + \underbrace{\textcolor{#94a3b8}{k_3}\bigl(1-\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}\bigr)}_{\textcolor{#94a3b8}{\text{blood volume}}}\right]">&Delta;S/S = V<sub>0</sub>[k<sub>1</sub>(1&minus;q) + k<sub>2</sub>(1&minus;q/v) + k<sub>3</sub>(1&minus;v)]</div>
 
-                    <div class="eq-h">Browser demo engine &middot; linearised Davis <span>&mdash; toy approximation, what the sliders compute</span></div>
+                    <div class="eq-h">Browser demo engine &middot; linearised Davis <span>&middot;&nbsp;toy approximation, what the sliders compute</span></div>
                     <p class="eq-sub">Linearising the Davis model about rest gives the small-signal form the demos use, with an
                     explicit calibration factor <em style="color:#94a3b8">M</em> for the amplitude scale. This is a
                     <strong>toy/demo approximation</strong>, not the paper's simulation engine:</p>
@@ -1563,8 +1563,8 @@
                         </tbody>
                     </table>
 
-                    <p class="eq-credit">The notation-design choices &mdash; one colour per concept, colour doubled with weight,
-                    plain-language braces, and de-emphasised constants &mdash; follow principles catalogued in Fred Hohman&rsquo;s
+                    <p class="eq-credit">The notation-design choices (one colour per concept, colour doubled with weight,
+                    plain-language braces, and de-emphasised constants) follow principles catalogued in Fred Hohman&rsquo;s
                     <a href="https://github.com/fredhohman/awesome-mathematical-notation-design" target="_blank" rel="noopener">Awesome
                     Mathematical Notation Design</a>. The colour-coded rendering follows
                     <a href="https://github.com/stared/equations-explained-colorfully" target="_blank" rel="noopener">Equations
@@ -1831,7 +1831,7 @@
                         <div class="slider-hint">Adds zero-mean Gaussian noise on top of each BOLD trace (SNR stress-test). This is a simplified observation-noise model, <em>not</em> a full physiological-noise model with respiratory, cardiac or motion components.</div>
                     </div>
 
-                    <div class="slider-hint" style="margin-top:0.5rem">Drag the <strong>least-squares (dashed) line</strong> in the scatter to nudge the two sliders; the line always reflects the re-simulated OLS. Works the same in all three scenario families.</div>
+                    <div class="slider-hint" style="margin-top:0.5rem">Drag the <strong>least-squares (dashed) line</strong> in the scatter to nudge the two sliders; the line is always re-fit to the re-simulated points. Works the same in all three scenario families.</div>
 
                     <div class="presets">
                         <button type="button" data-sim-preset="healthy">Healthy region</button>
