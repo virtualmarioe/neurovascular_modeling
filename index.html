@@ -1426,37 +1426,42 @@
                 <div class="primer-math">
                     <p>The balloon is described by two coupled differential equations, for normalised blood
                     volume <em style="color:#16a34a">v</em> and deoxyhemoglobin content <em style="color:#4338ca">q</em>,
-                    driven by inflow <em style="color:#0284c7">f</em>:</p>
+                    driven by inflow <em style="color:#0ea5e9">f</em>:</p>
 
-                    <div class="eq" data-tex="\frac{d\,\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}}{dt} \;=\; \frac{1}{\htmlData{term=tau}{\textcolor{#64748b}{\boldsymbol{\tau}}}}\left(\htmlData{term=f}{\textcolor{#0284c7}{\boldsymbol{f}}} - f_{\text{out}}\right), \qquad f_{\text{out}} = \htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}^{\,1/\htmlData{term=alpha}{\textcolor{#b45309}{\boldsymbol{\alpha}}}}">dv/dt = (1/&tau;)(f &minus; f<sub>out</sub>),  f<sub>out</sub> = v<sup>1/&alpha;</sup></div>
+                    <div class="eq" data-tex="\frac{d\,\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}}{dt} \;=\; \frac{1}{\htmlData{term=tau}{\textcolor{#64748b}{\boldsymbol{\tau}}}}\,\underbrace{\left(\htmlData{term=f}{\textcolor{#0ea5e9}{\boldsymbol{f}}} - f_{\text{out}}\right)}_{\textcolor{#94a3b8}{\text{net inflow}}}, \qquad f_{\text{out}} = \underbrace{\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}^{\,1/\htmlData{term=alpha}{\textcolor{#b45309}{\boldsymbol{\alpha}}}}}_{\textcolor{#94a3b8}{\text{drainage}}}">dv/dt = (1/&tau;)(f &minus; f<sub>out</sub>),  f<sub>out</sub> = v<sup>1/&alpha;</sup></div>
 
-                    <div class="eq" data-tex="\frac{d\,\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}}{dt} \;=\; \frac{1}{\htmlData{term=tau}{\textcolor{#64748b}{\boldsymbol{\tau}}}}\left(\htmlData{term=f}{\textcolor{#0284c7}{\boldsymbol{f}}}\,\frac{\htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E(f)}}}}{\htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E_0}}}} - f_{\text{out}}\,\frac{\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}}{\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}}\right), \qquad \htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E(f)}}} = 1 - (1-\htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E_0}}})^{\,1/\htmlData{term=f}{\textcolor{#0284c7}{\boldsymbol{f}}}}">dq/dt = (1/&tau;)(f&middot;E(f)/E<sub>0</sub> &minus; f<sub>out</sub>&middot;q/v),  E(f) = 1 &minus; (1&minus;E<sub>0</sub>)<sup>1/f</sup></div>
+                    <div class="eq" data-tex="\frac{d\,\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}}{dt} \;=\; \frac{1}{\htmlData{term=tau}{\textcolor{#64748b}{\boldsymbol{\tau}}}}\Bigl(\underbrace{\htmlData{term=f}{\textcolor{#0ea5e9}{\boldsymbol{f}}}\,\frac{\htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E(f)}}}}{\htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E_0}}}}}_{\textcolor{#94a3b8}{\text{oxygen in}}} - \underbrace{f_{\text{out}}\,\frac{\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}}{\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}}}_{\textcolor{#94a3b8}{\text{washed out}}}\Bigr), \qquad \htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E(f)}}} = 1 - (1-\htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E_0}}})^{\,1/\htmlData{term=f}{\textcolor{#0ea5e9}{\boldsymbol{f}}}}">dq/dt = (1/&tau;)(f&middot;E(f)/E<sub>0</sub> &minus; f<sub>out</sub>&middot;q/v),  E(f) = 1 &minus; (1&minus;E<sub>0</sub>)<sup>1/f</sup></div>
 
                     <p>and the measured signal combines the volume and deoxyhemoglobin terms:</p>
 
-                    <div class="eq" data-tex="\frac{\Delta S}{S} \;=\; V_0\left[\,k_1\bigl(1-\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}\bigr) + k_2\Bigl(1-\tfrac{\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}}{\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}}\Bigr) + k_3\bigl(1-\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}\bigr)\right]">&Delta;S/S = V<sub>0</sub>[k<sub>1</sub>(1&minus;q) + k<sub>2</sub>(1&minus;q/v) + k<sub>3</sub>(1&minus;v)]</div>
+                    <div class="eq" data-tex="\frac{\Delta S}{S} \;=\; \textcolor{#94a3b8}{V_0}\left[\,\underbrace{\textcolor{#94a3b8}{k_1}\bigl(1-\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}\bigr)}_{\textcolor{#94a3b8}{\text{deoxy content}}} + \underbrace{\textcolor{#94a3b8}{k_2}\Bigl(1-\tfrac{\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}}{\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}}\Bigr)}_{\textcolor{#94a3b8}{\text{deoxy concentration}}} + \underbrace{\textcolor{#94a3b8}{k_3}\bigl(1-\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}\bigr)}_{\textcolor{#94a3b8}{\text{blood volume}}}\right]">&Delta;S/S = V<sub>0</sub>[k<sub>1</sub>(1&minus;q) + k<sub>2</sub>(1&minus;q/v) + k<sub>3</sub>(1&minus;v)]</div>
 
                     <div class="eq-legend">
-                        <span data-term="f" style="--c:#0284c7"><em style="color:#0284c7;font-style:normal;font-weight:700">f</em>&nbsp;&ndash;&nbsp;cerebral blood flow (CBF)</span>
+                        <span data-term="f" style="--c:#0ea5e9"><em style="color:#0ea5e9;font-style:normal;font-weight:700">f</em>&nbsp;&ndash;&nbsp;cerebral blood flow (CBF)</span>
                         <span data-term="v" style="--c:#16a34a"><em style="color:#16a34a;font-style:normal;font-weight:700">v</em>&nbsp;&ndash;&nbsp;cerebral blood volume (CBV)</span>
                         <span data-term="q" style="--c:#4338ca"><em style="color:#4338ca;font-style:normal;font-weight:700">q</em>&nbsp;&ndash;&nbsp;deoxyhemoglobin</span>
                         <span data-term="alpha" style="--c:#b45309"><em style="color:#b45309;font-style:normal;font-weight:700">&alpha;</em>&nbsp;&ndash;&nbsp;Grubb exponent (CBF&ndash;CBV coupling)</span>
                         <span data-term="E" style="--c:#0d9488"><em style="color:#0d9488;font-style:normal;font-weight:700">E, E<sub>0</sub></em>&nbsp;&ndash;&nbsp;oxygen-extraction fraction</span>
                     </div>
                     <p class="eq-hint">Hover any coloured symbol, in the legend or the equations, for its definition.</p>
+                    <p class="eq-hint">Reading aid: every concept keeps one colour across the whole page &mdash; flow is the same sky-blue as the CBF curve, volume the same green as the balloon &mdash; so the symbols and the plots read as one picture. Colour is doubled with <strong>bold weight</strong> so the coding still works for colour-blind readers, the grey braces name each part in plain language, and the pale <em style="color:#94a3b8;font-style:normal">constants</em> recede so the physiology stands out.</p>
 
                     <p>Here <em style="color:#64748b">&tau;</em> is the transit time and
                     <em>V<sub>0</sub>, k<sub>1</sub>, k<sub>2</sub>, k<sub>3</sub></em> are calibration constants. The
                     <strong>adjusted</strong> model relaxes the fixed
-                    <em style="color:#16a34a">v</em>&nbsp;=&nbsp;<em style="color:#0284c7">f</em><sup>&alpha;</sup> link,
+                    <em style="color:#16a34a">v</em>&nbsp;=&nbsp;<em style="color:#0ea5e9">f</em><sup>&alpha;</sup> link,
                     so CBF, CMRO<sub>2</sub> and CBV can be prescribed separately. The animation above uses a
                     deliberately simplified version of these dynamics to keep the intuition front and centre.</p>
 
-                    <p class="eq-credit">Colour-coded equations follow the approach of
+                    <p class="eq-credit">The notation-design choices &mdash; one colour per concept, colour doubled with weight,
+                    plain-language braces, and de-emphasised constants &mdash; follow principles catalogued in Fred Hohman&rsquo;s
+                    <a href="https://github.com/fredhohman/awesome-mathematical-notation-design" target="_blank" rel="noopener">Awesome
+                    Mathematical Notation Design</a>. The colour-coded rendering follows
                     <a href="https://github.com/stared/equations-explained-colorfully" target="_blank" rel="noopener">Equations
                     Explained Colorfully</a> by Piotr Migda&#322; (MIT-licensed), which in turn credits
-                    BetterExplained&rsquo;s colorized equations and Stuart Riffle&rsquo;s color-coded Fourier
-                    transform. Equations typeset with <a href="https://katex.org/" target="_blank" rel="noopener">KaTeX</a>.</p>
+                    <a href="https://betterexplained.com/articles/colorized-math-equations/" target="_blank" rel="noopener">BetterExplained&rsquo;s
+                    colorized equations</a> and <a href="https://web.archive.org/web/20130318211259/http://www.altdevblogaday.com/2011/05/17/understanding-the-fourier-transform" target="_blank" rel="noopener">Stuart
+                    Riffle&rsquo;s color-coded Fourier transform</a>. Equations typeset with <a href="https://katex.org/" target="_blank" rel="noopener">KaTeX</a>.</p>
                 </div>
             </details>
         </div>
@@ -4615,7 +4620,7 @@
     <script>
     (function () {
         var TERMS = {
-            f:     { name: 'f · cerebral blood flow (CBF)', desc: 'Fresh, oxygenated blood arriving; the inflow that fills the balloon.', hi: '#7dd3fc', bg: 'linear-gradient(160deg, rgba(2,132,199,0.55), rgba(15,23,42,0.96))', border: 'rgba(125,211,252,0.65)' },
+            f:     { name: 'f · cerebral blood flow (CBF)', desc: 'Fresh, oxygenated blood arriving; the inflow that fills the balloon.', hi: '#7dd3fc', bg: 'linear-gradient(160deg, rgba(14,165,233,0.55), rgba(15,23,42,0.96))', border: 'rgba(125,211,252,0.65)' },
             v:     { name: 'v · cerebral blood volume (CBV)', desc: 'How inflated the venous balloon is; it rises fast and deflates slowly.', hi: '#86efac', bg: 'linear-gradient(160deg, rgba(22,163,74,0.5), rgba(15,23,42,0.96))', border: 'rgba(134,239,172,0.65)' },
             q:     { name: 'q · deoxyhemoglobin', desc: 'Deoxygenated haemoglobin held in the balloon; more of it lowers BOLD.', hi: '#a5b4fc', bg: 'linear-gradient(160deg, rgba(67,56,202,0.5), rgba(15,23,42,0.96))', border: 'rgba(165,180,252,0.65)' },
             alpha: { name: 'α · Grubb exponent', desc: 'The CBF-CBV coupling strength; the adjusted model unlocks it.', hi: '#fcd34d', bg: 'linear-gradient(160deg, rgba(180,83,9,0.5), rgba(15,23,42,0.96))', border: 'rgba(253,224,71,0.6)' },
