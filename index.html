@@ -20,6 +20,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js" crossorigin="anonymous"></script>
     <style>
         /* ===== Reset & Base ===== */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -555,14 +557,30 @@
         .primer-details > summary::-webkit-details-marker { display: none; }
         .primer-details > summary::before { content: "\002B\00A0"; color: #d97706; font-weight: 800; }
         .primer-details[open] > summary::before { content: "\2212\00A0"; }
-        .primer-math { padding: 0 18px 16px; font-size: 0.85rem; color: #334155; line-height: 1.7; }
+        .primer-math { position: relative; padding: 0 18px 16px; font-size: 0.85rem; color: #334155; line-height: 1.7; }
         .primer-math p { margin: 8px 0; }
         .primer-math em { color: #0f172a; font-style: italic; }
         .primer-math .eq {
-            font-family: 'Cambria Math', Cambria, 'Times New Roman', serif; font-size: 0.98rem;
             background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
-            padding: 10px 14px; margin: 8px 0; overflow-x: auto; color: #0f172a;
+            padding: 16px 16px; margin: 10px 0; overflow-x: auto; overflow-y: hidden;
+            text-align: center; color: #0f172a;
+            font-family: 'Cambria Math', Cambria, 'Times New Roman', serif; font-size: 0.98rem;
         }
+        .primer-math .eq .katex { font-size: 1.32em; }
+        .primer-math .eq [data-term], .eq-legend [data-term] { cursor: help; }
+        .eq-hint { font-size: 0.76rem; color: #94a3b8; margin: 4px 0 0; }
+        .eq-tip { white-space: normal; max-width: 240px; }
+        .eq-tip .eq-tip-name { font-weight: 800; font-size: 0.82rem; }
+        .eq-tip .eq-tip-desc { font-weight: 500; font-size: 0.76rem; color: #e2e8f0; line-height: 1.45; }
+        .eq-legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 14px 0 6px; }
+        .eq-legend span { display: inline-flex; align-items: center; gap: 7px; font-size: 0.8rem; color: #475569; }
+        .eq-legend span::before {
+            content: ""; width: 11px; height: 11px; border-radius: 3px;
+            background: var(--c, #94a3b8); flex: 0 0 auto;
+        }
+        .eq-credit { margin-top: 16px; font-size: 0.75rem; color: #94a3b8; line-height: 1.65; }
+        .eq-credit a { color: #b45309; text-decoration: none; border-bottom: 1px solid rgba(217, 119, 6, 0.35); }
+        .eq-credit a:hover { border-bottom-color: #d97706; }
 
         /* ===== Scenario cards (existing) ===== */
         .scenario-grid {
@@ -1407,16 +1425,38 @@
                 <summary>Show me the math</summary>
                 <div class="primer-math">
                     <p>The balloon is described by two coupled differential equations, for normalised blood
-                    volume <em>v</em> and deoxyhemoglobin content <em>q</em>, driven by inflow <em>f</em>:</p>
-                    <div class="eq">dv/dt = (1/&tau;) &middot; ( f &minus; f<sub>out</sub> ),&nbsp; f<sub>out</sub> = v<sup>1/&alpha;</sup></div>
-                    <div class="eq">dq/dt = (1/&tau;) &middot; ( f &middot; E(f)/E<sub>0</sub> &minus; f<sub>out</sub> &middot; q/v ),&nbsp; E(f) = 1 &minus; (1&minus;E<sub>0</sub>)<sup>1/f</sup></div>
+                    volume <em style="color:#16a34a">v</em> and deoxyhemoglobin content <em style="color:#4338ca">q</em>,
+                    driven by inflow <em style="color:#0284c7">f</em>:</p>
+
+                    <div class="eq" data-tex="\frac{d\,\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}}{dt} \;=\; \frac{1}{\htmlData{term=tau}{\textcolor{#64748b}{\boldsymbol{\tau}}}}\left(\htmlData{term=f}{\textcolor{#0284c7}{\boldsymbol{f}}} - f_{\text{out}}\right), \qquad f_{\text{out}} = \htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}^{\,1/\htmlData{term=alpha}{\textcolor{#b45309}{\boldsymbol{\alpha}}}}">dv/dt = (1/&tau;)(f &minus; f<sub>out</sub>),  f<sub>out</sub> = v<sup>1/&alpha;</sup></div>
+
+                    <div class="eq" data-tex="\frac{d\,\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}}{dt} \;=\; \frac{1}{\htmlData{term=tau}{\textcolor{#64748b}{\boldsymbol{\tau}}}}\left(\htmlData{term=f}{\textcolor{#0284c7}{\boldsymbol{f}}}\,\frac{\htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E(f)}}}}{\htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E_0}}}} - f_{\text{out}}\,\frac{\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}}{\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}}\right), \qquad \htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E(f)}}} = 1 - (1-\htmlData{term=E}{\textcolor{#0d9488}{\boldsymbol{E_0}}})^{\,1/\htmlData{term=f}{\textcolor{#0284c7}{\boldsymbol{f}}}}">dq/dt = (1/&tau;)(f&middot;E(f)/E<sub>0</sub> &minus; f<sub>out</sub>&middot;q/v),  E(f) = 1 &minus; (1&minus;E<sub>0</sub>)<sup>1/f</sup></div>
+
                     <p>and the measured signal combines the volume and deoxyhemoglobin terms:</p>
-                    <div class="eq">&Delta;S/S = V<sub>0</sub> &middot; [ k<sub>1</sub>(1&minus;q) + k<sub>2</sub>(1&minus;q/v) + k<sub>3</sub>(1&minus;v) ]</div>
-                    <p>Here <em>&alpha;</em> is the Grubb exponent (the CBF&ndash;CBV coupling), <em>E<sub>0</sub></em>
-                    the resting oxygen-extraction fraction, and <em>&tau;</em> the transit time. The
-                    <strong>adjusted</strong> model relaxes the fixed <em>v</em> = f<sup>&alpha;</sup> link so CBF,
-                    CMRO<sub>2</sub> and CBV can be prescribed separately. The animation above uses a deliberately
-                    simplified version of these dynamics to keep the intuition front and centre.</p>
+
+                    <div class="eq" data-tex="\frac{\Delta S}{S} \;=\; V_0\left[\,k_1\bigl(1-\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}\bigr) + k_2\Bigl(1-\tfrac{\htmlData{term=q}{\textcolor{#4338ca}{\boldsymbol{q}}}}{\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}}\Bigr) + k_3\bigl(1-\htmlData{term=v}{\textcolor{#16a34a}{\boldsymbol{v}}}\bigr)\right]">&Delta;S/S = V<sub>0</sub>[k<sub>1</sub>(1&minus;q) + k<sub>2</sub>(1&minus;q/v) + k<sub>3</sub>(1&minus;v)]</div>
+
+                    <div class="eq-legend">
+                        <span data-term="f" style="--c:#0284c7"><em style="color:#0284c7;font-style:normal;font-weight:700">f</em>&nbsp;&ndash;&nbsp;cerebral blood flow (CBF)</span>
+                        <span data-term="v" style="--c:#16a34a"><em style="color:#16a34a;font-style:normal;font-weight:700">v</em>&nbsp;&ndash;&nbsp;cerebral blood volume (CBV)</span>
+                        <span data-term="q" style="--c:#4338ca"><em style="color:#4338ca;font-style:normal;font-weight:700">q</em>&nbsp;&ndash;&nbsp;deoxyhemoglobin</span>
+                        <span data-term="alpha" style="--c:#b45309"><em style="color:#b45309;font-style:normal;font-weight:700">&alpha;</em>&nbsp;&ndash;&nbsp;Grubb exponent (CBF&ndash;CBV coupling)</span>
+                        <span data-term="E" style="--c:#0d9488"><em style="color:#0d9488;font-style:normal;font-weight:700">E, E<sub>0</sub></em>&nbsp;&ndash;&nbsp;oxygen-extraction fraction</span>
+                    </div>
+                    <p class="eq-hint">Hover any coloured symbol, in the legend or the equations, for its definition.</p>
+
+                    <p>Here <em style="color:#64748b">&tau;</em> is the transit time and
+                    <em>V<sub>0</sub>, k<sub>1</sub>, k<sub>2</sub>, k<sub>3</sub></em> are calibration constants. The
+                    <strong>adjusted</strong> model relaxes the fixed
+                    <em style="color:#16a34a">v</em>&nbsp;=&nbsp;<em style="color:#0284c7">f</em><sup>&alpha;</sup> link,
+                    so CBF, CMRO<sub>2</sub> and CBV can be prescribed separately. The animation above uses a
+                    deliberately simplified version of these dynamics to keep the intuition front and centre.</p>
+
+                    <p class="eq-credit">Colour-coded equations follow the approach of
+                    <a href="https://github.com/stared/equations-explained-colorfully" target="_blank" rel="noopener">Equations
+                    Explained Colorfully</a> by Piotr Migda&#322; (MIT-licensed), which in turn credits
+                    BetterExplained&rsquo;s colorized equations and Stuart Riffle&rsquo;s color-coded Fourier
+                    transform. Equations typeset with <a href="https://katex.org/" target="_blank" rel="noopener">KaTeX</a>.</p>
                 </div>
             </details>
         </div>
@@ -4568,6 +4608,73 @@
         document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
     });
 
+    })();
+    </script>
+
+    <!-- KaTeX rendering + per-term rollover explanations for the colour-coded equations -->
+    <script>
+    (function () {
+        var TERMS = {
+            f:     { name: 'f · cerebral blood flow (CBF)', desc: 'Fresh, oxygenated blood arriving; the inflow that fills the balloon.', hi: '#7dd3fc', bg: 'linear-gradient(160deg, rgba(2,132,199,0.55), rgba(15,23,42,0.96))', border: 'rgba(125,211,252,0.65)' },
+            v:     { name: 'v · cerebral blood volume (CBV)', desc: 'How inflated the venous balloon is; it rises fast and deflates slowly.', hi: '#86efac', bg: 'linear-gradient(160deg, rgba(22,163,74,0.5), rgba(15,23,42,0.96))', border: 'rgba(134,239,172,0.65)' },
+            q:     { name: 'q · deoxyhemoglobin', desc: 'Deoxygenated haemoglobin held in the balloon; more of it lowers BOLD.', hi: '#a5b4fc', bg: 'linear-gradient(160deg, rgba(67,56,202,0.5), rgba(15,23,42,0.96))', border: 'rgba(165,180,252,0.65)' },
+            alpha: { name: 'α · Grubb exponent', desc: 'The CBF-CBV coupling strength; the adjusted model unlocks it.', hi: '#fcd34d', bg: 'linear-gradient(160deg, rgba(180,83,9,0.5), rgba(15,23,42,0.96))', border: 'rgba(253,224,71,0.6)' },
+            E:     { name: 'E, E₀ · oxygen-extraction fraction', desc: 'Fraction of delivered oxygen the tissue pulls out of the blood.', hi: '#5eead4', bg: 'linear-gradient(160deg, rgba(13,148,136,0.5), rgba(15,23,42,0.96))', border: 'rgba(94,234,212,0.65)' },
+            tau:   { name: 'τ · transit time', desc: 'How long blood takes to cross the balloon; it sets the response speed.', hi: '#cbd5e1', bg: 'linear-gradient(160deg, rgba(100,116,139,0.5), rgba(15,23,42,0.96))', border: 'rgba(203,213,225,0.6)' }
+        };
+        var tip = null, host = null;
+        function ensureTip() {
+            if (tip) return tip;
+            host = document.querySelector('.primer-math');
+            if (!host) return null;
+            tip = document.createElement('div');
+            tip.className = 'scatter-tooltip eq-tip';
+            host.appendChild(tip);
+            return tip;
+        }
+        function positionTip(e) {
+            var r = host.getBoundingClientRect();
+            var x = e.clientX - r.left + 14, y = e.clientY - r.top + 14;
+            var tw = tip.offsetWidth, th = tip.offsetHeight;
+            if (x + tw > r.width - 4) x = e.clientX - r.left - tw - 14;
+            if (y + th > r.height - 4) y = e.clientY - r.top - th - 14;
+            if (x < 4) x = 4; if (y < 4) y = 4;
+            tip.style.left = x + 'px'; tip.style.top = y + 'px';
+        }
+        function show(e, key) {
+            var t = TERMS[key]; if (!t || !ensureTip()) return;
+            tip.innerHTML = '<span class="eq-tip-name" style="color:' + t.hi + '">' + t.name + '</span>' +
+                            '<span class="eq-tip-desc">' + t.desc + '</span>';
+            tip.style.background = t.bg; tip.style.borderColor = t.border;
+            positionTip(e);
+            tip.classList.add('visible');
+        }
+        function hide() { if (tip) tip.classList.remove('visible'); }
+        function wireTerms() {
+            document.querySelectorAll('.primer-math [data-term]').forEach(function (el) {
+                if (el.dataset.ttWired) return; el.dataset.ttWired = '1';
+                var key = el.getAttribute('data-term');
+                el.addEventListener('mouseenter', function (e) { show(e, key); });
+                el.addEventListener('mousemove', function (e) { if (tip && tip.classList.contains('visible')) positionTip(e); });
+                el.addEventListener('mouseleave', hide);
+            });
+        }
+        function renderMath() {
+            if (!window.katex) return false;
+            document.querySelectorAll('.eq[data-tex]').forEach(function (el) {
+                if (el.dataset.katexDone) return;
+                try {
+                    window.katex.render(el.getAttribute('data-tex'), el, { displayMode: true, throwOnError: false, trust: true, strict: false });
+                    el.dataset.katexDone = '1';
+                } catch (e) { /* keep plain-text fallback */ }
+            });
+            wireTerms();
+            return true;
+        }
+        if (!renderMath()) {
+            document.addEventListener('DOMContentLoaded', renderMath);
+            window.addEventListener('load', renderMath);
+        }
     })();
     </script>
 
