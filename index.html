@@ -246,6 +246,12 @@
             color: #422006; font-size: 0.94rem; line-height: 1.75;
         }
         .takeaway strong { color: #92400e; }
+        .link-accent {
+            color: #b45309; font-weight: 600; text-decoration: none; white-space: nowrap;
+            border-bottom: 2px solid rgba(217, 119, 6, 0.4);
+            transition: color 0.15s ease, border-color 0.15s ease;
+        }
+        .link-accent:hover { color: #d97706; border-bottom-color: #d97706; }
 
         /* ===== Educational-use disclaimer (gateway to interactive demos) ===== */
         #disclaimer { padding: 30px 0 10px; background: #ffffff; }
@@ -255,7 +261,6 @@
             display: flex; gap: 16px; align-items: flex-start;
             background: linear-gradient(135deg, #fff7ed, #fffbeb);
             border: 1px solid #fde68a;
-            border-left: 4px solid #d97706;
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(217, 119, 6, 0.06);
             color: #422006;
@@ -525,13 +530,41 @@
             transition: all 0.15s ease;
         }
         .primer-play:hover { background: #1e293b; }
-        .primer-play.playing { background: #0ea5e9; }
+        .primer-play.playing { background: #fbbf24; color: #0f172a; }
         .primer-reset {
             padding: 9px 16px; font-size: 0.8rem; font-weight: 600;
             border-radius: 999px; border: 1px solid #d97706; background: #fff;
             color: #d97706; cursor: pointer; transition: all 0.15s ease;
         }
         .primer-reset:hover { background: #d97706; color: #fff; }
+        .primer-stepper { display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .primer-stepbtn {
+            width: 30px; height: 30px; border-radius: 999px;
+            border: 1px solid #cbd5e1; background: #fff; color: #334155;
+            cursor: pointer; font-size: 0.72rem; line-height: 1;
+            transition: all 0.15s ease;
+        }
+        .primer-stepbtn:hover { border-color: #0f172a; color: #0f172a; background: #f1f5f9; }
+        .primer-stepnum { font-size: 0.76rem; font-weight: 600; color: #64748b; min-width: 96px; text-align: center; }
+        .primer-details {
+            max-width: 1180px; margin: 20px auto 0;
+            border: 1px solid #e2e8f0; border-radius: 12px; background: #f8fafc; overflow: hidden;
+        }
+        .primer-details > summary {
+            cursor: pointer; padding: 14px 18px; font-weight: 700;
+            font-size: 0.9rem; color: #0f172a; list-style: none;
+        }
+        .primer-details > summary::-webkit-details-marker { display: none; }
+        .primer-details > summary::before { content: "\002B\00A0"; color: #d97706; font-weight: 800; }
+        .primer-details[open] > summary::before { content: "\2212\00A0"; }
+        .primer-math { padding: 0 18px 16px; font-size: 0.85rem; color: #334155; line-height: 1.7; }
+        .primer-math p { margin: 8px 0; }
+        .primer-math em { color: #0f172a; font-style: italic; }
+        .primer-math .eq {
+            font-family: 'Cambria Math', Cambria, 'Times New Roman', serif; font-size: 0.98rem;
+            background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
+            padding: 10px 14px; margin: 8px 0; overflow-x: auto; color: #0f172a;
+        }
 
         /* ===== Scenario cards (existing) ===== */
         .scenario-grid {
@@ -1330,12 +1363,25 @@
                         and trace the BOLD response.
                     </div>
 
+                    <div class="primer-stepper">
+                        <button type="button" class="primer-stepbtn" id="primerStepPrev" aria-label="Previous step">&#9664;</button>
+                        <span class="primer-stepnum" id="primerStepNum">Walk through it</span>
+                        <button type="button" class="primer-stepbtn" id="primerStepNext" aria-label="Next step">&#9654;</button>
+                    </div>
+
                     <div class="primer-btns">
                         <button type="button" class="primer-play" id="primerPlay" aria-label="Trigger neural pulse">
                             <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"/></svg>
                             <span id="primerPlayLabel">Trigger neural pulse</span>
                         </button>
-                        <button type="button" class="primer-reset" id="primerReset">Reset</button>
+                        <button type="button" class="primer-reset" id="primerReset">Reset time</button>
+                    </div>
+
+                    <div class="slider" style="margin-top: 4px;">
+                        <label><span>CBV coupling <em>(adjusted model)</em></span><span id="primerCouplingVal">100% &middot; standard</span></label>
+                        <input type="range" id="primerCoupling" min="0" max="150" value="100" step="5">
+                        <div class="slider-hint">Standard balloon: CBV is <strong>locked</strong> to flow (100%). The paper's <strong>adjusted</strong> model <strong>unlocks</strong> it, so dial CBV down and the undershoot fades. The dashed grey line marks the standard response.</div>
+                        <button type="button" class="primer-reset" id="primerCouplingReset" style="margin-top: 10px; align-self: flex-start;">Reset coupling</button>
                     </div>
                 </div>
             </div>
@@ -1346,8 +1392,35 @@
                 deflates only slowly. For a few seconds it holds an oversized pool of deoxygenated blood, so the
                 signal drops <em>below</em> where it started. That post-stimulus undershoot is a purely
                 <em>vascular</em> effect, with no change at all in the neural input. Now open the
-                <a href="#balloon">Explorer</a> below to turn each knob yourself.
+                <a href="#balloon" class="link-accent">Explorer</a> below to turn each knob yourself.
             </div>
+
+            <p class="exp-intro" style="margin-top: 32px;">
+                <strong>The paper's key expansion.</strong> In the classic balloon model these knobs are geared
+                together: raise the flow and the volume follows by a fixed rule. The <em>adjusted</em> balloon
+                model at the heart of this study <strong>unlocks</strong> them, letting CBF, CMRO<sub>2</sub> and
+                CBV vary independently. Try it above: drag <em>CBV coupling</em> below 100% and the undershoot
+                melts away, even though the neural pulse is unchanged. That freedom is exactly what lets the study
+                ask "what if the vasculature is impaired?", the question behind the three
+                <a href="#heatmap" class="link-accent">scenario landscapes</a>, and why a BOLD difference need not mean a neural one.
+            </p>
+
+            <details class="primer-details">
+                <summary>Show me the math</summary>
+                <div class="primer-math">
+                    <p>The balloon is described by two coupled differential equations, for normalised blood
+                    volume <em>v</em> and deoxyhemoglobin content <em>q</em>, driven by inflow <em>f</em>:</p>
+                    <div class="eq">dv/dt = (1/&tau;) &middot; ( f &minus; f<sub>out</sub> ),&nbsp; f<sub>out</sub> = v<sup>1/&alpha;</sup></div>
+                    <div class="eq">dq/dt = (1/&tau;) &middot; ( f &middot; E(f)/E<sub>0</sub> &minus; f<sub>out</sub> &middot; q/v ),&nbsp; E(f) = 1 &minus; (1&minus;E<sub>0</sub>)<sup>1/f</sup></div>
+                    <p>and the measured signal combines the volume and deoxyhemoglobin terms:</p>
+                    <div class="eq">&Delta;S/S = V<sub>0</sub> &middot; [ k<sub>1</sub>(1&minus;q) + k<sub>2</sub>(1&minus;q/v) + k<sub>3</sub>(1&minus;v) ]</div>
+                    <p>Here <em>&alpha;</em> is the Grubb exponent (the CBF&ndash;CBV coupling), <em>E<sub>0</sub></em>
+                    the resting oxygen-extraction fraction, and <em>&tau;</em> the transit time. The
+                    <strong>adjusted</strong> model relaxes the fixed <em>v</em> = f<sup>&alpha;</sup> link so CBF,
+                    CMRO<sub>2</sub> and CBV can be prescribed separately. The animation above uses a deliberately
+                    simplified version of these dynamics to keep the intuition front and centre.</p>
+                </div>
+            </details>
         </div>
     </section>
     <!-- ===== BALLOON MODEL EXPLAINER ===== -->
@@ -2729,15 +2802,24 @@
         const boldValEl = document.getElementById('primerBoldVal');
         const cbfValEl = document.getElementById('primerCbfVal');
         const cbvValEl = document.getElementById('primerCbvVal');
+        const coupIn = document.getElementById('primerCoupling');
+        const coupVal = document.getElementById('primerCouplingVal');
+        const coupReset = document.getElementById('primerCouplingReset');
+        const stepPrev = document.getElementById('primerStepPrev');
+        const stepNext = document.getElementById('primerStepNext');
+        const stepNum = document.getElementById('primerStepNum');
 
-        const DT = 0.05, T = 24, N = Math.round(T / DT);
+        const DT = 0.05, T = 30, N = Math.round(T / DT);
         const STIM_ON = 2, STIM_OFF = 8;
         function neural(t) {
             return 0.5 * (1 + Math.tanh((t - STIM_ON) / 0.5)) *
                    0.5 * (1 + Math.tanh((STIM_OFF - t) / 0.5));
         }
-        // Pre-integrate the whole time course once.
-        const data = (function () {
+        // Pre-integrate the time course for a given CBV coupling. coupling = 1
+        // is the standard Grubb balloon (CBV = CBF^0.38); coupling < 1 loosens
+        // CBV from flow and coupling > 1 exaggerates it, mimicking the paper's
+        // adjusted model where CBV can be set independently of CBF.
+        function simulate(coupling) {
             const arr = [];
             let v = 1;
             for (let i = 0; i <= N; i++) {
@@ -2745,14 +2827,16 @@
                 const HD = 1.0;                          // hemodynamic lag: BOLD follows the neural pulse
                 const f = 1 + 0.60 * neural(t - HD);     // CBF
                 const m = 1 + 0.28 * neural(t - HD - 0.8); // CMRO2 (lagged, weaker)
-                const target = Math.pow(f, 0.38);        // CBV ~ CBF^Grubb (much smaller swing than flow)
+                const target = 1 + coupling * (Math.pow(f, 0.38) - 1); // CBV, scaled by coupling
                 const tau = target > v ? 1.6 : 4.2;      // balloon: inflate fast, deflate slow
                 v += (target - v) / tau * DT;
                 const bold = 2.6 * (f - 1) - 1.1 * (m - 1) - 1.9 * (v - 1);
                 arr.push({ t: t, f: f, m: m, v: v, bold: bold });
             }
             return arr;
-        })();
+        }
+        const dataStd = simulate(1);                     // standard-model reference curve
+        let coupling = 1, data = dataStd;
 
         const DEOXY = [30, 58, 138], OXY = [220, 38, 38];
         function mix(a, b, t) {
@@ -2809,6 +2893,12 @@
                        ' L' + bx(STIM_OFF) + ',' + nLo + ' L' + bx(T) + ',' + nLo;
             boldSvg.appendChild(svg('path', { d: nd, fill: 'none', stroke: '#d97706', 'stroke-width': 1.5, 'stroke-linejoin': 'round' }));
             boldSvg.appendChild(svg('line', { x1: bx(0), y1: by(0), x2: bx(T), y2: by(0), stroke: '#cbd5e1', 'stroke-dasharray': '3 3' }));
+            // Faint dashed reference of the standard (locked) response when CBV is unlocked.
+            if (Math.abs(coupling - 1) > 0.02) {
+                let gd = '';
+                for (let i = 0; i < dataStd.length; i++) gd += (i === 0 ? 'M' : 'L') + bx(dataStd[i].t).toFixed(1) + ',' + by(dataStd[i].bold).toFixed(1);
+                boldSvg.appendChild(svg('path', { d: gd, fill: 'none', stroke: '#94a3b8', 'stroke-width': 1.4, 'stroke-dasharray': '4 3', opacity: 0.85 }));
+            }
             let d = '';
             for (let i = 0; i <= upTo; i++) d += (i === 0 ? 'M' : 'L') + bx(data[i].t).toFixed(1) + ',' + by(data[i].bold).toFixed(1);
             if (d) boldSvg.appendChild(svg('path', { d: d, fill: 'none', stroke: '#0f172a', 'stroke-width': 2.2, 'stroke-linejoin': 'round' }));
@@ -2828,7 +2918,7 @@
 
         function narrate(t) {
             if (t < STIM_ON) return 'Resting. Flow, volume and oxygen are balanced, so BOLD sits at baseline.';
-            if (t < 3.5) return '<strong>Pulse!</strong> Arteries open, CBF surges in and flushes out deoxyhemoglobin, so the balloon reddens and BOLD climbs.';
+            if (t < 3.5) return '<strong>Pulse of nerual activity!</strong> Oxygen gets consumed, arteries open, CBF surges in and flushes out deoxyhemoglobin, so the balloon reddens and BOLD climbs.';
             if (t < STIM_OFF) return 'During activity the balloon keeps inflating (CBV rises), but flow still outpaces oxygen use, so BOLD stays high.';
             if (t < 12) return 'Activity stops. Flow falls almost at once, but the swollen balloon can only deflate <em>slowly</em>.';
             if (t < 17) return 'The still-large balloon holds extra deoxygenated blood, so BOLD sinks <em>below</em> baseline, the <strong>post-stimulus undershoot</strong>.';
@@ -2840,13 +2930,16 @@
             drawBalloon(s);
             drawBold(idx);
             boldValEl.textContent = (s.bold >= 0 ? '+' : '−') + Math.abs(s.bold).toFixed(1) + '%';
+            boldValEl.classList.remove('r-sign-neg', 'r-sign-pos', 'r-sign-neu');
+            boldValEl.classList.add(s.bold < -0.05 ? 'r-sign-neg' : s.bold > 0.05 ? 'r-sign-pos' : 'r-sign-neu');
             cbfValEl.textContent = '+' + Math.round((s.f - 1) * 100) + '%';
             cbvValEl.textContent = '+' + Math.round((s.v - 1) * 100) + '%';
             stepEl.innerHTML = narrate(s.t);
         }
 
         const REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        let idx = 0, playing = false, raf = null, t0 = null;
+        let idx = 0, playing = false, raf = null, t0 = null, stepK = -1;
+        function resetStepUi() { stepK = -1; if (stepNum) stepNum.textContent = 'Walk through it'; }
         function stopPlay() { playing = false; playBtn.classList.remove('playing'); if (raf) cancelAnimationFrame(raf); raf = null; }
         function step(ts) {
             if (t0 === null) t0 = ts;
@@ -2862,6 +2955,7 @@
                 for (let i = 0; i < data.length; i++) if (data[i].bold > data[peak].bold) peak = i;
                 drawBalloon(data[peak]); drawBold(N);
                 boldValEl.textContent = '+' + data[peak].bold.toFixed(1) + '%';
+                boldValEl.classList.remove('r-sign-neg', 'r-sign-neu'); boldValEl.classList.add('r-sign-pos');
                 cbfValEl.textContent = '+' + Math.round((data[peak].f - 1) * 100) + '%';
                 cbvValEl.textContent = '+' + Math.round((data[peak].v - 1) * 100) + '%';
                 stepEl.innerHTML = 'Reduced-motion view: the full BOLD response is shown at once. It rises during the pulse, then dips <em>below</em> baseline afterwards as the balloon slowly deflates.';
@@ -2869,11 +2963,38 @@
                 return;
             }
             playing = true; playBtn.classList.add('playing'); playLabel.textContent = 'Playing…';
-            t0 = null; idx = 0;
+            t0 = null; idx = 0; resetStepUi();
             raf = requestAnimationFrame(step);
         });
         resetBtn.addEventListener('click', function () {
-            stopPlay(); idx = 0; frame(0); playLabel.textContent = 'Trigger neural pulse';
+            stopPlay(); idx = 0; resetStepUi(); frame(0); playLabel.textContent = 'Trigger neural pulse';
+        });
+
+        // Story-step navigation: jump to the key beats of the response.
+        const STEP_TIMES = [1, 3, 6, 10, 14, 21];
+        function gotoStep(k) {
+            stopPlay();
+            stepK = Math.max(0, Math.min(STEP_TIMES.length - 1, k));
+            idx = Math.min(N, Math.round(STEP_TIMES[stepK] / DT));
+            frame(idx);
+            if (stepNum) stepNum.textContent = 'Step ' + (stepK + 1) + ' of ' + STEP_TIMES.length;
+            playLabel.textContent = 'Trigger neural pulse';
+        }
+        if (stepPrev) stepPrev.addEventListener('click', function () { gotoStep(stepK < 0 ? 0 : stepK - 1); });
+        if (stepNext) stepNext.addEventListener('click', function () { gotoStep(stepK < 0 ? 0 : stepK + 1); });
+
+        // CBV coupling: the paper's adjusted-model expansion.
+        if (coupIn) coupIn.addEventListener('input', function () {
+            coupling = +coupIn.value / 100;
+            data = Math.abs(coupling - 1) < 0.001 ? dataStd : simulate(coupling);
+            coupVal.innerHTML = coupling === 1 ? '100% &middot; standard' : Math.round(coupling * 100) + '% &middot; adjusted';
+            if (!playing) { idx = Math.round(14 / DT); frame(idx); resetStepUi(); }
+        });
+        if (coupReset) coupReset.addEventListener('click', function () {
+            coupling = 1; data = dataStd;
+            if (coupIn) coupIn.value = 100;
+            coupVal.innerHTML = '100% &middot; standard';
+            if (!playing) frame(idx);
         });
 
         frame(0);
