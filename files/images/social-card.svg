@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f8fafc"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Semantic-colour rule (site palette: CBF, CMRO2, CBV, deoxy-Hb, extraction, coupling, neural) -->
+  <g>
+    <rect x="0"    y="0" width="172" height="8" fill="#0ea5e9"/>
+    <rect x="172"  y="0" width="171" height="8" fill="#dc2626"/>
+    <rect x="343"  y="0" width="171" height="8" fill="#16a34a"/>
+    <rect x="514"  y="0" width="172" height="8" fill="#4338ca"/>
+    <rect x="686"  y="0" width="171" height="8" fill="#0d9488"/>
+    <rect x="857"  y="0" width="171" height="8" fill="#b45309"/>
+    <rect x="1028" y="0" width="172" height="8" fill="#d97706"/>
+  </g>
+
+  <!-- Eyebrow -->
+  <text x="72" y="110" font-size="22" font-weight="700" letter-spacing="3" fill="#b45309">NEUROIMAGE 218 · 2020 · INTERACTIVE COMPANION</text>
+
+  <!-- Title: the paper's thesis, two lines -->
+  <text x="70" y="200" font-size="60" font-weight="800" fill="#0f172a">When vasculature, not neurons,</text>
+  <text x="70" y="272" font-size="60" font-weight="800" fill="#0f172a">reshapes BOLD connectivity</text>
+
+  <!-- Subtitle -->
+  <text x="72" y="334" font-size="27" font-weight="400" fill="#334155">A simulation study: how CBF, CMRO&#8322; and CBV can, on their own,</text>
+  <text x="72" y="372" font-size="27" font-weight="400" fill="#334155">reshape and even reverse resting-state BOLD functional connectivity.</text>
+
+  <!-- Concept chips: the three physiological variables, in their site colours -->
+  <g font-size="25" font-weight="700">
+    <g>
+      <rect x="72" y="424" width="140" height="52" rx="26" fill="#e0f2fe"/>
+      <circle cx="106" cy="450" r="9" fill="#0ea5e9"/>
+      <text x="126" y="459" fill="#075985">CBF</text>
+    </g>
+    <g>
+      <rect x="228" y="424" width="180" height="52" rx="26" fill="#fee2e2"/>
+      <circle cx="262" cy="450" r="9" fill="#dc2626"/>
+      <text x="282" y="459" fill="#991b1b">CMRO&#8322;</text>
+    </g>
+    <g>
+      <rect x="424" y="424" width="140" height="52" rx="26" fill="#dcfce7"/>
+      <circle cx="458" cy="450" r="9" fill="#16a34a"/>
+      <text x="478" y="459" fill="#166534">CBV</text>
+    </g>
+  </g>
+
+  <!-- Headline-finding motif: BOLD-FC sign reversal, coloured by sign (site convention) -->
+  <g font-family="Cambria Math, Georgia, serif" font-size="40" font-weight="700">
+    <text x="72" y="556" fill="#0f172a">
+      <tspan fill="#0f172a">BOLD-FC:  </tspan><tspan fill="#d97706">+0.9</tspan><tspan fill="#0f172a">  &#8594;  </tspan><tspan fill="#2563eb">&#8722;0.7</tspan>
+    </text>
+  </g>
+
+  <!-- Footer meta -->
+  <text x="72" y="598" font-size="21" font-weight="500" fill="#64748b">virtualmarioe.github.io/neurovascular_modeling</text>
+  <text x="1128" y="598" font-size="21" font-weight="500" fill="#64748b" text-anchor="end">NeuroImage 218 (2020) · 116871</text>
+</svg>
